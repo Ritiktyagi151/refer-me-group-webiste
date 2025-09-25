@@ -1,0 +1,361 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*{
+  /* overflow-x: hidden; */
+}
+
+/* Custom styling for Swiper arrows */
+.swiper-button-next,
+.swiper-button-prev {
+  color: white !important;
+  background-color: rgba(0, 0, 0, 0.4);
+  padding: 12px;
+  border-radius: 9999px;
+  backdrop-filter: blur(4px);
+  transition: background-color 0.3s ease;
+  width: 40px;
+  height: 40px;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Reduce icon size */
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 16px !important; /* Make the arrow smaller */
+  font-weight: bold;
+}
+
+
+/* Dropdown Container */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 200px;
+  z-index: 1000;
+  display: none;
+  flex-direction: column;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 8px 0;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Dropdown Item */
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  font-size: 14px;
+  color: #374151;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+/* Hover Effect for Dropdown Item */
+.dropdown-item:hover {
+  background-color: #fefce8;
+}
+
+/* Show Dropdown on Hover */
+.dropdown:hover .dropdown-menu {
+  display: flex;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Ensure Dropdown Menu is Aligned Properly */
+.dropdown-menu a {
+  width: 100%;
+}
+
+/* Accessibility Focus Styles */
+.dropdown-menu a:focus {
+  outline: 2px solid #facc15;
+  outline-offset: 2px;
+}
+
+/* Mobile Sidebar Enhancements */
+@media (max-width: 768px) {
+  .dropdown-menu {
+    position: static;
+    box-shadow: none;
+    background-color: transparent;
+    padding: 0;
+    transform: none;
+    opacity: 1;
+    display: block;
+  }
+}
+
+/* src/styles/instructor-slider.css */
+.instructor-slider .slick-prev,
+.instructor-slider .slick-next {
+  width: 40px;
+  height: 40px;
+  background: rgba(79, 70, 229, 0.8); /* Indigo background */
+  border-radius: 50%;
+  z-index: 10;
+  transition: background 0.3s ease;
+}
+
+.instructor-slider .slick-prev:hover,
+.instructor-slider .slick-next:hover {
+  background: #4338ca; /* Darker indigo on hover */
+}
+
+.instructor-slider .slick-prev:before,
+.instructor-slider .slick-next:before {
+  font-size: 20px;
+  color: #ffffff; /* White arrow icons */
+  opacity: 1;
+}
+
+.instructor-slider .slick-prev {
+  left: -50px; /* Position outside the slider */
+}
+
+.instructor-slider .slick-next {
+  right: -50px; /* Position outside the slider */
+}
+
+.instructor-slider .slick-dots {
+  bottom: -30px; /* Position dots below the slider */
+}
+
+.instructor-slider .slick-dots li button:before {
+  font-size: 12px;
+  color: #4f46e5; /* Indigo dots */
+  opacity: 0.5;
+}
+
+.instructor-slider .slick-dots li.slick-active button:before {
+  color: #4f46e5;
+  opacity: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .instructor-slider .slick-prev {
+    left: 10px; /* Closer to content on mobile */
+  }
+  .instructor-slider .slick-next {
+    right: 10px; /* Closer to content on mobile */
+  }
+}
+
+
+/* Existing gradient-shadow animation (from previous response) */
+.gradient-shadow {
+  position: relative;
+  overflow: visible;
+  z-index: 1;
+}
+
+.gradient-shadow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 1rem; /* Matches rounded-xl */
+  z-index: -1;
+  animation: gradientShadow 6s ease-in-out infinite;
+  transition: all 0.3s ease;
+}
+
+@keyframes gradientShadow {
+  0% {
+    box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3), /* indigo-600 */
+                0 0 30px rgba(16, 185, 129, 0.2); /* teal-500 */
+  }
+  50% {
+    box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3), /* teal-500 */
+                0 0 40px rgba(79, 70, 229, 0.2); /* indigo-600 */
+  }
+  100% {
+    box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3), /* indigo-600 */
+                0 0 30px rgba(16, 185, 129, 0.2); /* teal-500 */
+  }
+}
+
+.gradient-shadow:hover::before {
+  box-shadow: 0 20px 40px rgba(79, 70, 229, 0.4),
+              0 0 50px rgba(16, 185, 129, 0.3);
+}
+
+/* New moving-border-shadow animation */
+.moving-border-shadow {
+  position: relative;
+  z-index: 1;
+}
+
+.moving-border-shadow::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border-radius: 0.5rem; /* Slightly larger than rounded-xl for border effect */
+  z-index: -2;
+  background: linear-gradient(
+    45deg,
+    rgba(79, 70, 229, 0.2), /* indigo-600 */
+    rgba(16, 185, 129, 0.033), /* teal-500 */
+    rgba(79, 70, 229, 0.2) /* indigo-600 */
+  );
+  background-size: 200% 200%;
+  animation: movingBorder 4s linear infinite;
+  transition: all 0.3s ease;
+}
+
+@keyframes movingBorder {
+  0% {
+    background-position: 0% 0%;
+    box-shadow: 0 0 15px rgba(79, 70, 229, 0.2),
+                0 0 10px rgba(16, 185, 129, 0.3);
+  }
+  50% {
+    background-position: 100% 100%;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.2),
+                0 0 15px rgba(79, 70, 229, 0.3);
+  }
+  100% {
+    background-position: 0% 0%;
+    box-shadow: 0 0 15px rgba(79, 70, 229, 0.2),
+                0 0 10px rgba(16, 185, 129, 0.3);
+  }
+}
+
+.moving-border-shadow:hover::after {
+  box-shadow: 0 0 25px rgba(79, 70, 229, 0.2),
+              0 0 20px rgba(16, 185, 129, 0.3);
+  background-position: 100% 100%;
+}
+
+/* src/index.css or your main CSS file */
+
+/* For 3D Transforms */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* Tailwind CSS animation-delay utility (if not already in tailwind.config.js) */
+.animation-delay-0 {
+  animation-delay: 0s;
+}
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+.animation-delay-6000 {
+  animation-delay: 6s;
+}
+
+/* src/index.css (or your main global CSS file where Tailwind is imported) */
+
+/* Add these lines for the 3D flip effect */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+/* Ensure Safari compatibility */
+.backface-hidden {
+  -webkit-backface-visibility: hidden;
+}
+
+/* Add any other global styles you have */
+
+
+
+/* Keyframes for the border animation */
+@keyframes border-glow-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Base styles for the container that holds the glowing border effect */
+.glowing-border-container {
+  position: relative;
+  overflow: hidden; /* Crucial to clip the pseudo-element outside */
+  border-radius: 0.75rem; /* Matches rounded-xl of your card */
+}
+
+/* The pseudo-element that creates the glowing, moving border */
+.glowing-border-container::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%; /* Double the width and height to cover corners during rotation */
+  height: 200%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    transparent 20%,
+    #8B5CF6 30%, /* Indigo-500 (Purple glow) */
+    #60A5FA 40%, /* Blue-400 */
+    transparent 50%
+  );
+  animation: border-glow-spin 4s linear infinite; /* Adjust duration as needed */
+  z-index: 0; /* Place it behind the content */
+  pointer-events: none; /* Ensure it doesn't block clicks */
+  opacity: 0; /* Hidden by default */
+  transition: opacity 0.3s ease-in-out; /* Smooth fade-in */
+}
+
+/* On hover of the parent, make the pseudo-element visible and animate */
+.group:hover .glowing-border-container::before {
+  opacity: 1;
+}
+
+/* Ensure content stays above the pseudo-element and has rounded corners */
+.glowing-border-content {
+  position: relative;
+  z-index: 1; /* Place content above the pseudo-element */
+  border-radius: 0.75rem; /* Matches rounded-xl */
+  /* Add other styles like background-color here if the actual card content isn't opaque */
+}
