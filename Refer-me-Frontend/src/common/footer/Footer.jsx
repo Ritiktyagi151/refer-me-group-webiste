@@ -9,7 +9,7 @@ const Footer = () => {
   useEffect(() => {
     const fetchFooter = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/footer");
+        const res = await fetch("https://72.60.101.229:5000/api/footer");
         const data = await res.json();
         setFooter(data);
       } catch (err) {
