@@ -24,9 +24,7 @@ const ContactAdminPanel = () => {
 
   const fetchContacts = async () => {
     try {
-      const res = await fetch(
-        "https://72.60.101.229:5000/api/contact-messages"
-      );
+      const res = await fetch("http://72.60.101.229:5000/api/contact-messages");
       const data = await res.json();
       setContacts(data);
     } catch (err) {
@@ -42,7 +40,7 @@ const ContactAdminPanel = () => {
       if (editContact) {
         // Update existing contact
         const res = await fetch(
-          `https://72.60.101.229:5000/api/contact-messages/${editContact._id}`,
+          `http://72.60.101.229:5000/api/contact-messages/${editContact._id}`,
           {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
@@ -54,7 +52,7 @@ const ContactAdminPanel = () => {
       } else {
         // Add new contact
         const res = await fetch(
-          "https://72.60.101.229:5000/api/contact-messages",
+          "http://72.60.101.229:5000/api/contact-messages",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -85,7 +83,7 @@ const ContactAdminPanel = () => {
   const handleDelete = async (id) => {
     if (isLocked) return;
     try {
-      await fetch(`https://72.60.101.229:5000/api/contact-messages/${id}`, {
+      await fetch(`http://72.60.101.229:5000/api/contact-messages/${id}`, {
         method: "DELETE",
       });
       setContacts(contacts.filter((c) => c._id !== id));

@@ -85,7 +85,7 @@ const FooterAdminPanel = () => {
   const [newLink, setNewLink] = useState({ text: "", path: "" });
 
   // API base URL
-  const API_BASE = "https://72.60.101.229:5000/api/footer";
+  const API_BASE = "http://72.60.101.229:5000/api/footer";
 
   // Fetch footer data from API
   useEffect(() => {

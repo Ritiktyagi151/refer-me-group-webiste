@@ -70,7 +70,7 @@ export default function AdminLoginPage() {
   //   }
 
   //   try {
-  //     const response = await fetch("https://72.60.101.229:5000/api/users/login", {
+  //     const response = await fetch("http://72.60.101.229:5000/api/users/login", {
   //       method: "POST",
   //       headers: {
   //         "Content-Type": "application/json",

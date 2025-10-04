@@ -92,7 +92,7 @@ const AdminPanel = () => {
   const fetchBlogs = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("https://72.60.101.229:5000/api/blogs");
+      const response = await fetch("http://72.60.101.229:5000/api/blogs");
       if (!response.ok) throw new Error("Failed to fetch blogs");
       const data = await response.json();
       setBlogs(data);
@@ -108,7 +108,7 @@ const AdminPanel = () => {
   // Fetch settings from API
   const fetchSettings = async () => {
     try {
-      const response = await fetch("https://72.60.101.229:5000/api/settings");
+      const response = await fetch("http://72.60.101.229:5000/api/settings");
       if (response.ok) {
         const data = await response.json();
         setSettings(data);
@@ -182,7 +182,7 @@ const AdminPanel = () => {
   const handleCreate = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("https://72.60.101.229:5000/api/blogs", {
+      const response = await fetch("http://72.60.101.229:5000/api/blogs", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -209,7 +209,7 @@ const AdminPanel = () => {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `https://72.60.101.229:5000/api/blogs/${formData._id}`,
+        `http://72.60.101.229:5000/api/blogs/${formData._id}`,
         {
           method: "PUT",
           headers: {
@@ -243,7 +243,7 @@ const AdminPanel = () => {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `https://72.60.101.229:5000/api/blogs/${id}`,
+        `http://72.60.101.229:5000/api/blogs/${id}`,
         {
           method: "DELETE",
         }
@@ -295,7 +295,7 @@ const AdminPanel = () => {
   const saveSettings = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("https://72.60.101.229:5000/api/settings", {
+      const response = await fetch("http://72.60.101.229:5000/api/settings", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
