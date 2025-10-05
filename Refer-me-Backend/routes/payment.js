@@ -28,8 +28,8 @@ router.post("/payu", (req, res) => {
     firstname: name,
     email,
     phone,
-    surl: "https://refermegroup.com/api/payment/success", // Local success URL (test ke liye)
-    furl: "https://refermegroup.com/api/payment/fail", // Local failure URL (test ke liye)
+    surl: "https://refermegroup.com/payment/success", // Local success URL (test ke liye)
+    furl: "https://refermegroup.com/payment/fail", // Local failure URL (test ke liye)
     hash,
     service_provider: "payu_paisa",
   };
