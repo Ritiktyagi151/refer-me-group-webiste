@@ -9,7 +9,7 @@ const Footer = () => {
   useEffect(() => {
     const fetchFooter = async () => {
       try {
-        const res = await fetch("https://refermegroup.comapi/footer");
+        const res = await fetch("https://refermegroup.com/api/footer");
         const data = await res.json();
         setFooter(data);
       } catch (err) {
