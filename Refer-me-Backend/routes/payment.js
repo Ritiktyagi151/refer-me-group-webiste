@@ -7,19 +7,24 @@ const router = express.Router();
 router.post("/payu", (req, res) => {
   const { name, email, phone, amount, productinfo, txnid } = req.body;
 
+  // ✅ Validate fields
   if (!name || !email || !phone || !amount || !productinfo || !txnid) {
     return res.status(400).json({ message: "Missing required fields" });
   }
 
-  // ⚡ Test Key & Salt (use .env me)
-  const key = process.env.PAYU_KEY; // e.g. gtKFFx
-  const salt = process.env.PAYU_SALT; // e.g. eCwWELxi
+  // ✅ Use environment variables for security
+  const key = process.env.PAYU_KEY; // Example: gtKFFx
+  const salt = process.env.PAYU_SALT; // Example: eCwWELxi
 
-  // ✅ Generate hash string required by PayU
+  if (!key || !salt) {
+    return res.status(500).json({ message: "Payment keys not configured" });
+  }
+
+  // ✅ Generate PayU hash
   const hashString = `${key}|${txnid}|${amount}|${productinfo}|${name}|${email}|||||||||||${salt}`;
   const hash = crypto.createHash("sha512").update(hashString).digest("hex");
 
-  // ✅ PayU test form params
+  // ✅ Build params
   const params = {
     key,
     txnid,
@@ -28,14 +33,15 @@ router.post("/payu", (req, res) => {
     firstname: name,
     email,
     phone,
-    surl: "https://refermegroup.com/payment/success", // Local success URL (test ke liye)
-    furl: "https://refermegroup.com/payment/fail", // Local failure URL (test ke liye)
+    surl: "https://refermegroup.com/api/payment/success",
+    furl: "https://refermegroup.com/api/payment/fail",
     hash,
     service_provider: "payu_paisa",
   };
 
+  // ✅ Send PayU payment info
   res.json({
-    actionUrl: "https://secure.payu.in/_payment", // ✅ Test PayU URL
+    actionUrl: "https://secure.payu.in/_payment", // LIVE URL (for test use https://test.payu.in/_payment)
     params,
   });
 });

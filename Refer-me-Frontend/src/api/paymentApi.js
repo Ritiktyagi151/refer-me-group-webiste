@@ -1,12 +1,13 @@
 import axios from "axios";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "https://refermegroup.com";
+  import.meta.env.VITE_API_BASE_URL || "https://refermegroup.com/api";
 
 export const paymentApi = {
   // ✅ Create PayU payment
   createPayment: async (data) => {
     try {
+      // ✅ Correct endpoint path
       const res = await axios.post(`${API_BASE_URL}/payment/payu`, data);
       return res.data;
     } catch (err) {
