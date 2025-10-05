@@ -25,7 +25,7 @@ const AdminPanel = () => {
   // Fetch groups from API
   const fetchGroups = async () => {
     try {
-      const res = await fetch("http://127.0.0.1:5000/api/careers");
+      const res = await fetch("https://refermegroup.com/api/careers");
       const data = await res.json();
       setGroups(data);
     } catch (error) {
@@ -54,8 +54,8 @@ const AdminPanel = () => {
 
     const method = editingId ? "PUT" : "POST";
     const url = editingId
-      ? `http://127.0.0.1:5000/api/careers/${editingId}`
-      : "http://127.0.0.1:5000/api/careers";
+      ? `https://refermegroup.com/api/careers/${editingId}`
+      : "https://refermegroup.com/api/careers";
 
     try {
       await fetch(url, {
@@ -88,7 +88,7 @@ const AdminPanel = () => {
   // Delete group
   const handleDelete = async (id) => {
     try {
-      await fetch(`http://127.0.0.1:5000/api/careers/${id}`, {
+      await fetch(`https://refermegroup.com/api/careers/${id}`, {
         method: "DELETE",
       });
       fetchGroups();

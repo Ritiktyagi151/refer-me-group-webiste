@@ -24,7 +24,7 @@ const ContactAdminPanel = () => {
 
   const fetchContacts = async () => {
     try {
-      const res = await fetch("http://127.0.0.1:5000/api/contact-messages");
+      const res = await fetch("https://refermegroup.com/api/contact-messages");
       const data = await res.json();
       setContacts(data);
     } catch (err) {
@@ -40,7 +40,7 @@ const ContactAdminPanel = () => {
       if (editContact) {
         // Update existing contact
         const res = await fetch(
-          `http://127.0.0.1:5000/api/contact-messages/${editContact._id}`,
+          `https://refermegroup.com/api/contact-messages/${editContact._id}`,
           {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
@@ -51,11 +51,14 @@ const ContactAdminPanel = () => {
         setContacts(contacts.map((c) => (c._id === updated._id ? updated : c)));
       } else {
         // Add new contact
-        const res = await fetch("http://127.0.0.1:5000/api/contact-messages", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        });
+        const res = await fetch(
+          "https://refermegroup.com/api/contact-messages",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          }
+        );
         const newContact = await res.json();
         setContacts([...contacts, newContact]);
       }
@@ -80,7 +83,7 @@ const ContactAdminPanel = () => {
   const handleDelete = async (id) => {
     if (isLocked) return;
     try {
-      await fetch(`http://127.0.0.1:5000/api/contact-messages/${id}`, {
+      await fetch(`https://refermegroup.com/api/contact-messages/${id}`, {
         method: "DELETE",
       });
       setContacts(contacts.filter((c) => c._id !== id));
