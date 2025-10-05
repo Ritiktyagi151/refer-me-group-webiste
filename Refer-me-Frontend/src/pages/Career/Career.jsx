@@ -12,7 +12,7 @@ const Career = () => {
 
   // Fetch data from API
   useEffect(() => {
-    fetch("http://72.60.101.229:5000/api/careers")
+    fetch("https://refermegroup.com/api/careers")
       .then((res) => res.json())
       .then((data) => setCourseGroups(data))
       .catch((err) => console.error("Error fetching careers:", err));

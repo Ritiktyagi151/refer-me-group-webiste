@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Base API URL (from .env or fallback)
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://72.60.101.229:5000/api/services";
+  import.meta.env.VITE_API_BASE_URL || "https://refermegroup.com/api/services";
 
 // Create Axios instance
 const api = axios.create({

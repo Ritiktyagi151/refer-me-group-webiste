@@ -52,7 +52,7 @@ const AdminPanel = () => {
   const [editCategoryValue, setEditCategoryValue] = useState("");
 
   // API base URL
-  const API_BASE_URL = "http://72.60.101.229:5000/api";
+  const API_BASE_URL = "https://refermegroup.com/api";
 
   // Form state
   const [formData, setFormData] = useState({

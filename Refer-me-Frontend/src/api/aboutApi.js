@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://72.60.101.229:5000/api/about";
+const API_URL = "https://refermegroup.com/api/about";
 
 // =================== About ===================
 // Get whole About document

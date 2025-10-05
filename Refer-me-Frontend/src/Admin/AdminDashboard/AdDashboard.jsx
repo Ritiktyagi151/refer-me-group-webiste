@@ -11,7 +11,7 @@ const AdDashboard = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          "http://72.60.101.229:5000/api/dashboard/stats"
+          "https://refermegroup.com/api/dashboard/stats"
         );
 
         if (!response.ok) {
