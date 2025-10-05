@@ -51,7 +51,7 @@ app.use("/api/services", serviceRoutes);
 app.use("/api/contact-messages", contactRoutes);
 app.use("/api/careers", careerRoutes);
 app.use("/api/dashboard", dashboardRoutes);
-app.use("/payment", paymentRoutes);
+app.use("/api/payment", paymentRoutes);
 app.use("/api/webinars", webinarRoutes);
 
 // Default route
