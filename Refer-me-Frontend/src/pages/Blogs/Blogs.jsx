@@ -8,7 +8,7 @@ const Blogs = () => {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const res = await fetch("https://refermegroup.com/api/blogs");
+        const res = await fetch("http://127.0.0.1:5000/api/blogs");
         const data = await res.json();
         console.log("Fetched blogs:", data);
         setBlogs(data);

@@ -22,7 +22,7 @@ const CourseGallerySection = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const res = await fetch("https://refermegroup.com/api/courses"); // 🔥 your API URL
+        const res = await fetch("http://127.0.0.1:5000/api/courses"); // 🔥 your API URL
         if (!res.ok) throw new Error("Failed to fetch courses");
         const data = await res.json();
         setCourses(data);

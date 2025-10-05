@@ -178,7 +178,7 @@ const AdminPanel = () => {
   };
 
   // API base URL
-  const API_BASE = "https://refermegroup.com/api/navbar";
+  const API_BASE = "http://127.0.0.1:5000/api/navbar";
 
   // Fetch navbar data from API
   useEffect(() => {

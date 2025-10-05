@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://refermegroup.com/api/users",
+  baseURL: "http://127.0.0.1:5000/api/users",
 });
 
 // Register user
