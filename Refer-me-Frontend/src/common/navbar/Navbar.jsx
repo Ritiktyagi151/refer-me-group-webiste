@@ -510,7 +510,7 @@ export default function Navbar() {
                   to="/career-counsling"
                   className="px-4 py-2 text-sm font-medium text-white hover:text-yellow-300 transition-colors"
                 >
-                  Carrer counslering
+                  Career counselling
                 </Link>
                 <Link
                   to="/contact"

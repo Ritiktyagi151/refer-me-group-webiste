@@ -50,10 +50,10 @@ const teamMembers = [
   },
   {
     id: 5,
-    name: "Aastha Malhotra",
+    name: "Ananya Walia ",
     role: "HR & Admin",
-    image: "/assets/teams/team (5).jpeg",
-    linkedin: "https://www.linkedin.com/in/aastha-malhotra-07982b169/",
+    image: "/assets/teams/ANANYA-WALIA.jpg",
+    linkedin: "https://www.linkedin.com/feed/",
     twitter: null,
     github: null,
     bio: "HR Specialist",
