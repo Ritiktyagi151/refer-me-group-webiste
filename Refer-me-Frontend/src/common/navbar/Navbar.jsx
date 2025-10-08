@@ -287,11 +287,13 @@ export default function Navbar() {
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center py-3">
             <div className="flex items-center gap-8">
-              <img
-                src="/assets/logo/rmg-logo.png"
-                className="h-10"
-                alt="RMG Logo"
-              />
+              <Link to="/">
+                <img
+                  src="/assets/logo/rmg-logo.png"
+                  className="h-10"
+                  alt="RMG Logo"
+                />
+              </Link>
               <div
                 className="relative hidden lg:block w-[400px]"
                 ref={searchContainerRef}

@@ -7,7 +7,7 @@ import { GiAchievement } from "react-icons/gi"; // Included for consistency
 const teamMembers = [
   {
     id: 1,
-    name: "Neelaam Baranwal",
+    name: "Neelam Baranwal",
     role: "Strategic Partner",
     image: "/assets/teams/team (1).jpeg",
     linkedin: null,
@@ -57,6 +57,17 @@ const teamMembers = [
     twitter: null,
     github: null,
     bio: "HR Specialist",
+    video: null,
+  },
+  {
+    id: 6,
+    name: "Twisha",
+    role: "Training Coordinator",
+    image: "/assets/teams/twisha.jpg",
+    // linkedin: "https://www.linkedin.com/feed/",
+    twitter: null,
+    github: null,
+    // bio: "HR Specialist",
     video: null,
   },
 ];

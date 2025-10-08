@@ -78,7 +78,7 @@ const History = () => {
       "Resume Service",
       "LinkedIn Service",
       "Exclusive Network",
-      "Support Professional having no Job/Financial Chalenge",
+      "Support Professional having no Job/Financial challenge",
     ],
   };
 
@@ -383,7 +383,7 @@ const History = () => {
                   description =
                     "Access to a private network of professionals and industry leaders.";
                   break;
-                case "Support Professional having no Job/Financial Chalenge":
+                case "Support Professional having no Job/Financial challenge":
                   icon = <FaHandshake className="text-gray-500" />;
                   description =
                     "Special assistance for professionals facing employment or financial difficulties.";
