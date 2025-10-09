@@ -1,74 +1,82 @@
-import React from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/autoplay';
+import React from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/autoplay";
 
 import {
-  FaChartBar, FaCode, FaNetworkWired, FaCheckCircle, FaBriefcase,
-  FaFlask, FaBug, FaMobileAlt, FaDatabase
-} from 'react-icons/fa';
+  FaChartBar,
+  FaCode,
+  FaNetworkWired,
+  FaCheckCircle,
+  FaBriefcase,
+  FaFlask,
+  FaBug,
+  FaMobileAlt,
+  FaDatabase,
+} from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 const domains = [
   {
-    title: "BI and Visualization",
+    title: "Data Science",
     icon: <FaChartBar />,
     color: "bg-red-100 text-red-500",
-    link: "https://www.knowledgehut.com/business-intelligence-and-visualization",
+    link: "/courses/data-science",
   },
   {
-    title: "Programming",
+    title: "AI for Leaders",
     icon: <FaCode />,
     color: "bg-green-100 text-green-500",
-    link: "https://www.knowledgehut.com/programming-certification",
+    link: "/courses/ai-for-leaders",
   },
   {
-    title: "IT Service Management",
+    title: "Tosca Automation",
     icon: <FaNetworkWired />,
     color: "bg-purple-100 text-purple-500",
-    link: "https://www.knowledgehut.com/itsm-certifications",
+    link: "/courses/tosca-automation",
   },
   {
-    title: "Quality",
+    title: "Business Analyst",
     icon: <FaCheckCircle />,
     color: "bg-yellow-100 text-yellow-400",
-    link: "https://www.knowledgehut.com/quality-management-courses",
+    link: "/courses/business-analyst",
   },
   {
-    title: "Business Management",
+    title: "Advance Automation",
     icon: <FaBriefcase />,
     color: "bg-blue-100 text-blue-500",
-    link: "https://www.knowledgehut.com/business-management-courses",
+    link: "/courses/advance-automation",
   },
   {
-    title: "Cybersecurity",
+    title: "Power Automate",
     icon: <FaBug />,
     color: "bg-red-100 text-red-500",
-    link: "https://www.knowledgehut.com/cyber-security-courses",
+    link: "/courses/power-automate",
   },
   {
-    title: "Cloud Computing",
+    title: "Core Java",
     icon: <FaDatabase />,
     color: "bg-yellow-100 text-yellow-400",
-    link: "https://www.knowledgehut.com/cloud-computing-courses",
+    link: "/courses/core-java",
   },
   {
     title: "DevOps",
     icon: <FaFlask />,
     color: "bg-green-100 text-green-500",
-    link: "https://www.knowledgehut.com/devops-courses",
+    link: "/courses/cloud-engineering-aws-devops",
   },
   {
-    title: "Web Development",
+    title: "API Automation with AI Integration",
     icon: <FaMobileAlt />,
     color: "bg-purple-100 text-purple-500",
-    link: "https://www.knowledgehut.com/web-development-courses",
+    link: "/courses/api-automation-ai",
   },
   {
     title: "Cloud Computing",
     icon: <FaDatabase />,
     color: "bg-yellow-100 text-yellow-400",
-    link: "https://www.knowledgehut.com/cloud-computing-courses",
+    link: "/courses/cloud-engineering-azure-devops",
   },
 ];
 
@@ -115,10 +123,10 @@ export default function DomainsSection() {
           Choose From 25+ In-Demand Domains
         </h3>
         <p className="max-w-2xl mx-auto mb-8 text-gray-500">
-          Our immersive courses in booming fields like Data Science, AI, and Cloud
-          Computing provide you with the practical knowledge and experience you
-          need to succeed in the ever-evolving job market. Don&apos;t just learn,
-          get future-ready with upGrad KnowledgeHut.
+          Our immersive courses in booming fields like Data Science, AI, and
+          Cloud Computing provide you with the practical knowledge and
+          experience you need to succeed in the ever-evolving job market.
+          Don&apos;t just learn, get future-ready with ReferMeGroup.
         </p>
 
         {/* First Swiper */}
@@ -128,9 +136,13 @@ export default function DomainsSection() {
               <div className="bg-white border border-blue-300 shadow-lg rounded-tl-3xl rounded-br-3xl p-5 h-40 flex flex-col justify-between items-start hover:shadow-blue-400 hover:scale-105 transition-all duration-300">
                 <div className="text-3xl text-blue-500">{item.icon}</div>
                 <h3 className="text-lg font-semibold">{item.title}</h3>
-                <a href={item.link} target="_blank" rel="noreferrer" className="text-sm text-blue-500 hover:underline">
+                <Link
+                  to={item.link}
+                  rel="noreferrer"
+                  className="text-sm text-blue-500 hover:underline"
+                >
                   Explore →
-                </a>
+                </Link>
               </div>
             </SwiperSlide>
           ))}
@@ -143,9 +155,13 @@ export default function DomainsSection() {
               <div className="bg-white border border-blue-300 shadow-lg rounded-tl-3xl rounded-br-3xl p-5 h-40 flex flex-col justify-between items-start hover:shadow-blue-400 hover:scale-105 transition-all duration-300">
                 <div className="text-3xl text-blue-500">{item.icon}</div>
                 <h3 className="text-lg font-semibold">{item.title}</h3>
-                <a href={item.link} target="_blank" rel="noreferrer" className="text-sm text-blue-500 hover:underline">
+                <Link
+                  to={item.link}
+                  rel="noreferrer"
+                  className="text-sm text-blue-500 hover:underline"
+                >
                   Explore →
-                </a>
+                </Link>
               </div>
             </SwiperSlide>
           ))}
