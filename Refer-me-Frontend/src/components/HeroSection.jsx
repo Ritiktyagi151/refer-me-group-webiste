@@ -60,7 +60,7 @@ function HeroSection() {
                     1200+
                   </p>
                   <p className="text-gray-700 mt-2 font-medium">
-                    Trained Corporates
+                    Trained Professionals
                   </p>
                 </div>
                 <div className="text-center p-6 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:shadow-md">

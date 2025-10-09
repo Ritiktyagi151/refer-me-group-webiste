@@ -12,7 +12,6 @@ import KnowledgeFLOSection from "../../components/KnowledgeFLOSection";
 import AchievementSection from "../../components/AchievementSection";
 import JobReadySection from "../../components/JobReadySection";
 // import SectionGreen from "../../components/SectionGreen";
-import PlacementRecordsSection from "../../components/PlacementRecordsSection";
 import VedioFAQSection from "../../components/VedioFAQSection";
 import Certificate from "../../components/Certificate";
 import Companies from "../../components/Companies";
@@ -23,6 +22,7 @@ import CourseGallerySection from "../../components/CourseGallerySection";
 import EnquiryModal from "../../components/EnquiryModal";
 import WhatsAppWidget from "../../components/WhatsAppWidget";
 import HiringSection from "../../components/HiringSection";
+import JobAssistanceSection from "../../components/PlacementRecordsSection";
 // import Quiz from "../../components/QuizPopup";
 // import ReferMeGroupSection from '../../components/ReferMeGroupSection'
 // import BusinessSection from '../../components/BusinessSection'
@@ -66,7 +66,7 @@ const Home = () => {
         <VedioFAQSection />
         <Certificate />
         <DomainsSection />
-        <PlacementRecordsSection />
+        <JobAssistanceSection />
       </main>
     </>
   );
