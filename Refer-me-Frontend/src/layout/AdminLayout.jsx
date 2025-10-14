@@ -60,12 +60,12 @@ const AdminDashboard = () => {
       icon: Home,
       link: "/admin/dashboard",
     },
-    {
-      id: "navbar",
-      name: "Navbar",
-      icon: Menu,
-      link: "/admin/navbar",
-    },
+    // {
+    //   id: "navbar",
+    //   name: "Navbar",
+    //   icon: Menu,
+    //   link: "/admin/navbar",
+    // },
     // {
     //   id: "home-section",
     //   name: "Home Section",
@@ -117,12 +117,12 @@ const AdminDashboard = () => {
         { id: "manthan", name: "Manthan", link: "/admin/services/manthan" },
       ],
     },
-    {
-      id: "contact",
-      name: "Contact Us",
-      icon: Phone,
-      link: "/admin/contact",
-    },
+    // {
+    //   id: "contact",
+    //   name: "Contact Us",
+    //   icon: Phone,
+    //   link: "/admin/contact",
+    // },
     {
       id: "footer",
       name: "Footer",

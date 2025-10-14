@@ -372,7 +372,7 @@ const AdminPanel = () => {
                     Blog Posts
                   </button>
                 </li>
-                <li>
+                {/* <li>
                   <button
                     onClick={() => setActiveSection("settings")}
                     className={`w-full text-left px-4 py-2 rounded-md ${
@@ -395,7 +395,7 @@ const AdminPanel = () => {
                   >
                     Appearance
                   </button>
-                </li>
+                </li> */}
               </ul>
             </nav>
           </div>

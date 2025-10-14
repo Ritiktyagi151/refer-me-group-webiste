@@ -43,7 +43,7 @@ const Footer = () => {
             <img
               src={footer.logo?.src}
               alt={footer.logo?.alt}
-              style={{ height: footer.logo?.size || "36px" }}
+              className={footer.logo?.size || "h-9"}
             />
           </Link>
           <p className="text-sm mt-3">{footer.description}</p>

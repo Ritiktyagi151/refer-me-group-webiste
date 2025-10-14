@@ -1,3 +1,4 @@
+// routes/footerController.js
 import SiteMeta from "../models/SiteMeta.js";
 
 export const getFooter = async (req, res) => {

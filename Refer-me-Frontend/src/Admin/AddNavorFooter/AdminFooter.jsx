@@ -33,7 +33,7 @@ const FooterAdminPanel = () => {
     logo: {
       src: "/assets/logo/rmg-logo.png",
       alt: "Refer Me Group Logo",
-      size: "w-36",
+      size: "h-9",
     },
     description:
       "We are dedicated to facilitating career advancement and fostering professional development. With a wealth of resources and initiatives, we strive to empower individuals at every stage of their journey.",
@@ -63,13 +63,13 @@ const FooterAdminPanel = () => {
       phone: "+91 76785 73511",
     },
     socialLinks: [
-      { icon: "facebook", link: "https://www.facebook.com/refermegroup.qa" },
-      { icon: "twitter", link: "https://www.twitter.com" },
+      { icon: "fab fa-facebook", link: "https://www.facebook.com/refermegroup.qa" },
+      { icon: "fab fa-twitter", link: "https://www.twitter.com" },
       {
-        icon: "linkedin",
+        icon: "fab fa-linkedin",
         link: "https://www.linkedin.com/company/refermegroup/",
       },
-      { icon: "instagram", link: "https://www.instagram.com/refermegroup/" },
+      { icon: "fab fa-instagram", link: "https://www.instagram.com/refermegroup/" },
     ],
     copyright: "© 2023 All Copyrights Reserved by Refer Me Group",
     developer: {
@@ -82,7 +82,7 @@ const FooterAdminPanel = () => {
   // Form states for editing
   const [editingSection, setEditingSection] = useState(null);
   const [formData, setFormData] = useState({});
-  const [newLink, setNewLink] = useState({ text: "", path: "" });
+  const [newItem, setNewItem] = useState({});
 
   // API base URL
   const API_BASE = "https://refermegroup.com/api/footer";
@@ -101,8 +101,8 @@ const FooterAdminPanel = () => {
       }
       const data = await response.json();
 
-      // Update state with fetched data
-      if (data) setFooterData(data);
+      // Merge with defaults
+      setFooterData((prev) => ({ ...prev, ...data }));
 
       setMessage({ type: "success", text: "Footer data loaded successfully" });
       setTimeout(() => setMessage({ type: "", text: "" }), 3000);
@@ -123,7 +123,7 @@ const FooterAdminPanel = () => {
     try {
       setLoading(true);
       const response = await fetch(API_BASE, {
-        method: "PUT",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
@@ -151,39 +151,6 @@ const FooterAdminPanel = () => {
     }
   };
 
-  // Save specific section data
-  const saveSectionData = async (section, data) => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${API_BASE}/${section}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to save ${section} data`);
-      }
-
-      setMessage({
-        type: "success",
-        text: `${section} changes saved successfully!`,
-      });
-      setTimeout(() => setMessage({ type: "", text: "" }), 3000);
-    } catch (error) {
-      console.error(`Error saving ${section} data:`, error);
-      setMessage({
-        type: "error",
-        text: `Failed to save ${section} changes. Please try again.`,
-      });
-      setTimeout(() => setMessage({ type: "", text: "" }), 5000);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // Toggle theme
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
@@ -199,6 +166,11 @@ const FooterAdminPanel = () => {
     if (isLocked) return;
     setEditingSection(section);
     setFormData(footerData[section]);
+    setNewItem(
+      section === "socialLinks"
+        ? { icon: "", link: "" }
+        : { text: "", path: "" }
+    );
     // Expand the section when editing
     setExpandedSections((prev) => ({ ...prev, [section]: true }));
   };
@@ -207,6 +179,7 @@ const FooterAdminPanel = () => {
   const cancelEditing = () => {
     setEditingSection(null);
     setFormData({});
+    setNewItem({});
   };
 
   // Save changes
@@ -217,20 +190,27 @@ const FooterAdminPanel = () => {
       [editingSection]: formData,
     }));
 
-    // Save to API
-    await saveSectionData(editingSection, formData);
+    // Save to API (whole data)
+    await saveAllData();
 
     setEditingSection(null);
     setFormData({});
+    setNewItem({});
   };
 
   // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => {
+      if (typeof prev === "string") {
+        return value;
+      } else {
+        return {
+          ...prev,
+          [name]: value,
+        };
+      }
+    });
   };
 
   // Handle array item changes
@@ -245,15 +225,17 @@ const FooterAdminPanel = () => {
     });
   };
 
-  // Add new link
-  const addNewLink = () => {
-    if (!newLink.text || !newLink.path) return;
-    setFormData((prev) => [...prev, { ...newLink }]);
-    setNewLink({ text: "", path: "" });
+  // Add new item
+  const addNewItem = () => {
+    const key1 = editingSection === "socialLinks" ? "icon" : "text";
+    const key2 = editingSection === "socialLinks" ? "link" : "path";
+    if (!newItem[key1] || !newItem[key2]) return;
+    setFormData((prev) => [...prev, { ...newItem }]);
+    setNewItem({ [key1]: "", [key2]: "" });
   };
 
-  // Remove link
-  const removeLink = (index) => {
+  // Remove item
+  const removeItem = (index) => {
     setFormData((prev) => prev.filter((_, i) => i !== index));
   };
 
@@ -284,32 +266,32 @@ const FooterAdminPanel = () => {
   );
 
   // Render editable array
-  const renderEditableArray = (items, textLabel, pathLabel) => (
+  const renderEditableArray = (items, field1, field2, ph1, ph2, title = "Links") => (
     <div className="mb-4">
-      <h4 className="text-sm font-medium mb-2">Links:</h4>
+      <h4 className="text-sm font-medium mb-2">{title}:</h4>
       <div className="space-y-2 mb-4 max-h-60 overflow-y-auto">
         {items.map((item, index) => (
           <div key={index} className="flex gap-2 items-center">
             <input
               type="text"
-              value={item.text}
+              value={item[field1] || ""}
               onChange={(e) =>
-                handleArrayItemChange(index, "text", e.target.value)
+                handleArrayItemChange(index, field1, e.target.value)
               }
               className="flex-1 px-2 py-1 border rounded"
-              placeholder={textLabel}
+              placeholder={ph1}
             />
             <input
               type="text"
-              value={item.path}
+              value={item[field2] || ""}
               onChange={(e) =>
-                handleArrayItemChange(index, "path", e.target.value)
+                handleArrayItemChange(index, field2, e.target.value)
               }
               className="flex-1 px-2 py-1 border rounded"
-              placeholder={pathLabel}
+              placeholder={ph2}
             />
             <button
-              onClick={() => removeLink(index)}
+              onClick={() => removeItem(index)}
               className="text-red-500 hover:text-red-700 p-1"
             >
               <FiTrash2 size={16} />
@@ -320,24 +302,28 @@ const FooterAdminPanel = () => {
       <div className="flex gap-2 mb-2">
         <input
           type="text"
-          value={newLink.text}
-          onChange={(e) => setNewLink({ ...newLink, text: e.target.value })}
+          value={newItem[field1] || ""}
+          onChange={(e) =>
+            setNewItem((prev) => ({ ...prev, [field1]: e.target.value }))
+          }
           className="flex-1 px-2 py-1 border rounded"
-          placeholder={textLabel}
+          placeholder={ph1}
         />
         <input
           type="text"
-          value={newLink.path}
-          onChange={(e) => setNewLink({ ...newLink, path: e.target.value })}
+          value={newItem[field2] || ""}
+          onChange={(e) =>
+            setNewItem((prev) => ({ ...prev, [field2]: e.target.value }))
+          }
           className="flex-1 px-2 py-1 border rounded"
-          placeholder={pathLabel}
+          placeholder={ph2}
         />
       </div>
       <button
-        onClick={addNewLink}
+        onClick={addNewItem}
         className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center text-sm"
       >
-        <FiPlus className="inline mr-1" /> Add Link
+        <FiPlus className="inline mr-1" /> Add {title.toLowerCase().replace(/s$/, "")}
       </button>
     </div>
   );
@@ -355,15 +341,32 @@ const FooterAdminPanel = () => {
             <>
               {renderEditableField("Logo Source", "src", formData.src)}
               {renderEditableField("Logo Alt Text", "alt", formData.alt)}
-              {renderEditableField("Logo Size", "size", formData.size)}
+              {renderEditableField("Logo Size (Tailwind class)", "size", formData.size)}
             </>
           )}
 
           {section === "description" &&
             renderEditableField("Description", "description", formData, true)}
 
-          {(section === "quickLinks" || section === "courses") &&
-            renderEditableArray(formData, "Link Text", "Link Path")}
+          {section === "quickLinks" &&
+            renderEditableArray(
+              formData,
+              "text",
+              "path",
+              "Link Text",
+              "Link Path",
+              "Quick Links"
+            )}
+
+          {section === "courses" &&
+            renderEditableArray(
+              formData,
+              "text",
+              "path",
+              "Course Name",
+              "Course Path",
+              "Courses"
+            )}
 
           {section === "contactInfo" && (
             <>
@@ -379,7 +382,14 @@ const FooterAdminPanel = () => {
           )}
 
           {section === "socialLinks" &&
-            renderEditableArray(formData, "Social Media", "Link URL")}
+            renderEditableArray(
+              formData,
+              "icon",
+              "link",
+              "Icon Class (e.g., fab fa-facebook)",
+              "Link URL",
+              "Social Links"
+            )}
 
           {section === "copyright" &&
             renderEditableField("Copyright Text", "copyright", formData)}
@@ -479,7 +489,7 @@ const FooterAdminPanel = () => {
               <ul className="list-disc pl-5 space-y-1">
                 {footerData.socialLinks.map((item, index) => (
                   <li key={index} className="text-sm">
-                    <span className="font-medium capitalize">{item.icon}</span>:{" "}
+                    <span className="font-medium">{item.icon}</span>:{" "}
                     {item.link}
                   </li>
                 ))}
