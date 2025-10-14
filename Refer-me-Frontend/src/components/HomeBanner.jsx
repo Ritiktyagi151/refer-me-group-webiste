@@ -2,6 +2,7 @@ import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectFade, Navigation } from "swiper/modules";
 import "swiper/swiper-bundle.css";
+import { Link } from "react-router-dom";
 
 // Mobile-specific slides
 const mobileSlides = [
@@ -153,9 +154,11 @@ const HomeBanner = () => {
                         And Who Stands Behind You.
                       </h3>
                     </div>
-                    <button className="mt-2 sm:mt-4 px-3 sm:px-4 py-1 sm:py-2 bg-white text-blue-600 text-xs sm:text-sm font-medium rounded-full hover:bg-gray-100 transition w-fit">
-                      About us
-                    </button>
+                    <Link to="/about/history">
+                      <button className="mt-2 sm:mt-4 px-3 sm:px-4 py-1 sm:py-2 bg-white text-blue-600 text-xs sm:text-sm font-medium rounded-full hover:bg-gray-100 transition w-fit">
+                        About us
+                      </button>
+                    </Link>
                   </div>
                 </div>
 
@@ -169,9 +172,11 @@ const HomeBanner = () => {
                         We’re more than a job platform
                       </span>
                     </div>
-                    <button className="mt-2 sm:mt-4 px-3 sm:px-4 py-1 sm:py-2 bg-white text-amber-600 text-xs sm:text-sm font-medium rounded-full hover:bg-gray-100 transition w-fit">
-                      Discover Our Services
-                    </button>
+                    <Link to="/about">
+                      <button className="mt-2 sm:mt-4 px-3 sm:px-4 py-1 sm:py-2 bg-white text-amber-600 text-xs sm:text-sm font-medium rounded-full hover:bg-gray-100 transition w-fit">
+                        Discover Our Services
+                      </button>
+                    </Link>
                   </div>
                 </div>
               </div>

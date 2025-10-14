@@ -1,11 +1,48 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-// import courses from "../data/courses.js"; // ❌ remove static import
+
+// Helper function to reconstruct the category name from the complex object
+const getCategoryName = (categoryArray) => {
+  if (!categoryArray || categoryArray.length === 0) {
+    return "";
+  }
+  const categoryObj = categoryArray[0];
+  // Filter out non-numeric keys, sort them numerically, map to characters, and join
+  return Object.keys(categoryObj)
+    .filter((key) => !isNaN(parseInt(key)))
+    .sort((a, b) => parseInt(a) - parseInt(b))
+    .map((key) => categoryObj[key])
+    .join("");
+};
+
+// Mapping from UI filter categories to the actual categories in the database
+const categoryMapping = {
+  "Data Science, AI & Automation": [
+    "Data Science, AI & Automation",
+    "Artificial Intelligence",
+    "Data Science & AI",
+    "Artificial Intelligence & Automation",
+    "Robotic Process Automation", // Added for UiPath
+  ],
+  "Software Testing & Programming": [
+    "Automation Testing",
+    "Test Automation",
+    "Programming",
+  ],
+  "Cloud & DevOps": ["Cloud Computing"],
+  "Management & Business": [
+    "Business Analysis",
+    "Program Management",
+    "Project Management",
+    "Product Management",
+  ],
+  "Marketing & Soft Skills": ["Digital Marketing", "Finance"], // Grouped Finance here
+};
 
 const CourseGallerySection = () => {
   const [activeCategory, setActiveCategory] = useState("All Courses");
-  const [courses, setCourses] = useState([]); // state for API data
+  const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -18,11 +55,10 @@ const CourseGallerySection = () => {
     "Marketing & Soft Skills",
   ];
 
-  // Fetch courses from API
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const res = await fetch("https://refermegroup.com/api/courses"); // 🔥 your API URL
+        const res = await fetch("https://refermegroup.com/api/courses");
         if (!res.ok) throw new Error("Failed to fetch courses");
         const data = await res.json();
         setCourses(data);
@@ -36,9 +72,15 @@ const CourseGallerySection = () => {
     fetchCourses();
   }, []);
 
-  const filteredCourses = courses.filter((course) =>
-    activeCategory === "All Courses" ? true : course.category === activeCategory
-  );
+  // ✅ FIX: Updated filtering logic to use the helper function and mapping
+  const filteredCourses =
+    activeCategory === "All Courses"
+      ? courses
+      : courses.filter((course) => {
+          const courseCategoryName = getCategoryName(course.category);
+          const mappedCategories = categoryMapping[activeCategory] || [];
+          return mappedCategories.includes(courseCategoryName);
+        });
 
   if (loading) {
     return (
@@ -121,32 +163,24 @@ const CourseGallerySection = () => {
           >
             {/* Badges */}
             <div className="absolute top-2 left-2 flex flex-wrap gap-2 z-20">
-              {course.recommended && (
-                <span className="bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg border border-white/20">
-                  Recommended
+              {course.badges?.map((badge, index) => (
+                <span
+                  key={index}
+                  className="bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg border border-white/20"
+                >
+                  {badge}
                 </span>
-              )}
-              {course.trending && (
-                <span className="bg-gradient-to-r from-green-500 to-green-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg border border-white/20">
-                  Trending
-                </span>
-              )}
-              {course.mostPurchased && (
-                <span className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg border border-white/20">
-                  Most Purchased
-                </span>
-              )}
-              {course.topRanked && (
-                <span className="bg-gradient-to-r from-purple-500 to-purple-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg border border-white/20">
-                  Top Ranked
-                </span>
-              )}
+              ))}
             </div>
 
             {/* Course Image */}
             <div className="relative group">
               <img
-                src={course.bannerImage}
+                src={
+                  course.bannerImage.startsWith("http")
+                    ? course.bannerImage
+                    : `https://refermegroup.com${course.bannerImage}`
+                }
                 alt={course.title}
                 className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-110"
               />
@@ -205,7 +239,12 @@ const CourseGallerySection = () => {
                 </Link>
                 <button
                   className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-2.5 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 flex items-center justify-center font-medium shadow-lg"
-                  onClick={() => window.open(course.curriculumPdfUrl, "_blank")}
+                  onClick={() =>
+                    window.open(
+                      `https://refermegroup.com${course.curriculumPdfUrl}`,
+                      "_blank"
+                    )
+                  }
                 >
                   <svg
                     className="w-5 h-5 mr-2"

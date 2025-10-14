@@ -3,11 +3,13 @@ import { useEffect, useRef, useState } from "react";
 const AchievementSection = () => {
   const sectionRef = useRef(null);
   const [countersActive, setCountersActive] = useState(false);
+  // Step 1: Add 'courses' to the state
   const [values, setValues] = useState({
-    learners: 0,
-    trainers: 0,
-    countries: 0,
+    professionals: 0,
+    courses: 0,
     hours: 0,
+    countries: 0,
+    mentors: 0,
   });
 
   useEffect(() => {
@@ -29,6 +31,7 @@ const AchievementSection = () => {
 
     return () => {
       if (sectionRef.current) {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         observer.unobserve(sectionRef.current);
       }
     };
@@ -37,11 +40,13 @@ const AchievementSection = () => {
   useEffect(() => {
     if (!countersActive) return;
 
+    // Step 2: Update target values with your data
     const targetValues = {
-      learners: 5000, // Updated for India focus
-      trainers: 25,
-      countries: 10,
-      hours: 15000,
+      professionals: 1200,
+      courses: 15,
+      hours: 12000, // 12K = 12000
+      countries: 20,
+      mentors: 15,
     };
 
     const duration = 2000; // animation duration in ms
@@ -51,15 +56,20 @@ const AchievementSection = () => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
 
+      // Step 3: Update the animation logic for all 5 values
       setValues({
-        learners: Math.floor(progress * targetValues.learners),
-        trainers: Math.floor(progress * targetValues.trainers),
-        countries: Math.floor(progress * targetValues.countries),
+        professionals: Math.floor(progress * targetValues.professionals),
+        courses: Math.floor(progress * targetValues.courses),
         hours: Math.floor(progress * targetValues.hours),
+        countries: Math.floor(progress * targetValues.countries),
+        mentors: Math.floor(progress * targetValues.mentors),
       });
 
       if (progress < 1) {
         requestAnimationFrame(animateCounters);
+      } else {
+        // Ensure final values are set exactly
+        setValues(targetValues);
       }
     };
 
@@ -76,48 +86,58 @@ const AchievementSection = () => {
       }}
     >
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-6">
+        <div className="text-center mb-10">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
-            Our Impact Across India
+            Our Achievements
           </h2>
-          <p className="text-xl text-indigo-600 max-w-3xl mx-auto">
-            Empowering thousands of learners with industry-relevant skills,
-            expert mentorship, and career guidance to achieve their professional
-            goals.
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            Empowering professionals across the globe with industry-relevant
+            skills and expert mentorship.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 pb-4">
-          {/* Learners */}
-          <div className="bg-white/40 backdrop-blur-sm rounded-xl p-8 text-center transform transition-all hover:scale-105 hover:bg-white/60">
-            <div className="text-4xl md:text-5xl font-bold mb-2 text-gray-500">
-              {values.learners.toLocaleString()}
+        {/* Step 4: Update the grid to have 5 columns and add the new items */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 pb-4">
+          {/* Trained Professionals */}
+          <div className="bg-white/40 backdrop-blur-sm rounded-xl p-6 text-center transform transition-all hover:scale-105 hover:bg-white/60">
+            <div className="text-4xl md:text-5xl font-bold mb-2 text-indigo-600">
+              {values.professionals.toLocaleString()}+
             </div>
-            <h3 className="text-xl font-semibold">Learners Trained</h3>
+            <h3 className="text-lg font-semibold">Trained Professionals</h3>
           </div>
 
-          {/* Trainers */}
-          <div className="bg-white/40 backdrop-blur-sm rounded-xl p-8 text-center transform transition-all hover:scale-105 hover:bg-white/60">
-            <div className="text-4xl md:text-5xl font-bold mb-2 text-gray-500">
-              {values.trainers}
+          {/* Courses & Videos */}
+          <div className="bg-white/40 backdrop-blur-sm rounded-xl p-6 text-center transform transition-all hover:scale-105 hover:bg-white/60">
+            <div className="text-4xl md:text-5xl font-bold mb-2 text-indigo-600">
+              {values.courses}+
             </div>
-            <h3 className="text-xl font-semibold">Industry Expert Mentors</h3>
+            <h3 className="text-lg font-semibold">Courses & Videos</h3>
+          </div>
+
+          {/* Training Hours */}
+          <div className="bg-white/40 backdrop-blur-sm rounded-xl p-6 text-center transform transition-all hover:scale-105 hover:bg-white/60">
+            <div className="text-4xl md:text-5xl font-bold mb-2 text-indigo-600">
+              {values.hours.toLocaleString()}+
+            </div>
+            <h3 className="text-lg font-semibold">Training Hours</h3>
           </div>
 
           {/* Countries */}
-          <div className="bg-white/40 backdrop-blur-sm rounded-xl p-8 text-center transform transition-all hover:scale-105 hover:bg-white/60">
-            <div className="text-4xl md:text-5xl font-bold mb-2 text-gray-500">
-              {values.countries}
+          <div className="bg-white/40 backdrop-blur-sm rounded-xl p-6 text-center transform transition-all hover:scale-105 hover:bg-white/60">
+            <div className="text-4xl md:text-5xl font-bold mb-2 text-indigo-600">
+              {values.countries}+
             </div>
-            <h3 className="text-xl font-semibold">States & Regions in India</h3>
+            <h3 className="text-lg font-semibold">
+              Countries Professional Trained
+            </h3>
           </div>
 
-          {/* Hours */}
-          <div className="bg-white/40 backdrop-blur-sm rounded-xl p-8 text-center transform transition-all hover:scale-105 hover:bg-white/60">
-            <div className="text-4xl md:text-5xl font-bold mb-2 text-gray-500">
-              {values.hours.toLocaleString()}
+          {/* Industry Expert Mentors */}
+          <div className="bg-white/40 backdrop-blur-sm rounded-xl p-6 text-center transform transition-all hover:scale-105 hover:bg-white/60">
+            <div className="text-4xl md:text-5xl font-bold mb-2 text-indigo-600">
+              {values.mentors}+
             </div>
-            <h3 className="text-xl font-semibold">Hours of Expert Training</h3>
+            <h3 className="text-lg font-semibold">Industry Expert Mentors</h3>
           </div>
         </div>
       </div>

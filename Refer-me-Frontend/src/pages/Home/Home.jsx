@@ -66,7 +66,7 @@ const Home = () => {
         <VedioFAQSection />
         <Certificate />
         <DomainsSection />
-        <JobAssistanceSection />
+        {/* <JobAssistanceSection /> */}
       </main>
     </>
   );
