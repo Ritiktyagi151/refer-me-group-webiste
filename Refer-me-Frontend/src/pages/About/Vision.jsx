@@ -375,12 +375,12 @@ const Vision = () => {
       <div className="relative z-10">
         {/* Hero Section */}
         <motion.section
-          className="py-24 md:py-32 text-center bg-gradient-to-b from-transparent to-gray-50 px-4"
+          className="py-24 md:py-16 text-center bg-gradient-to-b from-transparent to-gray-50 px-4"
           initial="hidden"
           animate="visible"
           variants={fadeIn}
         >
-          <h1 className="text-5xl md:text-7xl font-extrabold mb-6 leading-tight text-gray-900">
+          <h1 className="text-5xl md:text-7xl font-extrabold mb-3 leading-tight text-gray-900">
             Our Mission at{" "}
             <motion.span
               className="text-blue-600 inline-block" // Adjusted for light theme
@@ -403,7 +403,7 @@ const Vision = () => {
 
         {/* Vision & Mission Section */}
         <motion.section
-          className="py-16 px-4 md:px-16 bg-gradient-to-r from-blue-100 to-purple-100 text-gray-900 rounded-lg shadow-2xl mx-4 md:mx-auto max-w-7xl my-12" // Adjusted for light theme
+          className="py-8 px-4 md:px-8 bg-gradient-to-r from-blue-100 to-purple-100 text-gray-900 rounded-lg shadow-2xl mx-4 md:mx-auto max-w-7xl my-6" // Adjusted for light theme
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.3 }}

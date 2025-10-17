@@ -56,6 +56,8 @@ const AdminPanel = () => {
   const [filteredBlogs, setFilteredBlogs] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
+  // State for image upload
+  const [selectedImage, setSelectedImage] = useState(null);
 
   // Fetch initial data
   useEffect(() => {
@@ -137,6 +139,30 @@ const AdminPanel = () => {
     }
   };
 
+  // Handle image upload
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setSelectedImage(file);
+
+    const formDataUpload = new FormData();
+    formDataUpload.append("image", file);
+
+    try {
+      const response = await fetch("https://refermegroup.com/api/upload", {
+        method: "POST",
+        body: formDataUpload,
+      });
+      if (!response.ok) throw new Error("Failed to upload image");
+      const { url } = await response.json();
+      setFormData((prev) => ({ ...prev, image: url }));
+    } catch (err) {
+      console.error("Error uploading image:", err);
+      setMessage({ type: "error", text: "Failed to upload image" });
+      setSelectedImage(null);
+    }
+  };
+
   // Handle tag addition
   const handleAddTag = () => {
     if (
@@ -176,6 +202,7 @@ const AdminPanel = () => {
     });
     setIsEditing(false);
     setIsLocked(false);
+    setSelectedImage(null);
   };
 
   // Create new blog post
@@ -277,6 +304,7 @@ const AdminPanel = () => {
     });
     setIsEditing(true);
     setIsLocked(false);
+    setSelectedImage(null);
   };
 
   // Handle settings change
@@ -492,18 +520,46 @@ const AdminPanel = () => {
                       </datalist>
                     </div>
 
-                    <div>
+                    <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Featured Image URL
+                        Featured Image
                       </label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        disabled={isLocked}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      />
+                      {selectedImage && (
+                        <div className="mt-2">
+                          <img
+                            src={URL.createObjectURL(selectedImage)}
+                            alt="Preview"
+                            className="max-w-xs rounded"
+                          />
+                        </div>
+                      )}
+                      {formData.image && (
+                        <div className="mt-2">
+                          <img
+                            src={formData.image}
+                            alt="Current Image"
+                            className="max-w-xs rounded"
+                          />
+                          <p className="text-sm text-gray-500 mt-1">
+                            Current: {formData.image}
+                          </p>
+                        </div>
+                      )}
                       <input
                         type="text"
                         name="image"
                         value={formData.image}
                         onChange={handleChange}
-                        disabled={isLocked}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        placeholder="https://example.com/image.jpg"
+                        disabled={isLocked || !!selectedImage}
+                        className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="Or paste image URL"
                       />
                     </div>
 
