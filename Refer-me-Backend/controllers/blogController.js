@@ -1,3 +1,4 @@
+// controllers/blogController.js
 import Blog from "../models/Blog.js";
 
 // CREATE BLOG
@@ -53,5 +54,18 @@ export const deleteBlog = async (req, res) => {
     res.json({ message: "Blog deleted" });
   } catch (err) {
     res.status(500).json({ error: "Failed to delete blog" });
+  }
+};
+
+// UPLOAD IMAGE
+export const uploadImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+    const imageUrl = `/uploads/${req.file.filename}`;
+    res.json({ url: imageUrl });
+  } catch (err) {
+    res.status(500).json({ error: "Upload failed", details: err.message });
   }
 };

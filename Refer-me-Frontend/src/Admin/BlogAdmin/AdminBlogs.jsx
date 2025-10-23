@@ -1,3 +1,4 @@
+// components/AdminPanel.jsx (or wherever this is)
 import { useState, useEffect } from "react";
 import {
   FiSave,
@@ -149,13 +150,14 @@ const AdminPanel = () => {
     formDataUpload.append("image", file);
 
     try {
-      const response = await fetch("https://refermegroup.com/api/upload", {
+      const response = await fetch("https://refermegroup.com/api/blogs/upload", {
         method: "POST",
         body: formDataUpload,
       });
       if (!response.ok) throw new Error("Failed to upload image");
       const { url } = await response.json();
       setFormData((prev) => ({ ...prev, image: url }));
+      setSelectedImage(null); // Clear preview after successful upload
     } catch (err) {
       console.error("Error uploading image:", err);
       setMessage({ type: "error", text: "Failed to upload image" });

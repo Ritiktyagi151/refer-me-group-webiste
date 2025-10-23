@@ -52,34 +52,36 @@ const AdminPanel = () => {
   const [editCategoryValue, setEditCategoryValue] = useState("");
 
   // API base URL
-  const API_BASE_URL = "https://refermegroup.com/api";
+  const API_BASE_URL = "https://refermegroup.com/api/courses";
 
   // Form state
   const [formData, setFormData] = useState({
-    id: "",
     title: "",
     category: "",
     type: "",
     duration: "",
     enrolled: "",
-    bannerImage: "",
+    bannerImage: null, // File object
     recommended: false,
     trending: false,
     mostPurchased: false,
     topRanked: false,
-    curriculumPdfUrl: "",
+    curriculumPdfUrl: null, // File object
   });
+  const [bannerPreview, setBannerPreview] = useState("");
+  const [pdfPreview, setPdfPreview] = useState("");
 
   // Validate course object
   const isValidCourse = (course) => {
     return (
       course &&
       typeof course === "object" &&
-      course.id &&
+      course._id &&
       course.title &&
       course.category &&
       course.type &&
-      course.bannerImage
+      course.bannerImage &&
+      course.curriculumPdfUrl
     );
   };
 
@@ -96,55 +98,44 @@ const AdminPanel = () => {
       setLoading(true);
       setError(null);
 
-      // Check localStorage
-      const savedCourses = localStorage.getItem("coursesData");
-      if (savedCourses) {
-        try {
-          const parsedCourses = JSON.parse(savedCourses);
-          if (Array.isArray(parsedCourses)) {
-            const validCourses = parsedCourses.filter(isValidCourse);
-            setCourses(validCourses);
-            if (validCourses.length < parsedCourses.length) {
-              setError(
-                "Some courses in localStorage were invalid and filtered out"
-              );
-              localStorage.setItem("coursesData", JSON.stringify(validCourses));
-            }
-          } else {
-            console.error("Parsed courses is not an array:", parsedCourses);
-            setError("Invalid courses data format in localStorage");
-            setCourses([]);
-            localStorage.setItem("coursesData", JSON.stringify([]));
+      const response = await fetch(API_BASE_URL);
+      if (response.ok) {
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          const validCourses = data.filter(isValidCourse);
+          setCourses(validCourses);
+          localStorage.setItem("coursesData", JSON.stringify(validCourses));
+          if (validCourses.length < data.length) {
+            setError("Some courses from API were invalid and filtered out");
           }
-        } catch (parseError) {
-          console.error("Error parsing localStorage courses:", parseError);
-          setError("Error parsing saved courses data");
+        } else {
+          console.error("API response is not an array:", data);
+          setError("Invalid courses data format from API");
           setCourses([]);
           localStorage.setItem("coursesData", JSON.stringify([]));
         }
-      }
-
-      // Try to fetch from API
-      try {
-        const response = await fetch(`${API_BASE_URL}/courses`);
-        if (response.ok) {
-          const data = await response.json();
-          if (Array.isArray(data)) {
-            const validCourses = data.filter(isValidCourse);
-            setCourses(validCourses);
-            localStorage.setItem("coursesData", JSON.stringify(validCourses));
-            if (validCourses.length < data.length) {
-              setError("Some courses from API were invalid and filtered out");
+      } else {
+        // Fallback to localStorage
+        const savedCourses = localStorage.getItem("coursesData");
+        if (savedCourses) {
+          try {
+            const parsedCourses = JSON.parse(savedCourses);
+            if (Array.isArray(parsedCourses)) {
+              const validCourses = parsedCourses.filter(isValidCourse);
+              setCourses(validCourses);
+              if (validCourses.length < parsedCourses.length) {
+                setError(
+                  "Some courses in localStorage were invalid and filtered out"
+                );
+                localStorage.setItem("coursesData", JSON.stringify(validCourses));
+              }
             }
-          } else {
-            console.error("API response is not an array:", data);
-            setError("Invalid courses data format from API");
+          } catch (parseError) {
+            console.error("Error parsing localStorage courses:", parseError);
+            setError("Error parsing saved courses data");
             setCourses([]);
-            localStorage.setItem("coursesData", JSON.stringify([]));
           }
         }
-      } catch (apiError) {
-        console.log("API not available, using localStorage data");
       }
     } catch (err) {
       console.error("Error fetching courses:", err);
@@ -187,39 +178,85 @@ const AdminPanel = () => {
     setHasChanges(true);
   };
 
+  // Handle image upload
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith("image/")) {
+      setFormData((prev) => ({ ...prev, bannerImage: file }));
+      const reader = new FileReader();
+      reader.onload = (ev) => setBannerPreview(ev.target.result);
+      reader.readAsDataURL(file);
+      setHasChanges(true);
+    } else {
+      setError("Please select a valid image file");
+    }
+  };
+
+  // Handle PDF upload
+  const handlePdfUpload = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type === "application/pdf") {
+      setFormData((prev) => ({ ...prev, curriculumPdfUrl: file }));
+      const reader = new FileReader();
+      reader.onload = (ev) => setPdfPreview(ev.target.result); // Optional preview, but PDF can't be previewed easily
+      reader.readAsDataURL(file);
+      setHasChanges(true);
+    } else {
+      setError("Please select a valid PDF file");
+    }
+  };
+
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validation
+    if (!formData.title || !formData.category || !formData.type || !formData.duration || !formData.enrolled || !formData.bannerImage || !formData.curriculumPdfUrl) {
+      setError("Please fill all required fields and upload files");
+      return;
+    }
 
     try {
       setLoading(true);
       setError(null);
 
-      if (isEditing) {
-        // Update existing course
-        const updatedCourses = courses.map((course) =>
-          course.id === formData.id ? formData : course
-        );
-        setCourses(updatedCourses);
-        localStorage.setItem("coursesData", JSON.stringify(updatedCourses));
+      const formDataToSend = new FormData();
+      formDataToSend.append("title", formData.title);
+      formDataToSend.append("category", formData.category);
+      formDataToSend.append("type", formData.type);
+      formDataToSend.append("duration", formData.duration);
+      formDataToSend.append("enrolled", formData.enrolled);
+      formDataToSend.append("recommended", formData.recommended);
+      formDataToSend.append("trending", formData.trending);
+      formDataToSend.append("mostPurchased", formData.mostPurchased);
+      formDataToSend.append("topRanked", formData.topRanked);
+      if (formData.bannerImage) formDataToSend.append("bannerImage", formData.bannerImage);
+      if (formData.curriculumPdfUrl) formDataToSend.append("curriculumPdfUrl", formData.curriculumPdfUrl);
 
-        alert("Course updated successfully!");
+      const url = isEditing ? `${API_BASE_URL}/${currentCourse._id}` : API_BASE_URL;
+      const method = isEditing ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
+        body: formDataToSend,
+      });
+
+      if (response.ok) {
+        const updatedCourse = await response.json();
+        if (isEditing) {
+          setCourses(courses.map((c) => (c._id === updatedCourse._id ? updatedCourse : c)));
+        } else {
+          setCourses([...courses, updatedCourse]);
+        }
+        localStorage.setItem("coursesData", JSON.stringify([...courses, updatedCourse]));
+        alert(isEditing ? "Course updated successfully!" : "Course added successfully!");
+        resetForm();
+        setHasChanges(false);
+        fetchCourses(); // Refresh list
       } else {
-        // Add new course
-        const newCourseData = {
-          ...formData,
-          id: Date.now().toString(), // Generate unique ID
-        };
-
-        const updatedCourses = [...courses, newCourseData];
-        setCourses(updatedCourses);
-        localStorage.setItem("coursesData", JSON.stringify(updatedCourses));
-
-        alert("Course added successfully!");
+        const err = await response.json();
+        setError(err.error || "Failed to save course");
       }
-
-      resetForm();
-      setHasChanges(false);
     } catch (err) {
       console.error("Error saving course:", err);
       setError(err.message);
@@ -231,19 +268,20 @@ const AdminPanel = () => {
   // Reset form
   const resetForm = () => {
     setFormData({
-      id: "",
       title: "",
       category: "",
       type: "",
       duration: "",
       enrolled: "",
-      bannerImage: "",
+      bannerImage: null,
       recommended: false,
       trending: false,
       mostPurchased: false,
       topRanked: false,
-      curriculumPdfUrl: "",
+      curriculumPdfUrl: null,
     });
+    setBannerPreview("");
+    setPdfPreview("");
     setIsEditing(false);
     setCurrentCourse(null);
   };
@@ -252,7 +290,21 @@ const AdminPanel = () => {
   const editCourse = (course) => {
     if (isLocked) return;
 
-    setFormData(course);
+    setFormData({
+      title: course.title || "",
+      category: course.category || "",
+      type: course.type || "",
+      duration: course.duration || "",
+      enrolled: course.enrolled || "",
+      bannerImage: null, // Reset to re-upload if needed
+      recommended: course.recommended || false,
+      trending: course.trending || false,
+      mostPurchased: course.mostPurchased || false,
+      topRanked: course.topRanked || false,
+      curriculumPdfUrl: null, // Reset to re-upload if needed
+    });
+    setBannerPreview(course.bannerImage || "");
+    setPdfPreview(course.curriculumPdfUrl ? "PDF uploaded" : ""); // Simple indicator
     setIsEditing(true);
     setCurrentCourse(course);
   };
@@ -269,16 +321,22 @@ const AdminPanel = () => {
       setLoading(true);
       setError(null);
 
-      // Update local state
-      const updatedCourses = courses.filter((course) => course.id !== id);
-      setCourses(updatedCourses);
-      localStorage.setItem("coursesData", JSON.stringify(updatedCourses));
+      const response = await fetch(`${API_BASE_URL}/${id}`, { method: "DELETE" });
+      if (response.ok) {
+        const updatedCourses = courses.filter((course) => course._id !== id);
+        setCourses(updatedCourses);
+        localStorage.setItem("coursesData", JSON.stringify(updatedCourses));
 
-      if (currentCourse && currentCourse.id === id) {
-        resetForm();
+        if (currentCourse && currentCourse._id === id) {
+          resetForm();
+        }
+
+        alert("Course deleted successfully!");
+        fetchCourses(); // Refresh list
+      } else {
+        const err = await response.json();
+        setError(err.error || "Failed to delete course");
       }
-
-      alert("Course deleted successfully!");
     } catch (err) {
       console.error("Error deleting course:", err);
       setError(err.message);
@@ -287,7 +345,7 @@ const AdminPanel = () => {
     }
   };
 
-  // Save all changes
+  // Save all changes (now redundant since we sync with API, but keep for local)
   const saveChanges = async () => {
     try {
       setLoading(true);
@@ -295,7 +353,7 @@ const AdminPanel = () => {
 
       localStorage.setItem("coursesData", JSON.stringify(courses));
 
-      alert("Changes saved successfully!");
+      alert("Changes saved locally!");
       setHasChanges(false);
     } catch (err) {
       console.error("Error saving changes:", err);
@@ -340,13 +398,14 @@ const AdminPanel = () => {
       (course) => course.category === editingCategory
     );
     if (coursesUsingCategory.length > 0) {
+      // Update courses category
       const updatedCourses = courses.map((course) =>
         course.category === editingCategory
           ? { ...course, category: editCategoryValue.trim() }
           : course
       );
       setCourses(updatedCourses);
-      localStorage.setItem("coursesData", JSON.stringify(updatedCourses));
+      // Note: In production, update via API PUT for each course
     }
 
     const updatedCategories = categories.map((cat) =>
@@ -418,7 +477,7 @@ const AdminPanel = () => {
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}
             >
-              {loading ? "Saving..." : "Save All Changes"}
+              {loading ? "Saving..." : "Save Local Changes"}
             </button>
           </div>
         </div>
@@ -474,7 +533,6 @@ const AdminPanel = () => {
             >
               Categories
             </button>
-            
           </nav>
         </div>
 
@@ -495,7 +553,7 @@ const AdminPanel = () => {
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700">
-                        Title
+                        Title *
                       </label>
                       <input
                         type="text"
@@ -510,7 +568,7 @@ const AdminPanel = () => {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700">
-                        Category
+                        Category *
                       </label>
                       <select
                         name="category"
@@ -533,7 +591,7 @@ const AdminPanel = () => {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700">
-                        Type
+                        Type *
                       </label>
                       <input
                         type="text"
@@ -548,7 +606,7 @@ const AdminPanel = () => {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700">
-                        Duration
+                        Duration *
                       </label>
                       <input
                         type="text"
@@ -563,7 +621,7 @@ const AdminPanel = () => {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700">
-                        Enrolled
+                        Enrolled *
                       </label>
                       <input
                         type="text"
@@ -578,31 +636,43 @@ const AdminPanel = () => {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700">
-                        Banner Image URL
+                        Banner Image *
                       </label>
+                      {bannerPreview && (
+                        <div className="mt-1">
+                          <img
+                            src={bannerPreview}
+                            alt="Banner preview"
+                            className="w-full max-h-32 object-cover rounded-md mb-2"
+                          />
+                        </div>
+                      )}
                       <input
-                        type="text"
-                        name="bannerImage"
-                        value={safeString(formData.bannerImage)}
-                        onChange={handleInputChange}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
                         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                        required
                         disabled={isLocked || loading}
+                        required={!isEditing}
                       />
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700">
-                        Curriculum PDF URL
+                        Curriculum PDF *
                       </label>
+                      {pdfPreview && (
+                        <div className="mt-1 text-sm text-gray-500 mb-2">
+                          {pdfPreview}
+                        </div>
+                      )}
                       <input
-                        type="text"
-                        name="curriculumPdfUrl"
-                        value={safeString(formData.curriculumPdfUrl)}
-                        onChange={handleInputChange}
+                        type="file"
+                        accept=".pdf"
+                        onChange={handlePdfUpload}
                         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                        required
                         disabled={isLocked || loading}
+                        required={!isEditing}
                       />
                     </div>
 
@@ -767,12 +837,12 @@ const AdminPanel = () => {
                       ) : (
                         courses.map((course, index) =>
                           isValidCourse(course) ? (
-                            <tr key={course.id || index}>
+                            <tr key={course._id || index}>
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <div className="flex items-center">
                                   <div className="flex-shrink-0 h-10 w-10">
                                     <img
-                                      className="h-10 w-10 rounded-md"
+                                      className="h-10 w-10 rounded-md object-cover"
                                       src={safeString(course.bannerImage)}
                                       alt={safeString(course.title)}
                                       onError={(e) => {
@@ -831,7 +901,7 @@ const AdminPanel = () => {
                                   Edit
                                 </button>
                                 <button
-                                  onClick={() => deleteCourse(course.id)}
+                                  onClick={() => deleteCourse(course._id)}
                                   disabled={isLocked || loading}
                                   className={`${
                                     isLocked || loading
@@ -850,7 +920,6 @@ const AdminPanel = () => {
                                 className="px-6 py-4 whitespace-nowrap text-sm text-red-500"
                               >
                                 Invalid course data at index {index}
-                                {console.error("Invalid course data:", course)}
                               </td>
                             </tr>
                           )
@@ -991,8 +1060,6 @@ const AdminPanel = () => {
             </div>
           </motion.div>
         )}
-
-       
       </main>
     </div>
   );

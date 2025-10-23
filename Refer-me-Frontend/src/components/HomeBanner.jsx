@@ -14,7 +14,7 @@ const mobileSlides = [
     cta: "Shop Now",
   },
   {
-    id: 2,
+    id: 2,  
     title: "Mobile Winter Special",
     subtitle: "Up to 50% Off",
     image: "/assets/banner-new/mobile-view-RMG2.jpg",
@@ -168,7 +168,7 @@ const HomeBanner = () => {
                   <div className="absolute inset-0 bg-amber-700/30"></div>
                   <div className="relative z-10 p-4 sm:p-6 flex flex-col justify-between h-full">
                     <div>
-                      <span className="text-xs sm:text-sm font-medium uppercase">
+                      <span className="text-[15.5px] backdrop-blur-sm ml-3 md:ml-8 md:text-[20px] font-bold uppercase">
                         We’re more than a job platform
                       </span>
                     </div>
