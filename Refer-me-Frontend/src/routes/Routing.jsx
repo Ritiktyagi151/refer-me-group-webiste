@@ -52,7 +52,7 @@ import OurStoryAdmin from "../Admin/AboutUS/OurStoryAdmin";
 import CoreCmtyAdmin from "../Admin/AboutUS/CoreCmtyAdmin";
 import PaymentPolicyAdmin from "../Admin/AboutUS/PaymentPolicyAdmin";
 import WebniarAdmin from "../Admin/OurServices/WebniarAdmin";
-import ManthanWebniarAdmin from "../Admin/OurServices/ManthanWebniarAdmin";
+import ManthanAdmin from "../Admin/OurServices/ManthanAdmin";
 import AdminLogout from "../Admin/AddLogin/AdminLogout";
 import AdminBlogs from "../Admin/BlogAdmin/AdminBlogs";
 import CareerQuiz from "../components/QuizPopup";
@@ -175,7 +175,7 @@ const router = createBrowserRouter([
       { path: "about/core-committee", element: <CoreCmtyAdmin /> },
       { path: "about/payment-policy", element: <PaymentPolicyAdmin /> },
       { path: "services/webinars", element: <WebniarAdmin /> },
-      { path: "services/manthan", element: <ManthanWebniarAdmin /> },
+      { path: "services/manthan", element: <ManthanAdmin /> },
     ],
   },
 

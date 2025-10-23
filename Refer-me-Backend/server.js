@@ -19,6 +19,7 @@ import careerRoutes from "./routes/careerRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 import paymentRoutes from "./routes/payment.js";
 import webinarRoutes from "./routes/webinar.js";
+import manthanRoutes from "./routes/manthanRoutes.js";
 
 const app = express();
 
@@ -53,6 +54,7 @@ app.use("/api/careers", careerRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/webinars", webinarRoutes);
+app.use("/api/manthan", manthanRoutes);
 
 // Default route
 app.get("/", (req, res) => {
