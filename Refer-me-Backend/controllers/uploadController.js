@@ -1,20 +1,46 @@
-import upload from "../middlewares/uploadMiddleware.js";
+import upload from "../middlewares/upload.js";
 
-// Single image upload handler
-export const uploadImage = [
-  upload.single("image"), // 'image' field from frontend FormData
-  (req, res) => {
-    try {
-      if (!req.file) {
-        return res.status(400).json({ error: "No image file uploaded" });
-      }
+// controllers/upload.controller.js
+export const uploadSingle = (req, res) => {
+  try {
+    console.log("Request headers:", req.headers);
+    console.log("Request body keys:", Object.keys(req.body));
 
-      // URL generate (localhost or production domain)
-      const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
-      res.status(200).json({ url: imageUrl });
-    } catch (error) {
-      console.error("Upload error:", error);
-      res.status(500).json({ error: "Failed to upload image" });
+    if (!req.file) {
+      console.warn("No file uploaded!");
+      return res.status(400).json({ message: 'No file uploaded!' });
     }
-  },
-];
+
+    console.log("File received:", req.file);
+
+    res.status(200).json({
+      message: 'File uploaded successfully!',
+      file: req.file
+    });
+  } catch (error) {
+    console.error("Error in uploadSingle controller:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const uploadMultiple = (req, res) => {
+  try {
+    console.log("Request headers:", req.headers);
+    console.log("Request body keys:", Object.keys(req.body));
+
+    if (!req.files || req.files.length === 0) {
+      console.warn("No files uploaded!");
+      return res.status(400).json({ message: 'No files uploaded!' });
+    }
+
+    console.log("Files received:", req.files);
+
+    res.status(200).json({
+      message: 'Files uploaded successfully!',
+      files: req.files
+    });
+  } catch (error) {
+    console.error("Error in uploadMultiple controller:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
