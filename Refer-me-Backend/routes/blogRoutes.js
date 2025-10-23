@@ -8,7 +8,7 @@ import {
   deleteBlog,
   uploadImage,
 } from "../controllers/blogController.js";
-import upload from "../middleware/upload.js"; // Adjust path if needed
+import upload from "../middlewares/upload.js"; // Adjust path if needed
 
 const router = express.Router();
 

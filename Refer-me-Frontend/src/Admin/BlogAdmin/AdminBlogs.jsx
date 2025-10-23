@@ -147,10 +147,10 @@ const AdminPanel = () => {
     setSelectedImage(file);
 
     const formDataUpload = new FormData();
-    formDataUpload.append("image", file);
+    formDataUpload.append("photo", file);
 
     try {
-      const response = await fetch("https://refermegroup.com/api/blogs/upload", {
+      const response = await fetch("http:///localhost:5000/api/uploadSingle", {
         method: "POST",
         body: formDataUpload,
       });
