@@ -61,48 +61,6 @@ const mockApi = {
     localStorage.setItem("paymentPolicy", JSON.stringify(data));
     return data;
   },
-
-  // What We Do
-  getWhatWeDo: async () => {
-    await mockApi.delay();
-    return (
-      JSON.parse(localStorage.getItem("whatWeDo")) || {
-        title: "",
-        introduction: "",
-        items: [],
-      }
-    );
-  },
-
-  saveWhatWeDo: async (data) => {
-    await mockApi.delay();
-    localStorage.setItem("whatWeDo", JSON.stringify(data));
-    return data;
-  },
-
-  addWhatWeDoItem: async (item) => {
-    await mockApi.delay();
-    const whatWeDo = JSON.parse(localStorage.getItem("whatWeDo")) || {
-      title: "",
-      introduction: "",
-      items: [],
-    };
-    whatWeDo.items.push(item);
-    localStorage.setItem("whatWeDo", JSON.stringify(whatWeDo));
-    return whatWeDo;
-  },
-
-  deleteWhatWeDoItem: async (index) => {
-    await mockApi.delay();
-    const whatWeDo = JSON.parse(localStorage.getItem("whatWeDo")) || {
-      title: "",
-      introduction: "",
-      items: [],
-    };
-    whatWeDo.items.splice(index, 1);
-    localStorage.setItem("whatWeDo", JSON.stringify(whatWeDo));
-    return whatWeDo;
-  },
 };
 
 const AdminPanel = () => {
@@ -124,12 +82,6 @@ const AdminPanel = () => {
     title: "",
     introduction: "",
   });
-  const [whatWeDo, setWhatWeDo] = useState({
-    title: "",
-    introduction: "",
-    items: [],
-  });
-  const [newItem, setNewItem] = useState("");
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -142,7 +94,6 @@ const AdminPanel = () => {
           fetchOurStory(),
           fetchCoreCommittee(),
           fetchPaymentPolicy(),
-          fetchWhatWeDo(),
         ]);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -249,53 +200,6 @@ const AdminPanel = () => {
     }
   };
 
-  // =================== What We Do ===================
-  const fetchWhatWeDo = async () => {
-    try {
-      const data = await mockApi.getWhatWeDo();
-      setWhatWeDo(data);
-    } catch (err) {
-      console.error("Error fetching What We Do:", err);
-    }
-  };
-
-  const handleWhatWeDoSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await mockApi.saveWhatWeDo(whatWeDo);
-      alert("What We Do saved successfully!");
-    } catch (err) {
-      console.error("Error saving What We Do:", err);
-      alert("Error saving What We Do");
-    }
-  };
-
-  const handleAddItem = async (e) => {
-    e.preventDefault();
-    try {
-      await mockApi.addWhatWeDoItem(newItem);
-      setNewItem("");
-      fetchWhatWeDo();
-      alert("Item added successfully!");
-    } catch (err) {
-      console.error("Error adding item:", err);
-      alert("Error adding item");
-    }
-  };
-
-  const handleDeleteItem = async (index) => {
-    if (window.confirm("Are you sure you want to delete this item?")) {
-      try {
-        await mockApi.deleteWhatWeDoItem(index);
-        fetchWhatWeDo();
-        alert("Item deleted successfully!");
-      } catch (err) {
-        console.error("Error deleting item:", err);
-        alert("Error deleting item");
-      }
-    }
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center">
@@ -321,12 +225,7 @@ const AdminPanel = () => {
         {/* Navigation Tabs */}
         <div className="border-b border-gray-200 mb-6">
           <nav className="-mb-px flex space-x-8">
-            {[
-              "our-story",
-              "core-committee",
-              "payment-policy",
-              "what-we-do",
-            ].map((tab) => (
+            {["our-story", "core-committee", "payment-policy"].map((tab) => (
               <button
                 key={tab}
                 className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
@@ -714,127 +613,6 @@ const AdminPanel = () => {
                 Save Payment Policy
               </button>
             </form>
-          </div>
-        )}
-
-        {/* What We Do Section */}
-        {activeTab === "what-we-do" && (
-          <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">What We Do</h2>
-
-            {/* Main Content Form */}
-            <form onSubmit={handleWhatWeDoSubmit} className="mb-8">
-              <div className="mb-4">
-                <label
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                  htmlFor="whatWeDoTitle"
-                >
-                  Title
-                </label>
-                <input
-                  type="text"
-                  id="whatWeDoTitle"
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  value={whatWeDo.title}
-                  onChange={(e) =>
-                    setWhatWeDo({ ...whatWeDo, title: e.target.value })
-                  }
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                  htmlFor="whatWeDoIntroduction"
-                >
-                  Introduction
-                </label>
-                <textarea
-                  id="whatWeDoIntroduction"
-                  rows="4"
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  value={whatWeDo.introduction}
-                  onChange={(e) =>
-                    setWhatWeDo({ ...whatWeDo, introduction: e.target.value })
-                  }
-                  required
-                />
-              </div>
-              <button
-                type="submit"
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-              >
-                Save What We Do
-              </button>
-            </form>
-
-            {/* Add Item Form */}
-            <form
-              onSubmit={handleAddItem}
-              className="mb-8 p-4 border rounded-lg"
-            >
-              <h3 className="text-lg font-medium mb-3">Add Activity Item</h3>
-              <div className="mb-4">
-                <label
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                  htmlFor="itemText"
-                >
-                  Item Text
-                </label>
-                <input
-                  type="text"
-                  id="itemText"
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  value={newItem}
-                  onChange={(e) => setNewItem(e.target.value)}
-                  required
-                />
-              </div>
-              <button
-                type="submit"
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-              >
-                Add Item
-              </button>
-            </form>
-
-            {/* Items List */}
-            <h3 className="text-lg font-medium mb-3">Activity Items</h3>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      #
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Item
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {whatWeDo.items.map((item, index) => (
-                    <tr key={index}>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {index + 1}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">{item}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <button
-                          className="text-red-600 hover:text-red-900"
-                          onClick={() => handleDeleteItem(index)}
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
           </div>
         )}
       </main>

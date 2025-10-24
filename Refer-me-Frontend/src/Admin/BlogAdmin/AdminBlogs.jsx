@@ -37,6 +37,8 @@ const AdminPanel = () => {
     siteTitle: "Refer Me Group Blog",
     siteDescription:
       "Expert insights, career tips, and emerging trends to guide your professional journey.",
+    headerText: "",
+    footerText: "",
     primaryColor: "#7C3AED",
     secondaryColor: "#F5F3FF",
     accentColor: "#4F46E5",
@@ -114,7 +116,17 @@ const AdminPanel = () => {
       const response = await fetch("https://refermegroup.com/api/settings");
       if (response.ok) {
         const data = await response.json();
-        setSettings(data);
+        setSettings({
+          siteTitle: data.siteTitle || "Refer Me Group Blog",
+          siteDescription:
+            data.siteDescription ||
+            "Expert insights, career tips, and emerging trends to guide your professional journey.",
+          headerText: data.headerText || "",
+          footerText: data.footerText || "",
+          primaryColor: data.primaryColor || "#7C3AED",
+          secondaryColor: data.secondaryColor || "#F5F3FF",
+          accentColor: data.accentColor || "#4F46E5",
+        });
       }
     } catch (err) {
       console.error("Error fetching settings:", err);
@@ -150,12 +162,13 @@ const AdminPanel = () => {
     formDataUpload.append("photo", file);
 
     try {
-      const response = await fetch("http:///localhost:5000/api/uploadSingle", {
+      const response = await fetch("http://localhost:5000/api/uploadSingle", {
         method: "POST",
         body: formDataUpload,
       });
       if (!response.ok) throw new Error("Failed to upload image");
-      const { url } = await response.json();
+      const data = await response.json();
+      const url = data.url || ""; // Safely extract url, default to empty string to avoid undefined
       setFormData((prev) => ({ ...prev, image: url }));
       setSelectedImage(null); // Clear preview after successful upload
     } catch (err) {
@@ -291,14 +304,14 @@ const AdminPanel = () => {
   // Edit blog post
   const handleEdit = (blog) => {
     setFormData({
-      _id: blog._id,
-      title: blog.title,
-      slug: blog.slug,
-      excerpt: blog.excerpt,
+      _id: blog._id || "",
+      title: blog.title || "",
+      slug: blog.slug || "",
+      excerpt: blog.excerpt || "",
       content: blog.content || "",
-      category: blog.category,
-      author: blog.author,
-      image: blog.image,
+      category: blog.category || "",
+      author: blog.author || "",
+      image: blog.image || "",
       tags: blog.tags || [],
       newTag: "",
       createdAt:
@@ -402,7 +415,7 @@ const AdminPanel = () => {
                     Blog Posts
                   </button>
                 </li>
-                {/* <li>
+                <li>
                   <button
                     onClick={() => setActiveSection("settings")}
                     className={`w-full text-left px-4 py-2 rounded-md ${
@@ -425,7 +438,7 @@ const AdminPanel = () => {
                   >
                     Appearance
                   </button>
-                </li> */}
+                </li>
               </ul>
             </nav>
           </div>
@@ -826,7 +839,7 @@ const AdminPanel = () => {
                     <input
                       type="text"
                       name="headerText"
-                      value={settings.headerText || ""}
+                      value={settings.headerText}
                       onChange={handleSettingsChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />
@@ -839,7 +852,7 @@ const AdminPanel = () => {
                     <input
                       type="text"
                       name="footerText"
-                      value={settings.footerText || ""}
+                      value={settings.footerText}
                       onChange={handleSettingsChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />
