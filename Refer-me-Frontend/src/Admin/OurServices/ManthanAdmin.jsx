@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { manthanApi } from "../../api/manthan";
 
 // ✅ FIX 1: अपना लोकल बैकएंड URL यहाँ जोड़ें
-const BACKEND_URL = "https://refermegroup.com";
+const BACKEND_URL = "http://localhost:5000";
 
 const ManthanAdmin = () => {
   const [upcomingEvents, setUpcomingEvents] = useState([]);
@@ -139,7 +139,7 @@ const ManthanAdmin = () => {
         onSubmit={handleSubmit}
         className="bg-white shadow-lg p-6 rounded-2xl space-y-4"
       >
-        {/* ... (पूरा फॉर्म जैसा है वैसा ही रहेगा) ... */}
+       {/* ... (पूरा फॉर्म जैसा है वैसा ही रहेगा) ... */}
         <div className="grid md:grid-cols-2 gap-4">
           <input
             type="text"

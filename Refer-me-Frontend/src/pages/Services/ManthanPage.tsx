@@ -6,7 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { manthanApi } from "../../api/manthan"; // ✅ Adjust the path as needed
 
 // ✅ FIX 1: अपना लोकल बैकएंड URL यहाँ जोड़ें
-const BACKEND_URL = "https://refermegroup.com";
+const BACKEND_URL = "http://localhost:5000";
 
 const ManthanPage = () => {
   const [formData, setFormData] = useState({ name: "", email: "", phone: "" });
