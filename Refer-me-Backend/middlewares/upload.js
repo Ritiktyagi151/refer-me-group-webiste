@@ -2,7 +2,6 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 
-
 // Ensure uploads directory exists
 const uploadsDir = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadsDir)) {
@@ -13,30 +12,40 @@ if (!fs.existsSync(uploadsDir)) {
 // Multer storage configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    console.log("Uploading file:", file.originalname);
     cb(null, uploadsDir);
   },
   filename: (req, file, cb) => {
     const filename = `${Date.now()}-${file.originalname}`;
-    console.log("Saving as filename:", filename);
     cb(null, filename);
   },
 });
 
-// File filter configuration
+// File filter configuration (Updated)
 const fileFilter = (req, file, cb) => {
-  if (file.fieldname === "bannerImage" && !file.mimetype.startsWith("image/")) {
-    return cb(new Error("Only image files allowed for banner"), false);
+  // Check for the 'image' fieldname used in Manthan
+  if (file.fieldname === "image") {
+    if (file.mimetype.startsWith("image/")) {
+      cb(null, true); // Allow image
+    } else {
+      cb(new Error("Only image files allowed for 'image' field"), false);
+    }
   }
-
-  if (
+  // Keep your other filters if needed
+  else if (
+    file.fieldname === "bannerImage" &&
+    !file.mimetype.startsWith("image/")
+  ) {
+    return cb(new Error("Only image files allowed for banner"), false);
+  } else if (
     file.fieldname === "curriculumPdfUrl" &&
     file.mimetype !== "application/pdf"
   ) {
     return cb(new Error("Only PDF files allowed for curriculum"), false);
   }
-
-  cb(null, true);
+  // Default to allow other fields if they pass
+  else {
+    cb(null, true);
+  }
 };
 
 // Multer upload instance

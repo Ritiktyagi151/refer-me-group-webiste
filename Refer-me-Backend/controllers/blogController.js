@@ -4,13 +4,25 @@ import Blog from "../models/Blog.js";
 // CREATE BLOG
 export const createBlog = async (req, res) => {
   try {
-    const { title, excerpt, content, image, author, category, tags, slug } = req.body;
+    const { title, excerpt, content, image, author, category, tags, slug } =
+      req.body;
 
-    const blog = new Blog({ title, excerpt, content, image, author, category, tags, slug });
+    const blog = new Blog({
+      title,
+      excerpt,
+      content,
+      image,
+      author,
+      category,
+      tags,
+      slug,
+    });
     await blog.save();
     res.status(201).json(blog);
   } catch (err) {
-    res.status(500).json({ error: "Blog creation failed", details: err.message });
+    res
+      .status(500)
+      .json({ error: "Blog creation failed", details: err.message });
   }
 };
 
@@ -38,7 +50,9 @@ export const getBlogById = async (req, res) => {
 // UPDATE BLOG
 export const updateBlog = async (req, res) => {
   try {
-    const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
     if (!updatedBlog) return res.status(404).json({ error: "Blog not found" });
     res.json(updatedBlog);
   } catch (err) {
@@ -63,7 +77,12 @@ export const uploadImage = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
     }
-    const imageUrl = `/uploads/${req.file.filename}`;
+
+    // UPDATE: Poora URL banayein (e.g., http://localhost:5000/uploads/image.png)
+    const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${
+      req.file.filename
+    }`;
+
     res.json({ url: imageUrl });
   } catch (err) {
     res.status(500).json({ error: "Upload failed", details: err.message });

@@ -159,18 +159,22 @@ const AdminPanel = () => {
     setSelectedImage(file);
 
     const formDataUpload = new FormData();
-    formDataUpload.append("photo", file);
+    formDataUpload.append("image", file); // <-- PROBLEM 2 FIX: "photo" se "image" kiya
 
     try {
-      const response = await fetch("http://localhost:5000/api/uploadSingle", {
-        method: "POST",
-        body: formDataUpload,
-      });
+      const response = await fetch(
+        "https://refermegroup.com/api/blogs/upload",
+        {
+          // <-- PROBLEM 1 FIX: Endpoint "uploadSingle" se "blogs/upload" kiya
+          method: "POST",
+          body: formDataUpload,
+        }
+      );
       if (!response.ok) throw new Error("Failed to upload image");
       const data = await response.json();
-      const url = data.url || ""; // Safely extract url, default to empty string to avoid undefined
+      const url = data.url || "";
       setFormData((prev) => ({ ...prev, image: url }));
-      setSelectedImage(null); // Clear preview after successful upload
+      setSelectedImage(null);
     } catch (err) {
       console.error("Error uploading image:", err);
       setMessage({ type: "error", text: "Failed to upload image" });

@@ -1,8 +1,9 @@
 import axios from "axios";
 
 // 🌐 Base API URL (from .env or fallback)
+// --- FIX: "/services" को हटा दिया गया है ---
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "https://refermegroup.com/api/services";
+  import.meta.env.VITE_API_BASE_URL || "https://refermegroup.com/api";
 
 // ✅ Create Axios instance
 const api = axios.create({
@@ -37,7 +38,10 @@ export const manthanApi = {
   // 🟣 Add New Event (for Admin)
   addEvent: async (formData) => {
     try {
-      const response = await api.post("/manthan", formData, {
+      // --- FIX: formData से category निकालकर सही URL पर पोस्ट करें ---
+      const category = formData.get("category") || "upcoming";
+
+      const response = await api.post(`/manthan/${category}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       return response.data;

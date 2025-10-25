@@ -46,6 +46,8 @@ const AdminPanel = () => {
     "Cloud & DevOps",
     "Management & Business",
     "Marketing & Soft Skills",
+    // --- ADD KAREIN (Aapke example data se) ---
+    "Cloud Computing",
   ]);
   const [newCategory, setNewCategory] = useState("");
   const [editingCategory, setEditingCategory] = useState(null);
@@ -71,19 +73,14 @@ const AdminPanel = () => {
   const [bannerPreview, setBannerPreview] = useState("");
   const [pdfPreview, setPdfPreview] = useState("");
 
+  // --- YEH FUNCTION UPDATE KIYA GAYA HAI ---
   // Validate course object
   const isValidCourse = (course) => {
-    return (
-      course &&
-      typeof course === "object" &&
-      course._id &&
-      course.title &&
-      course.category &&
-      course.type &&
-      course.bannerImage &&
-      course.curriculumPdfUrl
-    );
+    // Ab yeh sirf check karega ki course hai aur usmein _id aur title hai.
+    // Isse aapke adhoore bane courses bhi list mein dikh jayenge.
+    return course && typeof course === "object" && course._id && course.title;
   };
+  // --- FUNCTION UPDATE KHATAM ---
 
   // Safely convert any value to string for rendering
   const safeString = (value) => {
@@ -102,40 +99,25 @@ const AdminPanel = () => {
       if (response.ok) {
         const data = await response.json();
         if (Array.isArray(data)) {
+          // Ab humara naya isValidCourse function yahan istemal hoga
           const validCourses = data.filter(isValidCourse);
           setCourses(validCourses);
-          localStorage.setItem("coursesData", JSON.stringify(validCourses));
+
           if (validCourses.length < data.length) {
-            setError("Some courses from API were invalid and filtered out");
+            console.warn(
+              "Some courses were filtered out by isValidCourse check."
+            );
+            // Yeh error dikhane ki zaroorat nahi
+            // setError("Some courses from API were invalid and filtered out");
           }
         } else {
           console.error("API response is not an array:", data);
           setError("Invalid courses data format from API");
           setCourses([]);
-          localStorage.setItem("coursesData", JSON.stringify([]));
         }
       } else {
-        // Fallback to localStorage
-        const savedCourses = localStorage.getItem("coursesData");
-        if (savedCourses) {
-          try {
-            const parsedCourses = JSON.parse(savedCourses);
-            if (Array.isArray(parsedCourses)) {
-              const validCourses = parsedCourses.filter(isValidCourse);
-              setCourses(validCourses);
-              if (validCourses.length < parsedCourses.length) {
-                setError(
-                  "Some courses in localStorage were invalid and filtered out"
-                );
-                localStorage.setItem("coursesData", JSON.stringify(validCourses));
-              }
-            }
-          } catch (parseError) {
-            console.error("Error parsing localStorage courses:", parseError);
-            setError("Error parsing saved courses data");
-            setCourses([]);
-          }
-        }
+        setError("Failed to fetch courses from API.");
+        setCourses([]);
       }
     } catch (err) {
       console.error("Error fetching courses:", err);
@@ -155,18 +137,22 @@ const AdminPanel = () => {
     if (savedCategories) {
       try {
         const parsedCategories = JSON.parse(savedCategories);
-        if (Array.isArray(parsedCategories)) {
-          setCategories(parsedCategories);
+        if (Array.isArray(parsedCategories) && parsedCategories.length > 0) {
+          // Purani list aur nayi local list ko merge karein
+          setCategories((prev) => [...new Set([...prev, ...parsedCategories])]);
         } else {
-          console.error("Parsed categories is not an array:", parsedCategories);
-          setError("Invalid categories data format in localStorage");
+          // Agar local storage khali hai, toh default list ko hi save kardein
+          localStorage.setItem("courseCategories", JSON.stringify(categories));
         }
       } catch (parseError) {
         console.error("Error parsing categories:", parseError);
         setError("Error parsing saved categories");
       }
+    } else {
+      // Agar local storage mein kuch nahi hai, toh default list save karein
+      localStorage.setItem("courseCategories", JSON.stringify(categories));
     }
-  }, []);
+  }, []); // [] dependency zaroori hai taaki yeh sirf ek baar chale
 
   // Handle form input changes
   const handleInputChange = (e) => {
@@ -197,22 +183,33 @@ const AdminPanel = () => {
     const file = e.target.files[0];
     if (file && file.type === "application/pdf") {
       setFormData((prev) => ({ ...prev, curriculumPdfUrl: file }));
-      const reader = new FileReader();
-      reader.onload = (ev) => setPdfPreview(ev.target.result); // Optional preview, but PDF can't be previewed easily
-      reader.readAsDataURL(file);
+      setPdfPreview(file.name);
       setHasChanges(true);
     } else {
       setError("Please select a valid PDF file");
     }
   };
 
-  // Handle form submission
+  // Handle form submission (Yeh wahi code hai jo pehle update kiya tha)
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Validation
-    if (!formData.title || !formData.category || !formData.type || !formData.duration || !formData.enrolled || !formData.bannerImage || !formData.curriculumPdfUrl) {
-      setError("Please fill all required fields and upload files");
+    if (
+      !formData.title ||
+      !formData.category ||
+      !formData.type ||
+      !formData.duration ||
+      !formData.enrolled
+    ) {
+      setError("Please fill all required text fields");
+      return;
+    }
+
+    if (!isEditing && (!formData.bannerImage || !formData.curriculumPdfUrl)) {
+      setError(
+        "Please upload both Banner Image and Curriculum PDF when creating a new course"
+      );
       return;
     }
 
@@ -230,10 +227,20 @@ const AdminPanel = () => {
       formDataToSend.append("trending", formData.trending);
       formDataToSend.append("mostPurchased", formData.mostPurchased);
       formDataToSend.append("topRanked", formData.topRanked);
-      if (formData.bannerImage) formDataToSend.append("bannerImage", formData.bannerImage);
-      if (formData.curriculumPdfUrl) formDataToSend.append("curriculumPdfUrl", formData.curriculumPdfUrl);
 
-      const url = isEditing ? `${API_BASE_URL}/${currentCourse._id}` : API_BASE_URL;
+      if (formData.bannerImage && typeof formData.bannerImage !== "string") {
+        formDataToSend.append("bannerImage", formData.bannerImage);
+      }
+      if (
+        formData.curriculumPdfUrl &&
+        typeof formData.curriculumPdfUrl !== "string"
+      ) {
+        formDataToSend.append("curriculumPdfUrl", formData.curriculumPdfUrl);
+      }
+
+      const url = isEditing
+        ? `${API_BASE_URL}/${currentCourse._id}`
+        : API_BASE_URL;
       const method = isEditing ? "PUT" : "POST";
 
       const response = await fetch(url, {
@@ -244,15 +251,22 @@ const AdminPanel = () => {
       if (response.ok) {
         const updatedCourse = await response.json();
         if (isEditing) {
-          setCourses(courses.map((c) => (c._id === updatedCourse._id ? updatedCourse : c)));
+          setCourses(
+            courses.map((c) =>
+              c._id === updatedCourse._id ? updatedCourse : c
+            )
+          );
         } else {
           setCourses([...courses, updatedCourse]);
         }
-        localStorage.setItem("coursesData", JSON.stringify([...courses, updatedCourse]));
-        alert(isEditing ? "Course updated successfully!" : "Course added successfully!");
+        alert(
+          isEditing
+            ? "Course updated successfully!"
+            : "Course added successfully!"
+        );
         resetForm();
         setHasChanges(false);
-        fetchCourses(); // Refresh list
+        fetchCourses(); // List ko API se refresh karein
       } else {
         const err = await response.json();
         setError(err.error || "Failed to save course");
@@ -296,15 +310,15 @@ const AdminPanel = () => {
       type: course.type || "",
       duration: course.duration || "",
       enrolled: course.enrolled || "",
-      bannerImage: null, // Reset to re-upload if needed
+      bannerImage: null,
       recommended: course.recommended || false,
       trending: course.trending || false,
       mostPurchased: course.mostPurchased || false,
       topRanked: course.topRanked || false,
-      curriculumPdfUrl: null, // Reset to re-upload if needed
+      curriculumPdfUrl: null,
     });
     setBannerPreview(course.bannerImage || "");
-    setPdfPreview(course.curriculumPdfUrl ? "PDF uploaded" : ""); // Simple indicator
+    setPdfPreview(course.curriculumPdfUrl ? "PDF pehle se uploaded hai" : "");
     setIsEditing(true);
     setCurrentCourse(course);
   };
@@ -321,18 +335,17 @@ const AdminPanel = () => {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`${API_BASE_URL}/${id}`, { method: "DELETE" });
+      const response = await fetch(`${API_BASE_URL}/${id}`, {
+        method: "DELETE",
+      });
       if (response.ok) {
         const updatedCourses = courses.filter((course) => course._id !== id);
         setCourses(updatedCourses);
-        localStorage.setItem("coursesData", JSON.stringify(updatedCourses));
 
         if (currentCourse && currentCourse._id === id) {
           resetForm();
         }
-
         alert("Course deleted successfully!");
-        fetchCourses(); // Refresh list
       } else {
         const err = await response.json();
         setError(err.error || "Failed to delete course");
@@ -345,15 +358,13 @@ const AdminPanel = () => {
     }
   };
 
-  // Save all changes (now redundant since we sync with API, but keep for local)
+  // Save all changes (local)
   const saveChanges = async () => {
     try {
       setLoading(true);
       setError(null);
-
-      localStorage.setItem("coursesData", JSON.stringify(courses));
-
-      alert("Changes saved locally!");
+      localStorage.setItem("courseCategories", JSON.stringify(categories));
+      alert("Local categories saved!");
       setHasChanges(false);
     } catch (err) {
       console.error("Error saving changes:", err);
@@ -373,24 +384,24 @@ const AdminPanel = () => {
     }
   };
 
-  // Add new category
+  // Add new category (Local)
   const addCategory = () => {
     if (newCategory.trim() === "") return;
 
-    const updatedCategories = [...categories, newCategory.trim()];
+    const updatedCategories = [...new Set([...categories, newCategory.trim()])];
     setCategories(updatedCategories);
     localStorage.setItem("courseCategories", JSON.stringify(updatedCategories));
     setNewCategory("");
-    alert("Category added successfully!");
+    alert("Category added locally!");
   };
 
-  // Start editing a category
+  // Start editing a category (Local)
   const startEditCategory = (category) => {
     setEditingCategory(category);
     setEditCategoryValue(category);
   };
 
-  // Save edited category
+  // Save edited category (Local)
   const saveEditCategory = () => {
     if (editCategoryValue.trim() === "") return;
 
@@ -398,14 +409,9 @@ const AdminPanel = () => {
       (course) => course.category === editingCategory
     );
     if (coursesUsingCategory.length > 0) {
-      // Update courses category
-      const updatedCourses = courses.map((course) =>
-        course.category === editingCategory
-          ? { ...course, category: editCategoryValue.trim() }
-          : course
+      alert(
+        `Warning: ${coursesUsingCategory.length} course(s) are using this category. You must update them manually.`
       );
-      setCourses(updatedCourses);
-      // Note: In production, update via API PUT for each course
     }
 
     const updatedCategories = categories.map((cat) =>
@@ -415,7 +421,7 @@ const AdminPanel = () => {
     localStorage.setItem("courseCategories", JSON.stringify(updatedCategories));
     setEditingCategory(null);
     setEditCategoryValue("");
-    alert("Category updated successfully!");
+    alert("Category updated locally!");
   };
 
   // Cancel editing category
@@ -424,7 +430,7 @@ const AdminPanel = () => {
     setEditCategoryValue("");
   };
 
-  // Remove category
+  // Remove category (Local)
   const removeCategory = (categoryToRemove) => {
     if (categoryToRemove === "All Courses") {
       alert("Cannot remove 'All Courses' category");
@@ -446,7 +452,7 @@ const AdminPanel = () => {
     );
     setCategories(updatedCategories);
     localStorage.setItem("courseCategories", JSON.stringify(updatedCategories));
-    alert("Category removed successfully!");
+    alert("Category removed locally!");
   };
 
   return (
@@ -467,17 +473,6 @@ const AdminPanel = () => {
               }`}
             >
               {isLocked ? "Unlock Editing" : "Lock Editing"}
-            </button>
-            <button
-              onClick={saveChanges}
-              disabled={!hasChanges || loading}
-              className={`px-4 py-2 rounded-md font-medium ${
-                hasChanges && !loading
-                  ? "bg-indigo-600 text-white hover:bg-indigo-700"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              }`}
-            >
-              {loading ? "Saving..." : "Save Local Changes"}
             </button>
           </div>
         </div>
@@ -531,7 +526,7 @@ const AdminPanel = () => {
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
               }`}
             >
-              Categories
+              Categories (Local)
             </button>
           </nav>
         </div>
@@ -636,7 +631,8 @@ const AdminPanel = () => {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700">
-                        Banner Image *
+                        Banner Image *{" "}
+                        {isEditing && "(Leave blank to keep same)"}
                       </label>
                       {bannerPreview && (
                         <div className="mt-1">
@@ -659,7 +655,8 @@ const AdminPanel = () => {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700">
-                        Curriculum PDF *
+                        Curriculum PDF *{" "}
+                        {isEditing && "(Leave blank to keep same)"}
                       </label>
                       {pdfPreview && (
                         <div className="mt-1 text-sm text-gray-500 mb-2">
@@ -836,14 +833,17 @@ const AdminPanel = () => {
                         </tr>
                       ) : (
                         courses.map((course, index) =>
-                          isValidCourse(course) ? (
-                            <tr key={course._id || index}>
+                          course && course._id ? ( // Basic check
+                            <tr key={course._id}>
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <div className="flex items-center">
                                   <div className="flex-shrink-0 h-10 w-10">
                                     <img
                                       className="h-10 w-10 rounded-md object-cover"
-                                      src={safeString(course.bannerImage)}
+                                      src={
+                                        safeString(course.bannerImage) ||
+                                        "https://via.placeholder.com/40"
+                                      }
                                       alt={safeString(course.title)}
                                       onError={(e) => {
                                         e.target.src =
@@ -940,8 +940,14 @@ const AdminPanel = () => {
             className="bg-white p-6 rounded-lg shadow-md"
           >
             <h2 className="text-lg font-medium text-gray-900 mb-4">
-              Manage Categories
+              Manage Categories (Local Storage)
             </h2>
+            <p className="text-sm text-yellow-700 bg-yellow-50 p-3 rounded-md mb-4">
+              <strong>Warning:</strong> These categories are saved only in your
+              browser (Local Storage). They are <strong>NOT</strong> connected
+              to the database. Categories must match exactly what you type in
+              the course form.
+            </p>
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="md:col-span-2">

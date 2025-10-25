@@ -1,27 +1,30 @@
+// routes/courseRoutes.js
 import { Router } from "express";
-import upload from "../middlewares/upload.js";
+import upload from "../middlewares/upload.js"; // Make sure this path is correct
 import {
   getCourses,
   createCourse,
   updateCourse,
   deleteCourse,
-  addCategory,
-  updateCategory,
-  deleteCategory,
 } from "../controllers/courseController.js";
 
 const router = Router();
 
+// Define fields jo hum upload karenge
+const courseUploadFields = [
+  { name: "bannerImage", maxCount: 1 },
+  { name: "curriculumPdfUrl", maxCount: 1 },
+];
+
 // Course CRUD
 router.get("/", getCourses);
-router.post("/", createCourse);
-router.put("/:id", updateCourse);
+
+// POST route ab file uploads ko handle karega
+router.post("/", upload.fields(courseUploadFields), createCourse);
+
+// PUT route bhi ab file uploads ko handle karega
+router.put("/:id", upload.fields(courseUploadFields), updateCourse);
+
 router.delete("/:id", deleteCourse);
-
-// Category CRUD inside course
-router.post("/:courseId/categories", upload.single("image"), addCategory);
-
-router.put("/:courseId/categories/:categoryId", updateCategory);
-router.delete("/:courseId/categories/:categoryId", deleteCategory);
 
 export default router;

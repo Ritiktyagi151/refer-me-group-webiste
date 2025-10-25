@@ -1,20 +1,7 @@
+// CourseGallerySection.jsx
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-
-// Helper function to reconstruct the category name from the complex object
-const getCategoryName = (categoryArray) => {
-  if (!categoryArray || categoryArray.length === 0) {
-    return "";
-  }
-  const categoryObj = categoryArray[0];
-  // Filter out non-numeric keys, sort them numerically, map to characters, and join
-  return Object.keys(categoryObj)
-    .filter((key) => !isNaN(parseInt(key)))
-    .sort((a, b) => parseInt(a) - parseInt(b))
-    .map((key) => categoryObj[key])
-    .join("");
-};
 
 // Mapping from UI filter categories to the actual categories in the database
 const categoryMapping = {
@@ -23,7 +10,7 @@ const categoryMapping = {
     "Artificial Intelligence",
     "Data Science & AI",
     "Artificial Intelligence & Automation",
-    "Robotic Process Automation", // Added for UiPath
+    "Robotic Process Automation",
   ],
   "Software Testing & Programming": [
     "Automation Testing",
@@ -72,12 +59,12 @@ const CourseGallerySection = () => {
     fetchCourses();
   }, []);
 
-  // ✅ FIX: Updated filtering logic to use the helper function and mapping
+  // ✅ FIX: Updated filtering logic to use simple string
   const filteredCourses =
     activeCategory === "All Courses"
       ? courses
       : courses.filter((course) => {
-          const courseCategoryName = getCategoryName(course.category);
+          const courseCategoryName = course.category; // Yeh ab ek simple string hai
           const mappedCategories = categoryMapping[activeCategory] || [];
           return mappedCategories.includes(courseCategoryName);
         });
@@ -154,16 +141,19 @@ const CourseGallerySection = () => {
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-full mx-auto relative z-10"
       >
         {filteredCourses.map((course) => {
-          // ✅ FIX: Safely construct image src to handle undefined/null bannerImage
+          // ✅ FIX: Safely construct image src. Backend ab poora URL bhej raha hai.
           const imageSrc = course.bannerImage
-            ? course.bannerImage.startsWith("http")
-              ? course.bannerImage
-              : `https://refermegroup.com${course.bannerImage}`
+            ? course.bannerImage
             : "https://via.placeholder.com/400x224/6B7280/FFFFFF?text=No+Image"; // Fallback placeholder
+
+          // ✅ FIX: PDF URL
+          const pdfUrl = course.curriculumPdfUrl
+            ? course.curriculumPdfUrl
+            : "#";
 
           return (
             <motion.div
-              key={course.id}
+              key={course._id} // Use _id from MongoDB
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
@@ -171,6 +161,8 @@ const CourseGallerySection = () => {
             >
               {/* Badges */}
               <div className="absolute top-2 left-2 flex flex-wrap gap-2 z-20">
+                {/* Aapke naye model mein 'badges' field nahi hai, 
+                    lekin main isse yahan chhod raha hoon agar aap future mein add karein */}
                 {course.badges?.map((badge, index) => (
                   <span
                     key={index}
@@ -179,6 +171,27 @@ const CourseGallerySection = () => {
                     {badge}
                   </span>
                 ))}
+                {/* Status badges from admin panel */}
+                {course.recommended && (
+                  <span className="bg-red-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
+                    Recommended
+                  </span>
+                )}
+                {course.trending && (
+                  <span className="bg-green-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
+                    Trending
+                  </span>
+                )}
+                {course.mostPurchased && (
+                  <span className="bg-yellow-500 text-black text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
+                    Popular
+                  </span>
+                )}
+                {course.topRanked && (
+                  <span className="bg-purple-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
+                    Top Ranked
+                  </span>
+                )}
               </div>
 
               {/* Course Image */}
@@ -240,7 +253,7 @@ const CourseGallerySection = () => {
 
                 <div className="flex space-x-4">
                   <Link
-                    to={`/courses/${course.id}`}
+                    to={`/courses/${course._id}`} // Use _id from MongoDB
                     className="flex-1 bg-white border border-gray-200 text-gray-800 py-2.5 rounded-xl hover:bg-gray-50 hover:shadow-md transition-all duration-300 font-medium text-center"
                   >
                     View Course
@@ -249,10 +262,11 @@ const CourseGallerySection = () => {
                     className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-2.5 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 flex items-center justify-center font-medium shadow-lg"
                     onClick={() =>
                       window.open(
-                        `https://refermegroup.com${course.curriculumPdfUrl}`,
+                        pdfUrl, // Use the new pdfUrl variable
                         "_blank"
                       )
                     }
+                    disabled={pdfUrl === "#"}
                   >
                     <svg
                       className="w-5 h-5 mr-2"

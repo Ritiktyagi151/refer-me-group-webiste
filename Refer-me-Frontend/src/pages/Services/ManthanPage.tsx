@@ -3,7 +3,10 @@ import { FiCalendar, FiClock, FiMapPin } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { manthanApi } from "../../api/manthan"    // ✅ Adjust the path as needed
+import { manthanApi } from "../../api/manthan"; // ✅ Adjust the path as needed
+
+// ✅ FIX 1: अपना लोकल बैकएंड URL यहाँ जोड़ें
+const BACKEND_URL = "https://refermegroup.com";
 
 const ManthanPage = () => {
   const [formData, setFormData] = useState({ name: "", email: "", phone: "" });
@@ -56,21 +59,28 @@ const ManthanPage = () => {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch("https://formsubmit.co/ajax/contact@refermegroup.com", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        "https://formsubmit.co/ajax/contact@refermegroup.com",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }
+      );
 
       if (response.ok) {
         toast.success("✅ Registration successful!", { position: "top-center" });
         setFormData({ name: "", email: "", phone: "" });
       } else {
-        toast.error("❌ Registration failed. Try again.", { position: "top-center" });
+        toast.error("❌ Registration failed. Try again.", {
+          position: "top-center",
+        });
       }
     } catch (error) {
       console.error(error);
-      toast.error("❌ Submission failed. Try again later.", { position: "top-center" });
+      toast.error("❌ Submission failed. Try again later.", {
+        position: "top-center",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -88,7 +98,9 @@ const ManthanPage = () => {
 
   const handleRegisterFromModal = () => {
     closeEventModal();
-    document.getElementById("registration-form")?.scrollIntoView({ behavior: "smooth" });
+    document
+      .getElementById("registration-form")
+      ?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -96,14 +108,17 @@ const ManthanPage = () => {
       <ToastContainer />
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {loading ? (
-          <div className="text-center py-20 text-gray-600">Loading events...</div>
+          <div className="text-center py-20 text-gray-600">
+            Loading events...
+          </div>
         ) : (
           <>
             {/* Upcoming Events */}
             <div className="max-w-6xl mx-auto mb-20">
               <div className="mb-16">
                 <h2 className="text-3xl font-bold text-gray-800 mb-8 flex items-center">
-                  <FiCalendar className="text-indigo-600 mr-3" /> Upcoming Events
+                  <FiCalendar className="text-indigo-600 mr-3" /> Upcoming
+                  Events
                 </h2>
                 {upcomingEvents.length === 0 ? (
                   <p className="text-gray-500">No upcoming events.</p>
@@ -117,13 +132,16 @@ const ManthanPage = () => {
                       >
                         <div className="h-48 overflow-hidden">
                           <img
-                            src={event.image}
+                            // ✅ FIX 2: इमेज दिखाने के लिए फुल URL का इस्तेमाल करें
+                            src={`${BACKEND_URL}${event.image}`}
                             alt={event.title}
                             className="w-full h-full object-cover"
                           />
                         </div>
                         <div className="p-6">
-                          <h3 className="text-xl font-semibold mb-2">{event.title}</h3>
+                          <h3 className="text-xl font-semibold mb-2">
+                            {event.title}
+                          </h3>
                           <div className="flex items-center text-gray-600 mb-2">
                             <FiClock className="mr-2" />
                             <span>
@@ -134,7 +152,9 @@ const ManthanPage = () => {
                             <FiMapPin className="mr-2" />
                             <span>{event.location}</span>
                           </div>
-                          <p className="text-gray-600 mb-4 line-clamp-2">{event.description}</p>
+                          <p className="text-gray-600 mb-4 line-clamp-2">
+                            {event.description}
+                          </p>
                           <button
                             onClick={() => openEventModal(event)}
                             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition"
@@ -165,7 +185,8 @@ const ManthanPage = () => {
                       >
                         <div className="h-48 overflow-hidden relative">
                           <img
-                            src={event.image}
+                            // ✅ FIX 3: इमेज दिखाने के लिए फुल URL का इस्तेमाल करें
+                            src={`${BACKEND_URL}${event.image}`}
                             alt={event.title}
                             className="w-full h-full object-cover"
                           />
@@ -174,7 +195,9 @@ const ManthanPage = () => {
                           </div>
                         </div>
                         <div className="p-6">
-                          <h3 className="text-xl font-semibold mb-2">{event.title}</h3>
+                          <h3 className="text-xl font-semibold mb-2">
+                            {event.title}
+                          </h3>
                           <div className="flex items-center text-gray-600 mb-2">
                             <FiClock className="mr-2" />
                             <span>{event.date}</span>
@@ -183,7 +206,9 @@ const ManthanPage = () => {
                             <FiMapPin className="mr-2" />
                             <span>{event.location}</span>
                           </div>
-                          <p className="text-gray-600 mb-4 line-clamp-2">{event.description}</p>
+                          <p className="text-gray-600 mb-4 line-clamp-2">
+                            {event.description}
+                          </p>
                           <button
                             onClick={() => openEventModal(event)}
                             className="w-full bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition"
@@ -207,7 +232,8 @@ const ManthanPage = () => {
           <div className="bg-white rounded-lg shadow-lg max-w-lg w-full p-6">
             <h2 className="text-2xl font-bold mb-4">{selectedEvent.title}</h2>
             <img
-              src={selectedEvent.image}
+              // ✅ FIX 4: मोडल में भी फुल URL का इस्तेमाल करें
+              src={`${BACKEND_URL}${selectedEvent.image}`}
               alt={selectedEvent.title}
               className="w-full h-48 object-cover rounded mb-4"
             />
@@ -237,7 +263,10 @@ const ManthanPage = () => {
       )}
 
       {/* Registration Form */}
-      <div id="registration-form" className="bg-white max-w-lg mx-auto p-6 rounded-xl shadow mt-10">
+      <div
+        id="registration-form"
+        className="bg-white max-w-lg mx-auto p-6 rounded-xl shadow mt-10"
+      >
         <h3 className="text-2xl font-bold mb-4">Register for Manthan</h3>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input

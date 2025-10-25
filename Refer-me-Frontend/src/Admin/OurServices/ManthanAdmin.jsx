@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { manthanApi } from "../../api/manthan";
 
+// ✅ FIX 1: अपना लोकल बैकएंड URL यहाँ जोड़ें
+const BACKEND_URL = "https://refermegroup.com";
+
 const ManthanAdmin = () => {
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [pastEvents, setPastEvents] = useState([]);
@@ -19,18 +22,17 @@ const ManthanAdmin = () => {
   const [preview, setPreview] = useState(null);
   const [editingEvent, setEditingEvent] = useState(null);
 
-  // 🟢 Fetch events
+  // 🟢 Fetch events (FIXED)
   const fetchEvents = async () => {
     try {
       const [upcomingRes, pastRes] = await Promise.all([
         manthanApi.getUpcomingEvents(),
         manthanApi.getPastEvents(),
       ]);
-      // Safeguard against undefined/non-array data
-      setUpcomingEvents(
-        Array.isArray(upcomingRes.data) ? upcomingRes.data : []
-      );
-      setPastEvents(Array.isArray(pastRes.data) ? pastRes.data : []);
+      // --- FIX: response.data की जगह सीधे response का इस्तेमाल करें ---
+      setUpcomingEvents(Array.isArray(upcomingRes) ? upcomingRes : []);
+      setPastEvents(Array.isArray(pastRes) ? pastRes : []);
+      // --------------------------------------------------------
     } catch (error) {
       console.error("Error fetching events:", error);
     } finally {
@@ -105,7 +107,8 @@ const ManthanAdmin = () => {
       category: event.category,
       image: null,
     });
-    setPreview(event.image ? event.image : null); // Assuming full URL from API
+    // ✅ FIX 2: प्रीव्यू के लिए फुल URL का इस्तेमाल करें
+    setPreview(event.image ? `${BACKEND_URL}${event.image}` : null);
   };
 
   // 🧹 Reset
@@ -136,6 +139,7 @@ const ManthanAdmin = () => {
         onSubmit={handleSubmit}
         className="bg-white shadow-lg p-6 rounded-2xl space-y-4"
       >
+        {/* ... (पूरा फॉर्म जैसा है वैसा ही रहेगा) ... */}
         <div className="grid md:grid-cols-2 gap-4">
           <input
             type="text"
@@ -243,13 +247,15 @@ const ManthanAdmin = () => {
         <section>
           <h2 className="text-2xl font-semibold mb-4">Upcoming Events</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {upcomingEvents.map((event) => (
+            {/* FIX: 'key' prop को unique बनाया गया है */}
+            {upcomingEvents.map((event, index) => (
               <div
-                key={event._id}
+                key={event._id || `upcoming-${index}`}
                 className="bg-white p-4 shadow-md rounded-xl relative"
               >
                 <img
-                  src={event.image}
+                  // ✅ FIX 3: इमेज दिखाने के लिए फुल URL का इस्तेमाल करें
+                  src={`${BACKEND_URL}${event.image}`}
                   alt={event.title}
                   className="w-full h-48 object-cover rounded-lg"
                 />
@@ -284,13 +290,15 @@ const ManthanAdmin = () => {
         <section>
           <h2 className="text-2xl font-semibold mb-4">Past Events</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {pastEvents.map((event) => (
+            {/* FIX: 'key' prop को unique बनाया गया है */}
+            {pastEvents.map((event, index) => (
               <div
-                key={event._id}
+                key={event._id || `past-${index}`}
                 className="bg-white p-4 shadow-md rounded-xl relative"
               >
                 <img
-                  src={event.image}
+                  // ✅ FIX 4: इमेज दिखाने के लिए फुल URL का इस्तेमाल करें
+                  src={`${BACKEND_URL}${event.image}`}
                   alt={event.title}
                   className="w-full h-48 object-cover rounded-lg"
                 />
