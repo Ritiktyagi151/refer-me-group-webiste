@@ -63,13 +63,19 @@ const FooterAdminPanel = () => {
       phone: "+91 76785 73511",
     },
     socialLinks: [
-      { icon: "fab fa-facebook", link: "https://www.facebook.com/refermegroup.qa" },
+      {
+        icon: "fab fa-facebook",
+        link: "https://www.facebook.com/refermegroup.qa",
+      },
       { icon: "fab fa-twitter", link: "https://www.twitter.com" },
       {
         icon: "fab fa-linkedin",
         link: "https://www.linkedin.com/company/refermegroup/",
       },
-      { icon: "fab fa-instagram", link: "https://www.instagram.com/refermegroup/" },
+      {
+        icon: "fab fa-instagram",
+        link: "https://www.instagram.com/refermegroup/",
+      },
     ],
     copyright: "© 2023 All Copyrights Reserved by Refer Me Group",
     developer: {
@@ -266,7 +272,14 @@ const FooterAdminPanel = () => {
   );
 
   // Render editable array
-  const renderEditableArray = (items, field1, field2, ph1, ph2, title = "Links") => (
+  const renderEditableArray = (
+    items,
+    field1,
+    field2,
+    ph1,
+    ph2,
+    title = "Links"
+  ) => (
     <div className="mb-4">
       <h4 className="text-sm font-medium mb-2">{title}:</h4>
       <div className="space-y-2 mb-4 max-h-60 overflow-y-auto">
@@ -323,7 +336,8 @@ const FooterAdminPanel = () => {
         onClick={addNewItem}
         className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center text-sm"
       >
-        <FiPlus className="inline mr-1" /> Add {title.toLowerCase().replace(/s$/, "")}
+        <FiPlus className="inline mr-1" /> Add{" "}
+        {title.toLowerCase().replace(/s$/, "")}
       </button>
     </div>
   );
@@ -341,7 +355,11 @@ const FooterAdminPanel = () => {
             <>
               {renderEditableField("Logo Source", "src", formData.src)}
               {renderEditableField("Logo Alt Text", "alt", formData.alt)}
-              {renderEditableField("Logo Size (Tailwind class)", "size", formData.size)}
+              {renderEditableField(
+                "Logo Size (Tailwind class)",
+                "size",
+                formData.size
+              )}
             </>
           )}
 

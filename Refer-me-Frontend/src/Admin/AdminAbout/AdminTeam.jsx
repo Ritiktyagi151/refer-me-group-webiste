@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 // Apne server ka URL yahaan set karein
-const SERVER_URL = "http://localhost:5000";
+const SERVER_URL = "https://refermegroup.com";
 
 const TeamAdmin = () => {
   // State variables
