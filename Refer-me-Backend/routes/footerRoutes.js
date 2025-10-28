@@ -1,11 +1,12 @@
-// routes/footerRoutes.js (Temporary - Comment out import)
 import express from "express";
-// import { getFooter, saveFooter } from "./footerController.js";  // <-- यह line comment कर दो
+import { getFooter, saveFooter } from "../controllers/footerController.js";
 
 const router = express.Router();
 
-// Temporary dummy routes (server start करने के लिए)
-router.get("/", (req, res) => res.json({ message: "Footer GET temporary" }));
-router.post("/", (req, res) => res.json({ message: "Footer POST temporary", body: req.body }));
+// Save footer data
+router.post("/", saveFooter);
+
+// Get footer data
+router.get("/", getFooter);
 
 export default router;

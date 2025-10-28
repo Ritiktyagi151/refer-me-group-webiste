@@ -9,9 +9,10 @@ const Footer = () => {
   useEffect(() => {
     const fetchFooter = async () => {
       try {
-        const res = await fetch("https://refermegroup.com/api/footer");
+        const res = await fetch("http://localhost:5000/api/footer");
         const data = await res.json();
-        setFooter(data);
+        console.log("Fetched footer data:", data); // 🔍 Debug log
+        setFooter(data.footer || data); // ✅ Handles both structures
       } catch (err) {
         console.error("Failed to fetch footer:", err);
       }
@@ -25,7 +26,7 @@ const Footer = () => {
     items?.map((item, idx) => (
       <li key={idx}>
         <Link
-          to={item.path}
+          to={item.path || "#"}
           className="group flex items-center gap-2 text-gray-200 hover:text-white transition duration-300"
         >
           <HiOutlineChevronDoubleRight className="text-indigo-400 group-hover:text-white" />
@@ -41,17 +42,17 @@ const Footer = () => {
         <div>
           <Link to="/">
             <img
-              src={footer.logo?.src}
-              alt={footer.logo?.alt}
+              src={footer.logo?.src || ""}
+              alt={footer.logo?.alt || "Footer Logo"}
               className={footer.logo?.size || "h-9"}
             />
           </Link>
-          <p className="text-sm mt-3">{footer.description}</p>
+          <p className="text-sm mt-3">{footer.description || ""}</p>
           <div className="flex space-x-4 mt-4">
             {footer.socialLinks?.map((s, i) => (
               <a
                 key={i}
-                href={s.link}
+                href={s.link || "#"}
                 target="_blank"
                 rel="noreferrer"
                 className="hover:text-white"

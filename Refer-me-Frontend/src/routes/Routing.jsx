@@ -47,16 +47,17 @@ import AdminProfile from "../Admin/AdminProfile/AdminProfile";
 import AdminSettings from "../Admin/AdminProfile/AdminSettings";
 import AdminLogin from "../Admin/AddLogin/AdminLogin";
 import AdminContact from "../Admin/AdminContact/AdminContact";
-import AdminAbout from "../Admin/AboutUS/AdminAbout";
-import OurStoryAdmin from "../Admin/AboutUS/OurStoryAdmin";
-import CoreCmtyAdmin from "../Admin/AboutUS/CoreCmtyAdmin";
-import PaymentPolicyAdmin from "../Admin/AboutUS/PaymentPolicyAdmin";
+// import AdminAbout from "../Admin/AboutUS/AdminAbout";
+// import OurStoryAdmin from "../Admin/AboutUS/OurStoryAdmin";
+// import CoreCmtyAdmin from "../Admin/AboutUS/CoreCmtyAdmin";
+// import PaymentPolicyAdmin from "../Admin/AboutUS/PaymentPolicyAdmin";
 import WebniarAdmin from "../Admin/OurServices/WebniarAdmin";
 import ManthanAdmin from "../Admin/OurServices/ManthanAdmin";
 import AdminLogout from "../Admin/AddLogin/AdminLogout";
 import AdminBlogs from "../Admin/BlogAdmin/AdminBlogs";
 import CareerQuiz from "../components/QuizPopup";
 import JobsGropusSAdmin from "../Admin/JobGroups/JobsGropusSAdmin";
+import TeamAdmin from "../Admin/AdminAbout/AdminTeam";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -170,10 +171,12 @@ const router = createBrowserRouter([
       { path: "contact", element: <AdminContact /> },
       { path: "blog", element: <AdminBlogs /> },
       { path: "jobs-groups", element: <JobsGropusSAdmin /> },
-      { path: "about/what-we-do", element: <AdminAbout /> },
-      { path: "about/our-story", element: <OurStoryAdmin /> },
-      { path: "about/core-committee", element: <CoreCmtyAdmin /> },
-      { path: "about/payment-policy", element: <PaymentPolicyAdmin /> },
+      { path: "adminteam", element: <TeamAdmin /> },
+
+      // { path: "about/what-we-do", element: <AdminAbout /> },
+      // { path: "about/our-story", element: <OurStoryAdmin /> },
+      // { path: "about/core-committee", element: <CoreCmtyAdmin /> },
+      // { path: "about/payment-policy", element: <PaymentPolicyAdmin /> },
       { path: "services/webinars", element: <WebniarAdmin /> },
       { path: "services/manthan", element: <ManthanAdmin /> },
     ],

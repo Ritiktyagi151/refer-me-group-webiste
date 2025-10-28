@@ -14,10 +14,11 @@ import {
   Video,
   ChevronDown,
   ChevronUp,
-  Info,
+  Info, // About Us ke liye icon
   Bookmark,
   Phone,
   Footprints,
+  Users, // CHANGE: Team ke liye naya icon
 } from "lucide-react";
 import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
 
@@ -30,8 +31,10 @@ const AdminDashboard = () => {
   const [profileDropdown, setProfileDropdown] = useState(false);
   const [activeTab, setActiveTab] = useState("dashboard");
   const [searchTerm, setSearchTerm] = useState("");
-  const [aboutDropdownOpen, setAboutDropdownOpen] = useState(false);
-  const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
+
+  // CHANGE: Dropdown state ko behtar banaya
+  // Ab yeh 'services' ya 'about' jaisi string store karega
+  const [openDropdown, setOpenDropdown] = useState(null);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -48,11 +51,13 @@ const AdminDashboard = () => {
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const toggleDarkMode = () => setDarkMode(!darkMode);
   const toggleProfileDropdown = () => setProfileDropdown(!profileDropdown);
-  const toggleAboutDropdown = () => setAboutDropdownOpen(!aboutDropdownOpen);
-  const toggleServicesDropdown = () =>
-    setServicesDropdownOpen(!servicesDropdownOpen);
 
-  // Sidebar items
+  // CHANGE: Generic dropdown toggle function
+  const toggleDropdown = (id) => {
+    setOpenDropdown(openDropdown === id ? null : id);
+  };
+
+  // CHANGE: sidebarItems array mein "About Us" add kiya
   const sidebarItems = [
     {
       id: "dashboard",
@@ -60,18 +65,22 @@ const AdminDashboard = () => {
       icon: Home,
       link: "/admin/dashboard",
     },
-    // {
-    //   id: "navbar",
-    //   name: "Navbar",
-    //   icon: Menu,
-    //   link: "/admin/navbar",
-    // },
-    // {
-    //   id: "home-section",
-    //   name: "Home Section",
-    //   icon: Home,
-    //   link: "/admin/home-section",
-    // },
+    // --- NAYA SECTION SHURU ---
+    {
+      id: "about",
+      name: "About Us",
+      icon: Info, // 'Info' icon use kiya
+      subItems: [
+        {
+          id: "team",
+          name: "Manage Team",
+          icon: Users, // 'Users' icon
+          link: "/admin/adminteam",
+        },
+        // Aap yahaan aur sub-items add kar sakte hain
+      ],
+    },
+    // --- NAYA SECTION KHATAM ---
     {
       id: "blog",
       name: "Blog",
@@ -90,39 +99,25 @@ const AdminDashboard = () => {
       icon: BookOpen,
       link: "/admin/jobs-groups",
     },
-    // {
-    //   id: "webinar",
-    //   name: "Webinars",
-    //   icon: Video,
-    //   link: "/admin/webinars",
-    // },
-    {
-      id: "about",
-      name: "About Us",
-      icon: Info,
-      subItems: [
-        {
-          id: "what-we-do",
-          name: "What We Do",
-          link: "/admin/about/what-we-do",
-        },
-      ],
-    },
     {
       id: "services",
       name: "Our Services",
       icon: Bookmark,
       subItems: [
-        { id: "webinars", name: "Webinars", link: "/admin/services/webinars" },
-        { id: "manthan", name: "Manthan", link: "/admin/services/manthan" },
+        {
+          id: "webinars",
+          name: "Webinars",
+          icon: Video,
+          link: "/admin/services/webinars",
+        },
+        {
+          id: "manthan",
+          name: "Manthan",
+          icon: BookOpen,
+          link: "/admin/services/manthan",
+        },
       ],
     },
-    // {
-    //   id: "contact",
-    //   name: "Contact Us",
-    //   icon: Phone,
-    //   link: "/admin/contact",
-    // },
     {
       id: "footer",
       name: "Footer",
@@ -175,10 +170,8 @@ const AdminDashboard = () => {
                 {item.subItems ? (
                   <div>
                     <button
-                      onClick={() => {
-                        if (item.id === "about") toggleAboutDropdown();
-                        if (item.id === "services") toggleServicesDropdown();
-                      }}
+                      // CHANGE: onClick ko generic banaya
+                      onClick={() => toggleDropdown(item.id)}
                       className={`flex items-center justify-between w-full p-3 rounded-lg transition-colors ${
                         activeTab === item.id
                           ? darkMode
@@ -196,19 +189,15 @@ const AdminDashboard = () => {
                         )}
                       </div>
                       {sidebarOpen &&
-                        ((item.id === "about" && aboutDropdownOpen) ||
-                        (item.id === "services" && servicesDropdownOpen) ? (
+                        // CHANGE: State ko generic banaya
+                        (openDropdown === item.id ? (
                           <ChevronUp className="h-4 w-4" />
                         ) : (
                           <ChevronDown className="h-4 w-4" />
                         ))}
                     </button>
-                    {(item.id === "about" &&
-                      aboutDropdownOpen &&
-                      sidebarOpen) ||
-                    (item.id === "services" &&
-                      servicesDropdownOpen &&
-                      sidebarOpen) ? (
+                    {/* CHANGE: Logic ko generic banaya */}
+                    {openDropdown === item.id && sidebarOpen && (
                       <div
                         className={`ml-8 mt-1 space-y-1 ${
                           darkMode ? "text-gray-400" : "text-gray-600"
@@ -218,14 +207,16 @@ const AdminDashboard = () => {
                           <Link
                             key={subItem.id}
                             to={subItem.link}
-                            className="block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                            // CHANGE: Sub-item mein icon add kiya
+                            className="flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                             onClick={() => setActiveTab(item.id)}
                           >
+                            <subItem.icon className="h-4 w-4 mr-2" />
                             {subItem.name}
                           </Link>
                         ))}
                       </div>
-                    ) : null}
+                    )}
                   </div>
                 ) : (
                   <Link
@@ -250,7 +241,7 @@ const AdminDashboard = () => {
           </nav>
         </div>
 
-        {/* Footer in Sidebar */}
+        {/* Sidebar Footer */}
         <div
           className={`p-4 border-t ${
             darkMode
