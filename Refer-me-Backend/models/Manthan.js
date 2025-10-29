@@ -10,7 +10,6 @@ const manthanSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    // --- Added fields ---
     time: {
       type: String,
       default: "",
@@ -19,7 +18,6 @@ const manthanSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    // --------------------
     description: {
       type: String,
       required: true,

@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.join(__dirname, ".."); // Project root (one level up from /controllers)
 
-// --- Get all upcoming events (No change) ---
+// Get all upcoming events
 export const getUpcomingEvents = async (req, res) => {
   try {
     const events = await Manthan.find({ category: "upcoming" }).sort({
@@ -20,7 +20,7 @@ export const getUpcomingEvents = async (req, res) => {
   }
 };
 
-// --- Get all past events (No change) ---
+// Get all past events
 export const getPastEvents = async (req, res) => {
   try {
     const events = await Manthan.find({ category: "past" }).sort({ date: -1 });
@@ -30,18 +30,20 @@ export const getPastEvents = async (req, res) => {
   }
 };
 
-// --- Add a new event (Updated) ---
+// Add a new event (Updated with logs)
 export const addEvent = async (req, res) => {
   try {
-    // Destructure all fields from the form
+    console.log('Add Event: Body keys:', Object.keys(req.body));  // ✅ Debug log
+    console.log('Add Event: File received?', !!req.file);  // ✅ Debug log
     const { title, date, time, location, description, category } = req.body;
     const image = req.file ? `/uploads/${req.file.filename}` : "";
+    console.log('Image path saved:', image);  // ✅ Debug log
 
     const event = new Manthan({
       title,
       date,
-      time, // Added
-      location, // Added
+      time,
+      location,
       description,
       category,
       image,
@@ -50,43 +52,47 @@ export const addEvent = async (req, res) => {
 
     res.status(201).json(event);
   } catch (error) {
+    console.error('Add Event Error:', error);
     res.status(500).json({ message: error.message });
   }
 };
 
-// --- Update event (Updated) ---
+// Update event (Updated with logs)
 export const updateEvent = async (req, res) => {
   try {
     const { id } = req.params;
-    const updatedData = req.body; // Contains title, date, time, location etc.
+    const updatedData = req.body;
+    console.log('Update Event: File received?', !!req.file);  // ✅ Debug log
 
     const event = await Manthan.findById(id);
     if (!event) return res.status(404).json({ message: "Event not found" });
 
     // If a new file (image) is uploaded
     if (req.file) {
-      // 1. Delete the old image (if it exists)
+      // Delete the old image (if it exists)
       if (event.image) {
-        const oldImagePath = path.join(ROOT_DIR, event.image); // e.g., ../uploads/filename.jpg
+        const oldImagePath = path.join(ROOT_DIR, event.image);
         if (fs.existsSync(oldImagePath)) {
           fs.unlinkSync(oldImagePath);
         }
       }
-      // 2. Set the new image path
+      // Set the new image path
       updatedData.image = `/uploads/${req.file.filename}`;
+      console.log('New image path updated:', updatedData.image);  // ✅ Debug log
     }
 
     const updatedEvent = await Manthan.findByIdAndUpdate(id, updatedData, {
-      new: true, // Return the updated document
+      new: true,
     });
 
     res.status(200).json(updatedEvent);
   } catch (error) {
+    console.error('Update Event Error:', error);
     res.status(500).json({ message: error.message });
   }
 };
 
-// --- Delete event (Updated for robustness) ---
+// Delete event
 export const deleteEvent = async (req, res) => {
   try {
     const { id } = req.params;

@@ -1,16 +1,55 @@
-import jwt from "jsonwebtoken";
-import User from "../models/User.js";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
 
-export const protect = async (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1]; // Bearer token
+// Ensure uploads directory exists
+const uploadsDir = path.join(process.cwd(), "uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+  console.log("✅ Created uploads directory:", uploadsDir);
+}
 
-  if (!token) return res.status(401).json({ message: "Not authorized, no token" });
+// Multer storage configuration
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadsDir);
+  },
+  filename: (req, file, cb) => {
+    const filename = `${Date.now()}-${file.originalname}`;
+    cb(null, filename);
+  },
+});
 
-  try {
-    const decoded = jwt.verify(token, "secret123");
-    req.user = await User.findById(decoded.id).select("-password"); // attach user
-    next();
-  } catch (error) {
-    res.status(401).json({ message: "Token failed" });
+// File filter (Updated with logs)
+const fileFilter = (req, file, cb) => {
+  console.log(`Multer: Processing file - ${file.fieldname}, mimetype: ${file.mimetype}`);  // ✅ Debug log
+  if (file.fieldname === "image") {
+    if (file.mimetype.startsWith("image/")) {
+      cb(null, true);
+    } else {
+      console.error(`Multer Error: Invalid image type - ${file.mimetype}`);  // ✅ Log
+      cb(new Error("Only image files allowed for 'image' field"), false);
+    }
+  } else if (
+    file.fieldname === "bannerImage" &&
+    !file.mimetype.startsWith("image/")
+  ) {
+    return cb(new Error("Only image files allowed for banner"), false);
+  } else if (
+    file.fieldname === "curriculumPdfUrl" &&
+    file.mimetype !== "application/pdf"
+  ) {
+    return cb(new Error("Only PDF files allowed for curriculum"), false);
+  } else {
+    cb(null, true);
   }
 };
+
+// Multer upload instance
+const upload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB limit
+  fileFilter,
+});
+
+export default upload;

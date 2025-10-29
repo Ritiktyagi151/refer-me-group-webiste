@@ -1,46 +1,47 @@
 import axios from "axios";
 
 // 🌐 Base API URL (from .env or fallback)
-// --- FIX: "/services" को हटा दिया गया है ---
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "https://refermegroup.com/api";
 
-// ✅ Create Axios instance
+// ✅ Create Axios instance (Updated: timeout + auth placeholder)
 const api = axios.create({
   baseURL: API_BASE_URL,
-  headers: { "Content-Type": "application/json" },
+  headers: { 
+    "Content-Type": "application/json",
+    // "Authorization": `Bearer ${localStorage.getItem('token')}` // Uncomment if JWT needed
+  },
+  timeout: 10000,  // 10s timeout for slow uploads
 });
 
 // 🧠 Manthan API — All endpoints for events
 export const manthanApi = {
-  // 🟢 Get Upcoming Events
+  // 🟢 Get Upcoming Events (Updated: fallback empty array)
   getUpcomingEvents: async () => {
     try {
       const response = await api.get("/manthan/upcoming");
-      return response.data;
+      return Array.isArray(response.data) ? response.data : [];
     } catch (error) {
       console.error("Error fetching upcoming events:", error);
-      throw error;
+      return [];  // Fallback to empty
     }
   },
 
-  // 🟠 Get Past Events
+  // 🟠 Get Past Events (Updated: fallback)
   getPastEvents: async () => {
     try {
       const response = await api.get("/manthan/past");
-      return response.data;
+      return Array.isArray(response.data) ? response.data : [];
     } catch (error) {
       console.error("Error fetching past events:", error);
-      throw error;
+      return [];  // Fallback
     }
   },
 
-  // 🟣 Add New Event (for Admin)
+  // 🟣 Add New Event (for Admin) — Already good!
   addEvent: async (formData) => {
     try {
-      // --- FIX: formData से category निकालकर सही URL पर पोस्ट करें ---
       const category = formData.get("category") || "upcoming";
-
       const response = await api.post(`/manthan/${category}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -51,7 +52,7 @@ export const manthanApi = {
     }
   },
 
-  // ✏️ Update Event (for Admin)
+  // ✏️ Update Event (for Admin) — Good!
   updateEvent: async (id, formData) => {
     try {
       const response = await api.put(`/manthan/${id}`, formData, {
@@ -64,7 +65,7 @@ export const manthanApi = {
     }
   },
 
-  // 🗑 Delete Event (for Admin)
+  // 🗑 Delete Event (for Admin) — Good!
   deleteEvent: async (id) => {
     try {
       const response = await api.delete(`/manthan/${id}`);
@@ -75,9 +76,10 @@ export const manthanApi = {
     }
   },
 
-  // 🖼 Upload Image (optional standalone endpoint)
+  // 🖼 Upload Image (optional — Backend में route add करें अगर use करें)
   uploadImage: async (formData) => {
     try {
+      // Note: Backend route `/manthan/upload` add करें अगर standalone upload चाहिए
       const response = await api.post("/manthan/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -88,7 +90,7 @@ export const manthanApi = {
     }
   },
 
-  // 🟩 Register for Event (user side)
+  // 🟩 Register for Event (user side) — Good!
   registerForEvent: async (id, data) => {
     try {
       const response = await api.post(`/manthan/upcoming/${id}/register`, data);

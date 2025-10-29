@@ -1,3 +1,4 @@
+// server.js (Updated: Removed problematic app.use("/api", uploadRoutes) to avoid conflicts)
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
@@ -19,7 +20,7 @@ import dashboardRoutes from "./routes/dashboardRoutes.js";
 import paymentRoutes from "./routes/payment.js";
 import webinarRoutes from "./routes/webinar.js";
 import manthanRoutes from "./routes/manthanRoutes.js";
-import uploadRoutes from "./routes/uploadRoutes.js";
+// import uploadRoutes from "./routes/uploadRoutes.js"; // Commented out to avoid applying multer globally
 
 // Team route
 import teamRoutes from "./routes/teamRoutes.js";
@@ -49,7 +50,7 @@ app.use(express.urlencoded({ extended: true }));
 console.log("Body parsers enabled");
 
 // API Routes
-app.use("/api", uploadRoutes);
+// app.use("/api", uploadRoutes); // Commented out - causes issues with non-file routes
 app.use("/api/users", userRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/settings", settingRoutes);

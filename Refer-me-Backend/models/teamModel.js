@@ -1,3 +1,4 @@
+// models/teamModel.js
 import mongoose from "mongoose";
 
 const teamMemberSchema = new mongoose.Schema(
@@ -11,7 +12,7 @@ const teamMemberSchema = new mongoose.Schema(
       required: true,
     },
     image: {
-      type: String, // Hum yahaan image ka path store karenge
+      type: String, // Relative path like "/uploads/filename.jpg"
       required: true,
     },
     bio: {
@@ -32,8 +33,5 @@ const teamMemberSchema = new mongoose.Schema(
   }
 );
 
-// BADLAAV YAHAN: 'module.exports' ki jagah 'export default'
-// YEH LINE POORI KAR RAHA HOON:
 const TeamMember = mongoose.model("TeamMember", teamMemberSchema);
 export default TeamMember;
-

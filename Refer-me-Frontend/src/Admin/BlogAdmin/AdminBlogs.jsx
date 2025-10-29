@@ -162,11 +162,14 @@ const AdminPanel = () => {
     formDataUpload.append("image", file); // <-- PROBLEM 2 FIX: "photo" se "image" kiya
 
     try {
-      const response = await fetch("http://localhost:5000/api/blogs/upload", {
-        // <-- PROBLEM 1 FIX: Endpoint "uploadSingle" se "blogs/upload" kiya
-        method: "POST",
-        body: formDataUpload,
-      });
+      const response = await fetch(
+        "https://refermegroup.com/api/blogs/upload",
+        {
+          // <-- PROBLEM 1 FIX: Endpoint "uploadSingle" se "blogs/upload" kiya
+          method: "POST",
+          body: formDataUpload,
+        }
+      );
       if (!response.ok) throw new Error("Failed to upload image");
       const data = await response.json();
       const url = data.url || "";

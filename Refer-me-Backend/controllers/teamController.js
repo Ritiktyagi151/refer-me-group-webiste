@@ -1,17 +1,36 @@
-// BADLAAV: Sabhi 'require' ko 'import' mein badla gaya
-import TeamMember from "../models/teamModel.js"; // .js extension zaroori hai
+// controllers/teamController.js (Updated: Fix paths on retrieval without DB change)
+import TeamMember from "../models/teamModel.js";
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url"; // __dirname ke liye zaroori
+import { fileURLToPath } from "url";
 
-// --- __dirname setup (ESM mein zaroori) ---
+// --- __dirname setup ---
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Utility function to delete an image file
+// Helper function to fix absolute path to relative (for existing DB entries)
+const fixImagePath = (imagePath) => {
+  if (!imagePath) return null;
+  // If it's already relative (/uploads/...), return as is
+  if (imagePath.startsWith('/uploads/')) return imagePath;
+  // If absolute (e.g., /root/.../uploads/filename), extract filename and make relative
+  const filenameMatch = imagePath.match(/uploads[\/\\](.+)$/);
+  if (filenameMatch) {
+    return `/uploads/${filenameMatch[1]}`;
+  }
+  return imagePath; // Fallback
+};
+
+// Utility function to delete an image file (updated to handle absolute paths)
 const deleteFile = (filePath) => {
-  // Path ko 'controllers' se bahar nikaal kar root folder mein point karein
-  const fullPath = path.join(__dirname, "..", filePath);
+  let fullPath = filePath;
+  // If relative, make full path
+  if (filePath.startsWith('/uploads/')) {
+    fullPath = path.join(__dirname, "..", filePath.replace(/^\//, ''));
+  } else {
+    // If absolute, use as is (for old paths)
+    fullPath = filePath;
+  }
 
   fs.unlink(fullPath, (err) => {
     if (err) {
@@ -22,18 +41,22 @@ const deleteFile = (filePath) => {
   });
 };
 
-// 1. GET ALL Members (READ)
-// BADLAAV: 'exports.getAllMembers' ki jagah 'export const getAllMembers'
+// 1. GET ALL Members (READ) - Fix paths here
 export const getAllMembers = async (req, res) => {
   try {
-    const members = await TeamMember.find({});
+    let members = await TeamMember.find({});
+    // Transform paths for all members
+    members = members.map(member => ({
+      ...member._doc,
+      image: fixImagePath(member.image),
+    }));
     res.status(200).json(members);
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
 
-// 2. CREATE Member (CREATE)
+// 2. CREATE Member (CREATE) - Already saves relative path
 export const createMember = async (req, res) => {
   const { name, role, bio, linkedin, twitter, github } = req.body;
 
@@ -41,8 +64,7 @@ export const createMember = async (req, res) => {
     return res.status(400).json({ message: "Image is required." });
   }
 
-  // Windows path (\) ko forward slash (/) se replace karein
-  const imagePath = req.file.path.replace(/\\/g, "/");
+  const imagePath = `/uploads/${req.file.filename}`;
 
   try {
     const newMember = new TeamMember({
@@ -52,13 +74,14 @@ export const createMember = async (req, res) => {
       linkedin,
       twitter,
       github,
-      image: imagePath, // Database mein file ka path save karein
+      image: imagePath,
     });
 
     const savedMember = await newMember.save();
+    // Fix path if needed (though it should be relative)
+    savedMember.image = fixImagePath(savedMember.image);
     res.status(201).json(savedMember);
   } catch (err) {
-    // Agar DB save fail ho, toh upload hui file delete karein
     if (req.file) {
       deleteFile(imagePath);
     }
@@ -66,7 +89,7 @@ export const createMember = async (req, res) => {
   }
 };
 
-// 3. UPDATE Member (UPDATE)
+// 3. UPDATE Member (UPDATE) - Fix returned path
 export const updateMember = async (req, res) => {
   const { id } = req.params;
   const { name, role, bio, linkedin, twitter, github } = req.body;
@@ -74,9 +97,8 @@ export const updateMember = async (req, res) => {
   try {
     const member = await TeamMember.findById(id);
     if (!member) {
-      // Agar naya file upload hua tha, use delete karo
       if (req.file) {
-        deleteFile(req.file.path.replace(/\\/g, "/"));
+        deleteFile(`/uploads/${req.file.filename}`);
       }
       return res.status(404).json({ message: "Member not found." });
     }
@@ -91,20 +113,23 @@ export const updateMember = async (req, res) => {
     };
 
     if (req.file) {
-      // Nayi file hai, purani file delete karo
       if (member.image) {
-        deleteFile(member.image);
+        deleteFile(member.image); // Handles both old absolute and new relative
       }
-      // Nayi file ka path update karo
-      updateData.image = req.file.path.replace(/\\/g, "/");
+      updateData.image = `/uploads/${req.file.filename}`;
     }
 
     const updatedMember = await TeamMember.findByIdAndUpdate(id, updateData, {
-      new: true, // Yeh updated document return karta hai
+      new: true,
     });
 
+    // Fix path in response
+    updatedMember.image = fixImagePath(updatedMember.image);
     res.status(200).json(updatedMember);
   } catch (err) {
+    if (req.file) {
+      deleteFile(`/uploads/${req.file.filename}`);
+    }
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
@@ -119,9 +144,8 @@ export const deleteMember = async (req, res) => {
       return res.status(404).json({ message: "Member not found." });
     }
 
-    // DB se delete karne se pehle file delete karo
     if (member.image) {
-      deleteFile(member.image);
+      deleteFile(member.image); // Handles absolute or relative
     }
 
     await TeamMember.findByIdAndDelete(id);
@@ -131,4 +155,3 @@ export const deleteMember = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
-
