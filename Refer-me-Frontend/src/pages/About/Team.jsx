@@ -1,4 +1,4 @@
-// Frontend: components/OurTeam.jsx (Updated: Extra safety for image src)
+// Frontend: components/OurTeam.jsx
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaLinkedin, FaTwitter, FaGithub } from "react-icons/fa";
@@ -6,26 +6,93 @@ import axios from "axios";
 
 const SERVER_URL = "https://refermegroup.com"; // Base URL
 
-// Helper to fix image path in frontend too (backup)
+// ✅ Local team members (always included)
+const staticTeamMembers = [
+  {
+    id: 1,
+    name: "Neelam Baranwal",
+    role: "Strategic Partner",
+    image: "/assets/teams/team (1).jpeg",
+    linkedin: null,
+    twitter: null,
+    github: null,
+    bio: "Visionary Strategist",
+    video: null,
+  },
+  {
+    id: 2,
+    name: "Saroj Baranwal",
+    role: "Strategic Partner",
+    image: "/assets/teams/team (2).jpeg",
+    linkedin: null,
+    twitter: null,
+    github: null,
+    bio: "People Connector",
+    video: null,
+  },
+  {
+    id: 3,
+    name: "Gunjan Baranwal",
+    role: "CEO & MD",
+    image: "/assets/teams/team (6).jpeg",
+    linkedin: "https://www.linkedin.com/in/gunjan-baranwal-650717b8/",
+    github: null,
+    bio: "Career Coach",
+    video: null,
+  },
+  {
+    id: 4,
+    name: "Snehal Mawle",
+    role: "Training Head",
+    image: "/assets/teams/team (4).jpeg",
+    linkedin: "https://www.linkedin.com/in/snehal-mawle-88a246257/",
+    twitter: null,
+    github: null,
+    bio: "Community Leader",
+    video: null,
+  },
+  {
+    id: 5,
+    name: "Ananya Walia",
+    role: "HR & Admin",
+    image: "/assets/teams/ANANYA-WALIA.jpg",
+    linkedin: "https://www.linkedin.com/feed/",
+    twitter: null,
+    github: null,
+    bio: "HR Specialist",
+    video: null,
+  },
+  {
+    id: 6,
+    name: "Twisha",
+    role: "Training Coordinator",
+    image: "/assets/teams/twisha.jpg",
+    twitter: null,
+    github: null,
+    video: null,
+  },
+];
+
+// ✅ Helper: ensure image URLs are always valid
 const fixImageUrl = (imagePath) => {
-  if (!imagePath) return '/assets/teams/default-avatar.jpg';
-  if (imagePath.startsWith('/uploads/')) {
+  if (!imagePath) return "/assets/teams/default-avatar.jpg";
+  if (imagePath.startsWith("/uploads/")) {
     return `${SERVER_URL}${imagePath}`;
   }
-  // If absolute path somehow, extract filename
   const filenameMatch = imagePath.match(/uploads[\/\\](.+)$/);
   if (filenameMatch) {
     return `${SERVER_URL}/uploads/${filenameMatch[1]}`;
   }
-  return imagePath; // Or fallback
+  return imagePath;
 };
 
+// ✅ Individual card
 const TeamMemberCard = ({ member }) => {
   const imageSrc = fixImageUrl(member.image);
 
   return (
     <motion.div
-      key={member._id}
+      key={member.id || member._id}
       className="relative w-full h-96 rounded-xl shadow-lg overflow-hidden group hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-2 cursor-pointer"
       initial={{ opacity: 0, y: 50, scale: 0.95 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -38,7 +105,7 @@ const TeamMemberCard = ({ member }) => {
           alt={member.name}
           className="absolute inset-0 object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
           onError={(e) => {
-            e.target.src = '/assets/teams/default-avatar.jpg'; // Fallback
+            e.target.src = "/assets/teams/default-avatar.jpg";
           }}
         />
         <div className="absolute inset-0 bg-black bg-opacity-10 transition-opacity duration-300 group-hover:bg-opacity-30"></div>
@@ -50,21 +117,40 @@ const TeamMemberCard = ({ member }) => {
 
       <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black via-black/80 to-transparent pt-12 pb-6 px-6 text-white text-center transition-transform duration-500 group-hover:-translate-y-0 translate-y-full">
         <h3 className="text-2xl font-bold mb-1">{member.name}</h3>
-        <p className="text-indigo-300 font-semibold text-lg mb-3">{member.role}</p>
-        <p className="text-sm italic opacity-90 mb-4 line-clamp-2">{member.bio || "Team Member"}</p>
+        <p className="text-indigo-300 font-semibold text-lg mb-3">
+          {member.role}
+        </p>
+        <p className="text-sm italic opacity-90 mb-4 line-clamp-2">
+          {member.bio || "Team Member"}
+        </p>
         <div className="flex justify-center space-x-4">
           {member.linkedin && (
-            <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="text-white hover:text-blue-400 transition-colors transform hover:scale-110">
+            <a
+              href={member.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white hover:text-blue-400 transition-colors transform hover:scale-110"
+            >
               <FaLinkedin size={24} />
             </a>
           )}
           {member.twitter && (
-            <a href={member.twitter} target="_blank" rel="noopener noreferrer" className="text-white hover:text-blue-300 transition-colors transform hover:scale-110">
+            <a
+              href={member.twitter}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white hover:text-blue-300 transition-colors transform hover:scale-110"
+            >
               <FaTwitter size={24} />
             </a>
           )}
           {member.github && (
-            <a href={member.github} target="_blank" rel="noopener noreferrer" className="text-white hover:text-gray-300 transition-colors transform hover:scale-110">
+            <a
+              href={member.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white hover:text-gray-300 transition-colors transform hover:scale-110"
+            >
               <FaGithub size={24} />
             </a>
           )}
@@ -74,22 +160,35 @@ const TeamMemberCard = ({ member }) => {
   );
 };
 
+// ✅ Main component
 const OurTeam = () => {
-  const [teamMembers, setTeamMembers] = useState([]);
+  const [teamMembers, setTeamMembers] = useState(staticTeamMembers);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchTeam = async () => {
       try {
         const res = await axios.get(`${SERVER_URL}/api/team`);
-        // Extra fix in frontend if backend missed any
-        const fixedMembers = res.data.map(member => ({
-          ...member,
-          image: fixImageUrl(member.image),
+        const fetched = res.data.map((m) => ({
+          ...m,
+          image: fixImageUrl(m.image),
         }));
-        setTeamMembers(fixedMembers);
+
+        // Merge backend + static (avoid duplicates by name)
+        const combined = [
+          ...staticTeamMembers,
+          ...fetched.filter(
+            (f) =>
+              !staticTeamMembers.some(
+                (s) => s.name.toLowerCase() === f.name.toLowerCase()
+              )
+          ),
+        ];
+
+        setTeamMembers(combined);
       } catch (err) {
         console.error("Failed to fetch team:", err);
+        setTeamMembers(staticTeamMembers); // fallback
       } finally {
         setLoading(false);
       }
@@ -103,10 +202,9 @@ const OurTeam = () => {
 
   return (
     <section className="relative py-24 bg-gradient-to-br from-gray-50 via-blue-50 to-gray-100 overflow-hidden">
-      <div className="absolute top-[-50px] left-[-50px] w-64 h-64 bg-indigo-200 rounded-full mix-blend-multiply filter blur-2xl opacity-50 animate-blob animation-delay-0 pointer-events-none"></div>
-      <div className="absolute bottom-[-50px] right-[-50px] w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-2xl opacity-50 animate-blob animation-delay-2000 pointer-events-none"></div>
-      <div className="absolute top-1/4 left-1/4 w-56 h-56 bg-purple-200 rounded-full mix-blend-multiply filter blur-2xl opacity-50 animate-blob animation-delay-4000 pointer-events-none"></div>
-      <div className="absolute bottom-1/3 left-1/2 w-60 h-60 bg-green-200 rounded-full mix-blend-multiply filter blur-2xl opacity-50 animate-blob animation-delay-6000 pointer-events-none"></div>
+      {/* Floating blobs */}
+      <div className="absolute top-[-50px] left-[-50px] w-64 h-64 bg-indigo-200 rounded-full mix-blend-multiply filter blur-2xl opacity-50 animate-blob pointer-events-none"></div>
+      <div className="absolute bottom-[-50px] right-[-50px] w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-2xl opacity-50 animate-blob pointer-events-none"></div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
         <div className="text-center mb-16">
@@ -126,16 +224,19 @@ const OurTeam = () => {
             viewport={{ once: true }}
             className="mt-6 text-xl text-gray-600 max-w-3xl mx-auto"
           >
-            Behind every success story is a dedicated team. Get to know the passionate individuals driving Refer Me Group forward.
+            Behind every success story is a dedicated team. Get to know the
+            passionate individuals driving Refer Me Group forward.
           </motion.p>
         </div>
 
         {teamMembers.length === 0 ? (
-          <p className="text-center text-gray-500">No team members available.</p>
+          <p className="text-center text-gray-500">
+            No team members available.
+          </p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
             {teamMembers.map((member) => (
-              <TeamMemberCard key={member._id} member={member} />
+              <TeamMemberCard key={member.id || member._id} member={member} />
             ))}
           </div>
         )}
