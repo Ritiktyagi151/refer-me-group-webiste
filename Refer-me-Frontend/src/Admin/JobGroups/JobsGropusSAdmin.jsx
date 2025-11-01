@@ -49,7 +49,9 @@ const iconComponents = {
 // Helper component to render an icon from its string name
 const RenderIcon = ({ iconName, className }) => {
   const IconComponent = iconComponents[iconName];
-  return IconComponent ? <IconComponent className={`${className} text-gray-800`} /> : null;
+  return IconComponent ? (
+    <IconComponent className={`${className} text-gray-800`} />
+  ) : null;
 };
 
 const AdminPanel = () => {
@@ -101,7 +103,10 @@ const AdminPanel = () => {
   const handleFeaturesChange = (e) => {
     setForm({
       ...form,
-      features: e.target.value.split(",").map((f) => f.trim()).filter(f => f), // Filter empty
+      features: e.target.value
+        .split(",")
+        .map((f) => f.trim())
+        .filter((f) => f), // Filter empty
     });
   };
 
@@ -128,7 +133,9 @@ const AdminPanel = () => {
 
       if (!res.ok) {
         const errorData = await res.text();
-        throw new Error(`HTTP error! status: ${res.status}, body: ${errorData}`);
+        throw new Error(
+          `HTTP error! status: ${res.status}, body: ${errorData}`
+        );
       }
 
       const savedData = await res.json();
@@ -144,7 +151,9 @@ const AdminPanel = () => {
         features: [],
       });
       setEditingId(null);
-      setMessage(editingId ? "Group updated successfully!" : "Group added successfully!");
+      setMessage(
+        editingId ? "Group updated successfully!" : "Group added successfully!"
+      );
     } catch (error) {
       console.error("Error saving group:", error);
       setMessage("Error saving group: " + error.message);
@@ -193,7 +202,13 @@ const AdminPanel = () => {
 
       {/* Message Display */}
       {message && (
-        <div className={`p-4 mb-4 rounded ${message.includes("Error") ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>
+        <div
+          className={`p-4 mb-4 rounded ${
+            message.includes("Error")
+              ? "bg-red-100 text-red-700"
+              : "bg-green-100 text-green-700"
+          }`}
+        >
           {message}
         </div>
       )}
@@ -214,7 +229,6 @@ const AdminPanel = () => {
           value={form.name}
           onChange={handleChange}
           className="border p-2 w-full mb-3 rounded"
-          required
         />
 
         <textarea
@@ -223,7 +237,6 @@ const AdminPanel = () => {
           value={form.description}
           onChange={handleChange}
           className="border p-2 w-full mb-3 rounded"
-          required
         ></textarea>
 
         <select
@@ -231,7 +244,6 @@ const AdminPanel = () => {
           value={form.icon}
           onChange={handleChange}
           className="border p-2 w-full mb-3 rounded"
-          required
         >
           <option value="" disabled>
             -- Select an Icon --
@@ -250,7 +262,6 @@ const AdminPanel = () => {
           value={form.whatsappLink}
           onChange={handleChange}
           className="border p-2 w-full mb-3 rounded"
-          required
         />
 
         <input
@@ -281,7 +292,9 @@ const AdminPanel = () => {
 
       {/* Table Section */}
       <div className="bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold mb-4">Job Groups ({groups.length})</h2>
+        <h2 className="text-xl font-semibold mb-4">
+          Job Groups ({groups.length})
+        </h2>
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
@@ -296,7 +309,9 @@ const AdminPanel = () => {
             <tbody>
               {groups.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="p-4 text-center text-gray-500">No groups found.</td>
+                  <td colSpan="5" className="p-4 text-center text-gray-500">
+                    No groups found.
+                  </td>
                 </tr>
               ) : (
                 groups.map((group) => {
@@ -304,11 +319,20 @@ const AdminPanel = () => {
                   return (
                     <tr key={group._id} className="border hover:bg-gray-50">
                       <td className="p-2 border">{group.name}</td>
-                      <td className="p-2 border text-sm">{group.description}</td>
+                      <td className="p-2 border text-sm">
+                        {group.description}
+                      </td>
                       <td className="p-2 border">
                         <div className="flex justify-center items-center">
-                          <RenderIcon iconName={group.icon} className="text-2xl" />
-                          {group.icon && <span className="ml-1 text-xs text-gray-500">({group.icon})</span>}
+                          <RenderIcon
+                            iconName={group.icon}
+                            className="text-2xl"
+                          />
+                          {group.icon && (
+                            <span className="ml-1 text-xs text-gray-500">
+                              ({group.icon})
+                            </span>
+                          )}
                         </div>
                       </td>
                       <td className="p-2 border">
