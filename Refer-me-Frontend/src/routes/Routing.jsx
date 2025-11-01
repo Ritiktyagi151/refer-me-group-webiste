@@ -143,7 +143,7 @@ const router = createBrowserRouter([
 
       // Other public routes
       { path: "contact", element: <ContactUs /> },
-      { path: "career", element: <Careers /> },
+      { path: "job-group", element: <Careers /> },
       { path: "career-counsling", element: <CareerQuiz /> },
 
       { path: "courses/:courseId", element: <CourseDetail /> },

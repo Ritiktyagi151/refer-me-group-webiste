@@ -57,7 +57,7 @@ function HeroSection() {
               <div className="flex-1 grid grid-cols-3 gap-4 md:gap-6">
                 <div className="text-center p-6 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
                   <p className="text-4xl font-extrabold text-blue-700 animate-pulse-once">
-                    1200+
+                    1500+
                   </p>
                   <p className="text-gray-700 mt-2 font-medium">
                     Trained Professionals
@@ -65,7 +65,7 @@ function HeroSection() {
                 </div>
                 <div className="text-center p-6 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
                   <p className="text-4xl font-extrabold text-blue-700 animate-pulse-once">
-                    15+
+                    21+
                   </p>
                   <p className="text-gray-700 mt-2 font-medium">
                     Courses & Videos
@@ -73,7 +73,7 @@ function HeroSection() {
                 </div>
                 <div className="text-center p-6 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:shadow-md">
                   <p className="text-4xl font-extrabold text-blue-700 animate-pulse-once">
-                    12K+
+                    13K+
                   </p>
                   <p className="text-gray-700 mt-2 font-medium">
                     Training Hours
