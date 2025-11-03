@@ -723,7 +723,7 @@ export default function Navbar() {
               Our Blogs
             </Link>
             <Link
-              to="/career"
+              to="/job-group"
               className="px-5 py-3 border-b border-gray-100 font-medium hover:bg-yellow-50 transition-colors"
               onClick={() => setSidebarOpen(false)}
             >
