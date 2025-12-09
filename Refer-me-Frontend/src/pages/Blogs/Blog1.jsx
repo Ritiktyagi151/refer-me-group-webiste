@@ -2,6 +2,15 @@
 
 export default function Blog1() {
   return (
+
+    <SEOManagement
+        title="Future of Data Science: Trends, Insights & What’s Next | Refer Me Group"
+        description="Discover how data science is evolving, upcoming trends, and what skills will matter in 2025. Read our expert insights and stay ahead in the data-driven world."
+        keywords="data science future, future of data science, data science trends 2025, data analytics blog, Refer Me Group data science"
+        canonical="/"
+      />
+    
+    
     <section className="max-w-6xl mx-auto px-6 py-12">
       <div className="mb-8">
         <img
