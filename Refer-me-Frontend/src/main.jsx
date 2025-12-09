@@ -1,16 +1,6 @@
-// import { StrictMode } from 'react'
-// import { createRoot } from 'react-dom/client'
-// import './index.css'
-// import App from './App.jsx'
-
-// createRoot(document.getElementById('root')).render(
-//   <StrictMode>
-//     <App />
-//   </StrictMode>,
-// )
-
 import { StrictMode, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { HelmetProvider } from "react-helmet-async"; // ✅ Import this
 
 import "./index.css";
 import App from "./App.jsx";
@@ -20,15 +10,24 @@ function Main() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 4000); // 2 sec fake loader, ya API ke hisab se hata de
+    // 4 second loading time thoda zyada hai user experience ke liye, 
+    // par abhi ke liye code logic fix karte hain.
+    const timer = setTimeout(() => setLoading(false), 4000); 
     return () => clearTimeout(timer);
   }, []);
 
-  return <>{loading ? <BrainLoadingAnimation /> : <App />}</>;
+  return (
+    <>
+      {loading ? <BrainLoadingAnimation /> : <App />}
+    </>
+  );
 }
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <Main />
+    {/* ✅ Provider ko sabse bahar lagao */}
+    <HelmetProvider>
+      <Main />
+    </HelmetProvider>
   </StrictMode>
 );

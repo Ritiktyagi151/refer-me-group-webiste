@@ -31,6 +31,7 @@
     "react-dom": "^19.0.0",
     "react-error-boundary": "^5.0.0",
     "react-head": "^3.4.2",
+    "react-helmet-async": "^2.0.5",
     "react-hook-form": "^7.56.3",
     "react-icons": "^5.5.0",
     "react-parallax-tilt": "^1.7.294",
