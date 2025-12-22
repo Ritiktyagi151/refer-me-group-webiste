@@ -1,77 +1,140 @@
 // BlogArticle.jsx
+import SEOManagement from "../../components/seo/SEOManagement";
 
 export default function Blog1() {
   return (
-
-    <SEOManagement
+    <>
+      {/* ================= SEO ================= */}
+      <SEOManagement
         title="Future of Data Science: Trends, Insights & What’s Next | Refer Me Group"
         description="Discover how data science is evolving, upcoming trends, and what skills will matter in 2025. Read our expert insights and stay ahead in the data-driven world."
         keywords="data science future, future of data science, data science trends 2025, data analytics blog, Refer Me Group data science"
-        canonical="/"
+        canonical="/blogs/future-of-data-science"
       />
-    
-    
-    <section className="max-w-6xl mx-auto px-6 py-12">
-      <div className="mb-8">
-        <img
-          src="/assets/blogs/Data Science Slide.jpg" // Place this image in public/images/
-          alt="Future of Data Science"
-          className="w-full rounded-xl shadow-lg"
-        />
-      </div>
 
-      <h1 className="text-4xl font-bold text-gray-900 mb-4">
-        The Future of Data Science: Trends to Watch in 2024
-      </h1>
-      <p className="text-gray-600 mb-2 text-sm">By Tech Insights • May 20, 2025</p>
+      {/* ================= BLOG CONTENT ================= */}
+      <section className="max-w-6xl mx-auto px-6 py-12">
+        {/* Blog Image */}
+        <div className="mb-8">
+          <img
+            src="/assets/blogs/Data Science Slide.jpg"
+            alt="Future of Data Science"
+            className="w-full rounded-xl shadow-lg"
+          />
+        </div>
 
-      <p className="text-gray-700 mb-4">
-        As we enter deeper into the data-driven era, 2024 marks a pivotal point for data science. With exponential growth in data generation and increasing reliance on intelligent systems, the landscape of data science is evolving rapidly. In this blog, we’ll explore the key trends that will define the future of data science in 2024 and how they’re reshaping industries across the globe.
-      </p>
+        {/* Title */}
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          The Future of Data Science: Trends to Watch in 2024
+        </h1>
 
-      <h2 className="text-2xl font-semibold text-gray-900 mt-6 mb-2">1. AI-Driven Automation & AutoML</h2>
-      <p className="text-gray-700 mb-4">
-        Automation continues to revolutionize the way data scientists build and deploy models. In 2024, AutoML tools are becoming smarter, allowing even non-technical users to create predictive models using visual interfaces. This trend lowers the barrier to entry and makes data science more accessible to business users and domain experts.
-      </p>
+        {/* Meta */}
+        <p className="text-gray-600 mb-6 text-sm">
+          By Tech Insights • May 20, 2025
+        </p>
 
-      <h2 className="text-2xl font-semibold text-gray-900 mt-6 mb-2">2. Rise of Real-Time Analytics</h2>
-      <p className="text-gray-700 mb-4">
-        The need for speed has never been more important. Real-time data processing is gaining momentum thanks to tools like Apache Kafka, Apache Flink, and Spark Streaming. From stock trading to e-commerce personalization, real-time insights are enabling organizations to make faster, smarter decisions.
-      </p>
+        {/* Intro */}
+        <p className="text-gray-700 mb-6">
+          As we enter deeper into the data-driven era, 2024 marks a pivotal
+          point for data science. With exponential growth in data generation and
+          increasing reliance on intelligent systems, the landscape of data
+          science is evolving rapidly. In this blog, we’ll explore the key
+          trends that will define the future of data science in 2024 and how
+          they’re reshaping industries across the globe.
+        </p>
 
-      <h2 className="text-2xl font-semibold text-gray-900 mt-6 mb-2">3. Explainable & Ethical AI</h2>
-      <p className="text-gray-700 mb-4">
-        As AI systems are increasingly used in healthcare, finance, and legal fields, transparency and fairness are becoming critical. In 2024, there’s a strong focus on building explainable AI (XAI) systems that allow stakeholders to understand how decisions are made. At the same time, regulations like GDPR, CCPA, and India’s Digital Personal Data Protection Act are pushing companies toward ethical and privacy-first data practices.
-      </p>
+        {/* Section 1 */}
+        <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-3">
+          1. AI-Driven Automation & AutoML
+        </h2>
+        <p className="text-gray-700 mb-5">
+          Automation continues to revolutionize the way data scientists build
+          and deploy models. In 2024, AutoML tools are becoming smarter,
+          allowing even non-technical users to create predictive models using
+          visual interfaces. This lowers the barrier to entry and makes data
+          science more accessible to business users and domain experts.
+        </p>
 
-      <h2 className="text-2xl font-semibold text-gray-900 mt-6 mb-2">4. Data-Centric AI & Quality Over Quantity</h2>
-      <p className="text-gray-700 mb-4">
-        Traditionally, AI success has depended on large datasets. But in 2024, we’re seeing a shift to data-centric AI—focusing more on the quality, labeling, and structure of data rather than sheer volume. Improving data quality at the source is proving more effective than tweaking complex models.
-      </p>
+        {/* Section 2 */}
+        <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-3">
+          2. Rise of Real-Time Analytics
+        </h2>
+        <p className="text-gray-700 mb-5">
+          The need for speed has never been more important. Real-time data
+          processing is gaining momentum thanks to tools like Apache Kafka,
+          Apache Flink, and Spark Streaming. From stock trading to e-commerce
+          personalization, real-time insights are enabling faster decisions.
+        </p>
 
-      <h2 className="text-2xl font-semibold text-gray-900 mt-6 mb-2">5. MLOps & Scalable Pipelines</h2>
-      <p className="text-gray-700 mb-4">
-        Just like DevOps revolutionized software delivery, MLOps is now essential for scaling machine learning. In 2024, platforms like MLflow, Kubeflow, and AWS SageMaker Pipelines are standard tools for managing the entire lifecycle—from model training to deployment and monitoring. Organizations are prioritizing robust workflows to reduce model drift and improve reproducibility.
-      </p>
+        {/* Section 3 */}
+        <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-3">
+          3. Explainable & Ethical AI
+        </h2>
+        <p className="text-gray-700 mb-5">
+          As AI systems expand into healthcare, finance, and legal domains,
+          transparency and fairness are essential. Explainable AI (XAI) allows
+          stakeholders to understand model decisions, while regulations like
+          GDPR and India’s DPDP Act push organizations toward ethical data
+          practices.
+        </p>
 
-      <h2 className="text-2xl font-semibold text-gray-900 mt-6 mb-2">6. Multimodal & Generative AI</h2>
-      <p className="text-gray-700 mb-4">
-        Generative AI models like ChatGPT and DALL·E have shown how powerful combining multiple data types can be. In 2024, we’re seeing a rise in multimodal models that process text, images, and even video together. This opens up new use cases in content generation, customer service, education, and more.
-      </p>
+        {/* Section 4 */}
+        <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-3">
+          4. Data-Centric AI
+        </h2>
+        <p className="text-gray-700 mb-5">
+          The focus is shifting from massive datasets to better data quality.
+          Cleaning, labeling, and structuring data effectively often delivers
+          better results than tuning complex algorithms.
+        </p>
 
-      <h2 className="text-2xl font-semibold text-gray-900 mt-6 mb-2">7. Cloud-Native Data Science</h2>
-      <p className="text-gray-700 mb-4">
-        With scalability and collaboration in mind, cloud-native data platforms are becoming the norm. Tools like Databricks, Snowflake, and BigQuery provide end-to-end environments for data science. Teams can now collaborate in real time on cloud workspaces without worrying about infrastructure.
-      </p>
+        {/* Section 5 */}
+        <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-3">
+          5. MLOps & Scalable Pipelines
+        </h2>
+        <p className="text-gray-700 mb-5">
+          MLOps is now critical for deploying machine learning at scale. Tools
+          like MLflow, Kubeflow, and SageMaker Pipelines help manage training,
+          deployment, monitoring, and versioning efficiently.
+        </p>
 
-      <h2 className="text-2xl font-semibold text-gray-900 mt-6 mb-2">8. Evolving Data Science Roles</h2>
-      <p className="text-gray-700 mb-4">
-        The traditional role of a data scientist is evolving into a hybrid role. In 2024, professionals are expected to be comfortable with data engineering, cloud tools, domain knowledge, and storytelling. Those who invest in continuous learning—especially in Python, SQL, AI ethics, and visualization—will have a competitive edge.
-      </p>
+        {/* Section 6 */}
+        <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-3">
+          6. Multimodal & Generative AI
+        </h2>
+        <p className="text-gray-700 mb-5">
+          Generative AI models combining text, images, and video are unlocking
+          new possibilities in education, marketing, customer service, and
+          creative industries.
+        </p>
 
-      <p className="text-gray-700 mt-6">
-        <strong>In conclusion,</strong> the future of data science is dynamic and full of opportunity. As tools become more intelligent and ethical considerations grow, the field is shifting toward inclusivity, automation, and real-time innovation. Whether you're a beginner or a seasoned professional, staying updated with these trends will ensure you remain relevant in the fast-paced world of data science.
-      </p>
-    </section>
+        {/* Section 7 */}
+        <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-3">
+          7. Cloud-Native Data Science
+        </h2>
+        <p className="text-gray-700 mb-5">
+          Cloud platforms like Databricks, Snowflake, and BigQuery offer
+          scalable and collaborative environments, allowing teams to focus on
+          insights instead of infrastructure.
+        </p>
+
+        {/* Section 8 */}
+        <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-3">
+          8. Evolving Data Science Roles
+        </h2>
+        <p className="text-gray-700 mb-6">
+          Modern data scientists are expected to understand cloud platforms,
+          data engineering, business context, and storytelling. Continuous
+          learning is key to staying competitive.
+        </p>
+
+        {/* Conclusion */}
+        <p className="text-gray-800 font-medium mt-8">
+          <strong>In conclusion,</strong> the future of data science is dynamic
+          and opportunity-rich. Embracing automation, ethics, and real-time
+          innovation will ensure long-term relevance in this fast-paced field.
+        </p>
+      </section>
+    </>
   );
 }

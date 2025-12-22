@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
-// Mapping from UI filter categories to the actual categories in the database
 const categoryMapping = {
   "Data Science, AI & Automation": [
     "Data Science, AI & Automation",
@@ -24,7 +23,7 @@ const categoryMapping = {
     "Project Management",
     "Product Management",
   ],
-  "Marketing & Soft Skills": ["Digital Marketing", "Finance"], // Grouped Finance here
+  "Marketing & Soft Skills": ["Digital Marketing", "Finance"],
 };
 
 const CourseGallerySection = () => {
@@ -55,49 +54,42 @@ const CourseGallerySection = () => {
         setLoading(false);
       }
     };
-
     fetchCourses();
   }, []);
 
-  // ✅ FIX: Updated filtering logic to use simple string
   const filteredCourses =
     activeCategory === "All Courses"
       ? courses
       : courses.filter((course) => {
-          const courseCategoryName = course.category; // Yeh ab ek simple string hai
+          const courseCategoryName = course.category;
           const mappedCategories = categoryMapping[activeCategory] || [];
           return mappedCategories.includes(courseCategoryName);
         });
 
-  if (loading) {
+  if (loading)
     return (
       <div className="py-16 text-center text-xl font-bold text-indigo-600">
         Loading courses...
       </div>
     );
-  }
-
-  if (error) {
+  if (error)
     return (
       <div className="py-16 text-center text-xl font-bold text-red-600">
         {error}
       </div>
     );
-  }
 
   return (
     <div className="py-16 px-4 bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 relative overflow-hidden">
-      {/* Decorative Background Elements */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-0 w-96 h-96 bg-indigo-800 opacity-20 rounded-full filter blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-pink-800 opacity-20 rounded-full filter blur-3xl translate-x-1/2 translate-y-1/2"></div>
       </div>
 
-      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, ease: "easeOut" }}
+        transition={{ duration: 1 }}
         className="text-center mb-6 relative z-10"
       >
         <h2 className="text-sm font-semibold text-indigo-500 uppercase tracking-widest mb-2">
@@ -111,67 +103,44 @@ const CourseGallerySection = () => {
         </h3>
       </motion.div>
 
-      {/* Category Tabs */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
-        className="flex flex-wrap justify-center gap-3 mb-12 relative z-10"
-      >
+      <div className="flex flex-wrap justify-center gap-3 mb-12 relative z-10">
         {categories.map((category) => (
           <button
             key={category}
             onClick={() => setActiveCategory(category)}
-            className={`px-6 py-3 rounded-lg text-sm font-medium transition-all duration-500 backdrop-blur-md border border-white/20 shadow-lg hover:shadow-xl ${
+            className={`px-6 py-3 rounded-lg text-sm font-medium transition-all duration-500 backdrop-blur-md border border-white/20 shadow-lg ${
               activeCategory === category
                 ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white"
-                : "bg-white/70 text-gray-800 hover:bg-white/90"
+                : "bg-white/70 text-gray-800"
             }`}
           >
             {category}
           </button>
         ))}
-      </motion.div>
+      </div>
 
-      {/* Course Cards */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
+        transition={{ duration: 1, delay: 0.4 }}
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-full mx-auto relative z-10"
       >
         {filteredCourses.map((course) => {
-          // ✅ FIX: Safely construct image src. Backend ab poora URL bhej raha hai.
           const imageSrc = course.bannerImage
             ? course.bannerImage
-            : "https://via.placeholder.com/400x224/6B7280/FFFFFF?text=No+Image"; // Fallback placeholder
-
-          // ✅ FIX: PDF URL
+            : "https://via.placeholder.com/400x224/6B7280/FFFFFF?text=No+Image";
           const pdfUrl = course.curriculumPdfUrl
             ? course.curriculumPdfUrl
             : "#";
 
           return (
             <motion.div
-              key={course._id} // Use _id from MongoDB
+              key={course._id}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
-              className="relative bg-white rounded-3xl shadow-2xl overflow-hidden transform hover:-translate-y-2 transition-all duration-500 border border-transparent bg-gradient-to-r from-indigo-100/30 via-purple-100/30 to-pink-100/30"
+              className="relative bg-white rounded-3xl shadow-2xl overflow-hidden border border-transparent bg-gradient-to-r from-indigo-100/30 via-purple-100/30 to-pink-100/30"
             >
-              {/* Badges */}
               <div className="absolute top-2 left-2 flex flex-wrap gap-2 z-20">
-                {/* Aapke naye model mein 'badges' field nahi hai, 
-                    lekin main isse yahan chhod raha hoon agar aap future mein add karein */}
-                {course.badges?.map((badge, index) => (
-                  <span
-                    key={index}
-                    className="bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg border border-white/20"
-                  >
-                    {badge}
-                  </span>
-                ))}
-                {/* Status badges from admin panel */}
                 {course.recommended && (
                   <span className="bg-red-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
                     Recommended
@@ -187,14 +156,8 @@ const CourseGallerySection = () => {
                     Popular
                   </span>
                 )}
-                {course.topRanked && (
-                  <span className="bg-purple-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
-                    Top Ranked
-                  </span>
-                )}
               </div>
 
-              {/* Course Image */}
               <div className="relative group">
                 <img
                   src={imageSrc}
@@ -202,85 +165,30 @@ const CourseGallerySection = () => {
                   className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-900/20 to-transparent opacity-90"></div>
-                <div className="absolute bottom-4 left-4 text-white text-sm font-medium z-10">
-                  {course.type}
-                </div>
               </div>
 
-              {/* Course Details */}
               <div className="p-6">
                 <h4 className="text-xl font-bold text-gray-900 mb-3 tracking-tight">
                   {course.title}
                 </h4>
-                <div className="flex items-center space-x-5 mb-4">
-                  <div className="flex items-center text-gray-600">
-                    <svg
-                      className="w-5 h-5 mr-2 text-indigo-500"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    <span className="text-sm font-medium">
-                      {course.duration}
-                    </span>
-                  </div>
-                  <div className="flex items-center text-gray-600">
-                    <svg
-                      className="w-5 h-5 mr-2 text-indigo-500"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                      />
-                    </svg>
-                    <span className="text-sm font-medium">
-                      {course.enrolled}
-                    </span>
-                  </div>
+                <div className="flex items-center space-x-5 mb-4 text-gray-600 text-sm font-medium">
+                  <span>{course.duration}</span>
+                  <span>{course.enrolled}</span>
                 </div>
 
                 <div className="flex space-x-4">
+                  {/* ✅ FIX: Yahan 'id' use kiya hai taaki Detail page match kr sake */}
                   <Link
-                    to={`/courses/${course._id}`} // Use _id from MongoDB
-                    className="flex-1 bg-white border border-gray-200 text-gray-800 py-2.5 rounded-xl hover:bg-gray-50 hover:shadow-md transition-all duration-300 font-medium text-center"
+                    to={`/courses/${course.id}`}
+                    className="flex-1 bg-white border border-gray-200 text-gray-800 py-2.5 rounded-xl text-center font-medium"
                   >
                     View Course
                   </Link>
                   <button
-                    className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-2.5 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 flex items-center justify-center font-medium shadow-lg"
-                    onClick={() =>
-                      window.open(
-                        pdfUrl, // Use the new pdfUrl variable
-                        "_blank"
-                      )
-                    }
+                    className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-2.5 rounded-xl font-medium shadow-lg"
+                    onClick={() => window.open(pdfUrl, "_blank")}
                     disabled={pdfUrl === "#"}
                   >
-                    <svg
-                      className="w-5 h-5 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                      />
-                    </svg>
                     Curriculum
                   </button>
                 </div>
