@@ -2,39 +2,33 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 // --- LIVE CONFIGURATION ---
-// Local testing ke liye: "http://localhost:5000"
-// Live production ke liye: "https://refermegroup.com"
+// Development ke liye "http://localhost:5000" use karein
+// Production/Live ke liye "https://refermegroup.com" use karein
 const SERVER_URL = "https://refermegroup.com";
 
-// Helper to fix image path (Live server friendly)
+// Helper: Image URL ko sahi karne ke liye (Relative to Absolute)
 const fixImageUrl = (imagePath) => {
   if (!imagePath) return "/assets/teams/default-avatar.jpg";
 
-  // Case 1: Agar path relative hai (/uploads/...)
-  // Hum check karte hain ki imagePath mein "/uploads/" hai ya nahi
-  if (imagePath.includes("/uploads/")) {
-    // Agar path pehle se "/uploads/filename.jpg" hai
-    const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
-    return `${SERVER_URL}${cleanPath}`;
-  }
+  // Case 1: Agar path pehle se hi full URL (http/https) hai
+  if (imagePath.startsWith("http")) return imagePath;
 
-  // Case 2: Agar database mein sirf filename hai ya absolute path cleanup chahiye
-  const filenameMatch = imagePath.match(/uploads[/\\](.+)$/);
-  if (filenameMatch) {
-    return `${SERVER_URL}/uploads/${filenameMatch[1]}`;
-  }
+  // Case 2: Agar path /uploads se shuru hota hai
+  // Hum ensure karte hain ki double slash na ho jaye (e.g. .com//uploads)
+  const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
 
-  // Case 3: Agar static asset path hai (jo public folder mein hai)
-  return imagePath;
+  return `${SERVER_URL}${cleanPath}`;
 };
 
 const TeamAdmin = () => {
+  // State variables
   const [teamMembers, setTeamMembers] = useState([]);
   const [editingMember, setEditingMember] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
 
+  // Form data state
   const [formData, setFormData] = useState({
     name: "",
     role: "",
@@ -44,6 +38,7 @@ const TeamAdmin = () => {
     github: "",
   });
 
+  // Image preview handle karne ke liye (Memory leak se bachne ke liye revoke use kiya hai)
   useEffect(() => {
     if (!imageFile) {
       setPreviewUrl(null);
@@ -51,17 +46,18 @@ const TeamAdmin = () => {
     }
     const objectUrl = URL.createObjectURL(imageFile);
     setPreviewUrl(objectUrl);
+
     return () => URL.revokeObjectURL(objectUrl);
   }, [imageFile]);
 
+  // 1. Backend se data fetch karna
   const fetchMembers = async () => {
     setLoading(true);
     try {
-      // Live server par CORS issue se bachne ke liye full URL use karein
       const res = await axios.get(`${SERVER_URL}/api/team`);
       setTeamMembers(res.data);
     } catch (err) {
-      console.error("Failed to fetch members:", err);
+      console.error("Fetch Error:", err);
     } finally {
       setLoading(false);
     }
@@ -71,6 +67,7 @@ const TeamAdmin = () => {
     fetchMembers();
   }, []);
 
+  // 2. Input change handlers
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -96,25 +93,30 @@ const TeamAdmin = () => {
     if (imageInput) imageInput.value = null;
   };
 
+  // 3. Form submit (Create/Update)
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
     if (!formData.name || !formData.role) {
       alert("Name and Role are required.");
+      setLoading(false);
       return;
     }
 
-    setLoading(true);
     const data = new FormData();
     Object.keys(formData).forEach((key) => data.append(key, formData[key]));
     if (imageFile) data.append("image", imageFile);
 
     try {
       if (editingMember) {
+        // Update logic
         await axios.put(`${SERVER_URL}/api/team/${editingMember._id}`, data);
         alert("Member updated successfully!");
       } else {
+        // Create logic
         if (!imageFile) {
-          alert("Please select an image.");
+          alert("Please select an image for the new member.");
           setLoading(false);
           return;
         }
@@ -124,13 +126,14 @@ const TeamAdmin = () => {
       resetForm();
       fetchMembers();
     } catch (err) {
-      console.error("Error saving member:", err);
+      console.error("Submit Error:", err);
       alert(`Error: ${err.response?.data?.message || err.message}`);
     } finally {
       setLoading(false);
     }
   };
 
+  // 4. Delete member
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this member?")) {
       try {
@@ -160,10 +163,10 @@ const TeamAdmin = () => {
   return (
     <div className="p-8 max-w-6xl mx-auto">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">
-        Manage Team Members (Live)
+        Manage Team Members
       </h1>
 
-      {/* --- FORM SECTION --- */}
+      {/* --- ADD / EDIT FORM --- */}
       <form
         onSubmit={handleSubmit}
         className="space-y-4 p-6 bg-white rounded-lg shadow-md mb-8 border border-gray-100"
@@ -260,7 +263,7 @@ const TeamAdmin = () => {
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 disabled:bg-gray-400 shadow-md"
+            className="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 disabled:bg-gray-400 shadow-md transition-all"
           >
             {loading
               ? "Saving..."
@@ -280,7 +283,7 @@ const TeamAdmin = () => {
         </div>
       </form>
 
-      {/* --- LIST SECTION --- */}
+      {/* --- EXISTING MEMBERS LIST --- */}
       <h2 className="text-2xl font-semibold mb-6 text-gray-800">
         Current Team Members
       </h2>
@@ -293,7 +296,7 @@ const TeamAdmin = () => {
             <img
               src={fixImageUrl(member.image)}
               alt={member.name}
-              className="w-full h-56 object-cover"
+              className="w-full h-56 object-cover bg-gray-100"
               onError={(e) => {
                 e.target.src = "/assets/teams/default-avatar.jpg";
               }}

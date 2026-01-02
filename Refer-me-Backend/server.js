@@ -28,32 +28,18 @@ const app = express();
 const uploadsDir = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
-  console.log("✅ Created uploads directory");
 }
 
-// --- FIX: CORS POLICY FOR PRODUCTION ---
-// Live domain aur localhost dono ko handle karne ke liye
-const allowedOrigins = [
-  "https://refermegroup.com",
-  "http://localhost:5173",
-  "http://localhost:3000",
-];
-
+// --- FIX: Production CORS Policy ---
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: ["https://refermegroup.com", "http://localhost:5173"],
     credentials: true,
   })
 );
 
 // --- FIX: STATIC FOLDER SERVING ---
-// Isse browser ko uploads folder ka access milta hai
+// Ye line browser ko uploads folder ka access deti hai
 app.use("/uploads", express.static(uploadsDir));
 
 app.use(express.json());
@@ -77,11 +63,10 @@ app.use("/api/team", teamRoutes);
 
 app.get("/", (req, res) => res.send("API is running..."));
 
-// --- CONNECT TO MONGODB ---
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ DB error:", err));
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server on port ${PORT}`));
