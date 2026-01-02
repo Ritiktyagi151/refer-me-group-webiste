@@ -6,79 +6,13 @@ import axios from "axios";
 
 const SERVER_URL = "https://refermegroup.com"; // Base URL
 
-// ✅ Local team members (always included)
-const staticTeamMembers = [
-  {
-    id: 1,
-    name: "Neelam Baranwal",
-    role: "Strategic Partner",
-    image: "/assets/teams/team (1).jpeg",
-    linkedin: null,
-    twitter: null,
-    github: null,
-    bio: "Visionary Strategist",
-    video: null,
-  },
-  {
-    id: 2,
-    name: "Saroj Baranwal",
-    role: "Strategic Partner",
-    image: "/assets/teams/team (2).jpeg",
-    linkedin: null,
-    twitter: null,
-    github: null,
-    bio: "People Connector",
-    video: null,
-  },
-  {
-    id: 3,
-    name: "Gunjan Baranwal",
-    role: "CEO & MD",
-    image: "/assets/teams/team (6).jpeg",
-    linkedin: "https://www.linkedin.com/in/gunjan-baranwal-650717b8/",
-    github: null,
-    bio: "Career Coach",
-    video: null,
-  },
-  {
-    id: 4,
-    name: "Snehal Mawle",
-    role: "Training Head",
-    image: "/assets/teams/team (4).jpeg",
-    linkedin: "https://www.linkedin.com/in/snehal-mawle-88a246257/",
-    twitter: null,
-    github: null,
-    bio: "Community Leader",
-    video: null,
-  },
-  {
-    id: 5,
-    name: "Ananya Walia",
-    role: "HR & Admin",
-    image: "/assets/teams/ANANYA-WALIA.jpg",
-    linkedin: "https://www.linkedin.com/feed/",
-    twitter: null,
-    github: null,
-    bio: "HR Specialist",
-    video: null,
-  },
-  {
-    id: 6,
-    name: "Twisha",
-    role: "Training Coordinator",
-    image: "/assets/teams/twisha.jpg",
-    twitter: null,
-    github: null,
-    video: null,
-  },
-];
-
-// ✅ Helper: ensure image URLs are always valid
+// ✅ Helper: ensure image URLs are always valid (Backend paths fix)
 const fixImageUrl = (imagePath) => {
   if (!imagePath) return "/assets/teams/default-avatar.jpg";
   if (imagePath.startsWith("/uploads/")) {
     return `${SERVER_URL}${imagePath}`;
   }
+  // Absolute path handling
   const filenameMatch = imagePath.match(/uploads[\/\\](.+)$/);
   if (filenameMatch) {
     return `${SERVER_URL}/uploads/${filenameMatch[1]}`;
@@ -86,13 +20,13 @@ const fixImageUrl = (imagePath) => {
   return imagePath;
 };
 
-// ✅ Individual card
+// ✅ Individual card (Design same rakha hai)
 const TeamMemberCard = ({ member }) => {
   const imageSrc = fixImageUrl(member.image);
 
   return (
     <motion.div
-      key={member.id || member._id}
+      key={member._id}
       className="relative w-full h-96 rounded-xl shadow-lg overflow-hidden group hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-2 cursor-pointer"
       initial={{ opacity: 0, y: 50, scale: 0.95 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -160,35 +94,19 @@ const TeamMemberCard = ({ member }) => {
   );
 };
 
-// ✅ Main component
+// ✅ Main component (Ab sirf Backend data fetch karega)
 const OurTeam = () => {
-  const [teamMembers, setTeamMembers] = useState(staticTeamMembers);
+  const [teamMembers, setTeamMembers] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchTeam = async () => {
       try {
         const res = await axios.get(`${SERVER_URL}/api/team`);
-        const fetched = res.data.map((m) => ({
-          ...m,
-          image: fixImageUrl(m.image),
-        }));
-
-        // Merge backend + static (avoid duplicates by name)
-        const combined = [
-          ...staticTeamMembers,
-          ...fetched.filter(
-            (f) =>
-              !staticTeamMembers.some(
-                (s) => s.name.toLowerCase() === f.name.toLowerCase()
-              )
-          ),
-        ];
-
-        setTeamMembers(combined);
+        // Backend data transform aur state update
+        setTeamMembers(res.data);
       } catch (err) {
         console.error("Failed to fetch team:", err);
-        setTeamMembers(staticTeamMembers); // fallback
       } finally {
         setLoading(false);
       }
@@ -197,7 +115,11 @@ const OurTeam = () => {
   }, []);
 
   if (loading) {
-    return <section className="py-24">Loading team...</section>;
+    return (
+      <section className="py-24 text-center text-xl font-semibold">
+        Loading our dynamic team...
+      </section>
+    );
   }
 
   return (
@@ -231,12 +153,12 @@ const OurTeam = () => {
 
         {teamMembers.length === 0 ? (
           <p className="text-center text-gray-500">
-            No team members available.
+            No team members available at the moment.
           </p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
             {teamMembers.map((member) => (
-              <TeamMemberCard key={member.id || member._id} member={member} />
+              <TeamMemberCard key={member._id} member={member} />
             ))}
           </div>
         )}

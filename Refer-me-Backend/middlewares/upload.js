@@ -2,56 +2,36 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 
-// Ensure uploads directory exists
 const uploadsDir = path.join(process.cwd(), "uploads");
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-  console.log("✅ Created uploads directory:", uploadsDir);
-}
 
-// Multer storage configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadsDir);
   },
   filename: (req, file, cb) => {
-    const filename = `${Date.now()}-${file.originalname}`;
-    cb(null, filename);
+    // FIX: Brackets aur special characters hatao taaki URL breakdown na ho
+    const safeName = file.originalname.replace(/[^a-zA-Z0-9.]/g, "-");
+    const uniqueName = `${Date.now()}-${safeName}`;
+    cb(null, uniqueName);
   },
 });
 
-// File filter configuration (Updated)
 const fileFilter = (req, file, cb) => {
-  // Check for the 'image' fieldname used in Manthan
-  if (file.fieldname === "image") {
-    if (file.mimetype.startsWith("image/")) {
-      cb(null, true); // Allow image
-    } else {
-      cb(new Error("Only image files allowed for 'image' field"), false);
-    }
-  }
-  // Keep your other filters if needed
-  else if (
-    file.fieldname === "bannerImage" &&
-    !file.mimetype.startsWith("image/")
-  ) {
-    return cb(new Error("Only image files allowed for banner"), false);
+  if (file.mimetype.startsWith("image/")) {
+    cb(null, true);
   } else if (
     file.fieldname === "curriculumPdfUrl" &&
-    file.mimetype !== "application/pdf"
+    file.mimetype === "application/pdf"
   ) {
-    return cb(new Error("Only PDF files allowed for curriculum"), false);
-  }
-  // Default to allow other fields if they pass
-  else {
     cb(null, true);
+  } else {
+    cb(new Error("Invalid file type!"), false);
   }
 };
 
-// Multer upload instance
 const upload = multer({
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB limit
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
   fileFilter,
 });
 

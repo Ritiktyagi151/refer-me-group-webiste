@@ -12,4 +12,13 @@ export default defineConfig({
       },
     },
   },
+  // Build optimize karein taaki SEO tags sahi se render ho sakein
+  build: {
+    outDir: "dist",
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      },
+    },
+  },
 });

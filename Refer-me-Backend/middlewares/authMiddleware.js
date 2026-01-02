@@ -1,55 +1,29 @@
+// middlewares/upload.js
 import multer from "multer";
 import path from "path";
 import fs from "fs";
 
-// Ensure uploads directory exists
+// process.cwd() se root directory ka absolute path nikaalein
 const uploadsDir = path.join(process.cwd(), "uploads");
+
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
   console.log("✅ Created uploads directory:", uploadsDir);
 }
 
-// Multer storage configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, uploadsDir);
+    cb(null, uploadsDir); // Absolute path use karein
   },
   filename: (req, file, cb) => {
-    const filename = `${Date.now()}-${file.originalname}`;
-    cb(null, filename);
+    const uniqueName = `${Date.now()}-${file.originalname}`;
+    cb(null, uniqueName);
   },
 });
 
-// File filter (Updated with logs)
-const fileFilter = (req, file, cb) => {
-  console.log(`Multer: Processing file - ${file.fieldname}, mimetype: ${file.mimetype}`);  // ✅ Debug log
-  if (file.fieldname === "image") {
-    if (file.mimetype.startsWith("image/")) {
-      cb(null, true);
-    } else {
-      console.error(`Multer Error: Invalid image type - ${file.mimetype}`);  // ✅ Log
-      cb(new Error("Only image files allowed for 'image' field"), false);
-    }
-  } else if (
-    file.fieldname === "bannerImage" &&
-    !file.mimetype.startsWith("image/")
-  ) {
-    return cb(new Error("Only image files allowed for banner"), false);
-  } else if (
-    file.fieldname === "curriculumPdfUrl" &&
-    file.mimetype !== "application/pdf"
-  ) {
-    return cb(new Error("Only PDF files allowed for curriculum"), false);
-  } else {
-    cb(null, true);
-  }
-};
-
-// Multer upload instance
 const upload = multer({
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB limit
-  fileFilter,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
 });
 
 export default upload;
