@@ -3,8 +3,8 @@ import axios from "axios";
 
 // --- LIVE CONFIGURATION ---
 // Production ke liye "https://refermegroup.com" ka hi use karein
-// const SERVER_URL = "https://refermegroup.com";
-const SERVER_URL = "http://localhost:5000";
+const SERVER_URL = "https://refermegroup.com";
+// const SERVER_URL = "http://localhost:5000";
 
 // Helper: Image URL ko sahi karne ke liye (Relative to Absolute)
 const fixImageUrl = (imagePath) => {
