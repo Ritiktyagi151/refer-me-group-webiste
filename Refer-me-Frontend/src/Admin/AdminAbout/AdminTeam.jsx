@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 // --- LIVE CONFIGURATION ---
-// Development ke liye "http://localhost:5000" use karein
-// Production/Live ke liye "https://refermegroup.com" use karein
+// Production ke liye "https://refermegroup.com" ka hi use karein
 const SERVER_URL = "https://refermegroup.com";
 
 // Helper: Image URL ko sahi karne ke liye (Relative to Absolute)
@@ -13,8 +12,8 @@ const fixImageUrl = (imagePath) => {
   // Case 1: Agar path pehle se hi full URL (http/https) hai
   if (imagePath.startsWith("http")) return imagePath;
 
-  // Case 2: Agar path /uploads se shuru hota hai
-  // Hum ensure karte hain ki double slash na ho jaye (e.g. .com//uploads)
+  // Case 2: Ensure karna ki domain aur path ke beech sahi slash '/' ho
+  // Humne ensure karna hai ki double slash na ho jaye (e.g. .com//uploads)
   const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
 
   return `${SERVER_URL}${cleanPath}`;
@@ -47,6 +46,7 @@ const TeamAdmin = () => {
     const objectUrl = URL.createObjectURL(imageFile);
     setPreviewUrl(objectUrl);
 
+    // Clean up memory when component unmounts or image changes
     return () => URL.revokeObjectURL(objectUrl);
   }, [imageFile]);
 

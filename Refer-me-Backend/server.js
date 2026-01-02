@@ -30,7 +30,7 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-// --- FIX: Production CORS Policy ---
+// Production CORS Configuration
 app.use(
   cors({
     origin: ["https://refermegroup.com", "http://localhost:5173"],
@@ -39,7 +39,7 @@ app.use(
 );
 
 // --- FIX: STATIC FOLDER SERVING ---
-// Ye line browser ko uploads folder ka access deti hai
+// Ye browser ko uploads folder access karne ki permission deta hai
 app.use("/uploads", express.static(uploadsDir));
 
 app.use(express.json());
