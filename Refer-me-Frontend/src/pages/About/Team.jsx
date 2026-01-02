@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 import { FaLinkedin, FaTwitter, FaGithub } from "react-icons/fa";
 import axios from "axios";
 
-const SERVER_URL = "http://localhost:5000"; // Base URL
+// const SERVER_URL = "http://localhost:5000"; // Base URL
+const SERVER_URL = "https://refermegroup.com";
 
 // ✅ Helper: ensure image URLs are always valid (Backend paths fix)
 const fixImageUrl = (imagePath) => {
