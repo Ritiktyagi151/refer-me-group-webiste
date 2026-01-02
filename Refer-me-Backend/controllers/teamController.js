@@ -2,39 +2,24 @@ import TeamMember from "../models/teamModel.js";
 import fs from "fs";
 import path from "path";
 
-const fixImagePath = (imagePath) => {
-  if (!imagePath) return null;
-  if (imagePath.startsWith("/uploads/")) return imagePath;
-  const filenameMatch = imagePath.match(/uploads[\/\\](.+)$/);
-  if (filenameMatch) {
-    return `/uploads/${filenameMatch[1]}`;
-  }
-  return imagePath;
-};
+const UPLOAD_DIR = "/var/www/refermegroup/uploads";
 
-const deleteFile = (filePath) => {
-  if (!filePath) return;
-  let fullPath;
-  if (filePath.startsWith("/uploads/")) {
-    fullPath = path.join(process.cwd(), filePath.replace(/^\//, ""));
-  } else {
-    fullPath = filePath;
-  }
+// ---------- helpers ----------
+const deleteFile = (imagePath) => {
+  if (!imagePath) return;
+
+  const filename = imagePath.replace("/uploads/", "");
+  const fullPath = path.join(UPLOAD_DIR, filename);
 
   if (fs.existsSync(fullPath)) {
-    fs.unlink(fullPath, (err) => {
-      if (err) console.error("Failed to delete image:", err);
-    });
+    fs.unlinkSync(fullPath);
   }
 };
 
+// ---------- controllers ----------
 export const getAllMembers = async (req, res) => {
   try {
-    let members = await TeamMember.find({});
-    members = members.map((member) => ({
-      ...member._doc,
-      image: fixImagePath(member.image),
-    }));
+    const members = await TeamMember.find({});
     res.status(200).json(members);
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
@@ -42,53 +27,51 @@ export const getAllMembers = async (req, res) => {
 };
 
 export const createMember = async (req, res) => {
-  const { name, role, bio, linkedin, twitter, github } = req.body;
-  if (!req.file) return res.status(400).json({ message: "Image is required." });
-
-  const imagePath = `/uploads/${req.file.filename}`;
-
   try {
+    if (!req.file) {
+      return res.status(400).json({ message: "Image is required" });
+    }
+
     const newMember = new TeamMember({
-      name,
-      role,
-      bio,
-      linkedin,
-      twitter,
-      github,
-      image: imagePath,
+      name: req.body.name,
+      role: req.body.role,
+      bio: req.body.bio,
+      linkedin: req.body.linkedin,
+      twitter: req.body.twitter,
+      github: req.body.github,
+      image: `/uploads/${req.file.filename}`,
     });
-    const savedMember = await newMember.save();
-    savedMember.image = fixImagePath(savedMember.image);
-    res.status(201).json(savedMember);
+
+    const saved = await newMember.save();
+    res.status(201).json(saved);
   } catch (err) {
-    if (req.file) deleteFile(imagePath);
+    if (req.file) deleteFile(`/uploads/${req.file.filename}`);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
 
 export const updateMember = async (req, res) => {
-  const { id } = req.params;
-  const { name, role, bio, linkedin, twitter, github } = req.body;
-
   try {
-    const member = await TeamMember.findById(id);
+    const member = await TeamMember.findById(req.params.id);
     if (!member) {
       if (req.file) deleteFile(`/uploads/${req.file.filename}`);
-      return res.status(404).json({ message: "Member not found." });
+      return res.status(404).json({ message: "Member not found" });
     }
-
-    const updateData = { name, role, bio, linkedin, twitter, github };
 
     if (req.file) {
-      if (member.image) deleteFile(member.image);
-      updateData.image = `/uploads/${req.file.filename}`;
+      deleteFile(member.image);
+      member.image = `/uploads/${req.file.filename}`;
     }
 
-    const updatedMember = await TeamMember.findByIdAndUpdate(id, updateData, {
-      new: true,
-    });
-    updatedMember.image = fixImagePath(updatedMember.image);
-    res.status(200).json(updatedMember);
+    member.name = req.body.name ?? member.name;
+    member.role = req.body.role ?? member.role;
+    member.bio = req.body.bio ?? member.bio;
+    member.linkedin = req.body.linkedin ?? member.linkedin;
+    member.twitter = req.body.twitter ?? member.twitter;
+    member.github = req.body.github ?? member.github;
+
+    await member.save();
+    res.status(200).json(member);
   } catch (err) {
     if (req.file) deleteFile(`/uploads/${req.file.filename}`);
     res.status(500).json({ message: "Server error", error: err.message });
@@ -96,13 +79,14 @@ export const updateMember = async (req, res) => {
 };
 
 export const deleteMember = async (req, res) => {
-  const { id } = req.params;
   try {
-    const member = await TeamMember.findById(id);
-    if (!member) return res.status(404).json({ message: "Member not found." });
-    if (member.image) deleteFile(member.image);
-    await TeamMember.findByIdAndDelete(id);
-    res.status(200).json({ message: "Member deleted successfully." });
+    const member = await TeamMember.findById(req.params.id);
+    if (!member) return res.status(404).json({ message: "Member not found" });
+
+    deleteFile(member.image);
+    await member.deleteOne();
+
+    res.status(200).json({ message: "Member deleted successfully" });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }

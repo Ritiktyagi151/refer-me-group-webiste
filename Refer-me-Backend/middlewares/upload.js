@@ -2,15 +2,24 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 
-const uploadsDir = path.join(process.cwd(), "uploads");
+const UPLOAD_DIR = "/var/www/refermegroup/uploads";
+
+// Ensure directory exists
+if (!fs.existsSync(UPLOAD_DIR)) {
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+}
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, uploadsDir);
+    cb(null, UPLOAD_DIR);
   },
   filename: (req, file, cb) => {
-    // Brackets aur special characters hatao taaki URL break na ho
-    const safeName = file.originalname.replace(/[^a-zA-Z0-9.]/g, "-");
+    // Clean filename (safe for URLs)
+    const safeName = file.originalname
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9.-]/g, "");
+
     cb(null, `${Date.now()}-${safeName}`);
   },
 });
