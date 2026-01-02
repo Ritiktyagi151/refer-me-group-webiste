@@ -1,27 +1,31 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-// --- CONFIGURATION ---
-// Development: http://localhost:5000 | Production: https://refermegroup.com
+// --- LIVE CONFIGURATION ---
+// Local testing ke liye: "http://localhost:5000"
+// Live production ke liye: "https://refermegroup.com"
 const SERVER_URL = "https://refermegroup.com";
 
-// Helper to fix image path (handles relative and old absolute paths)
+// Helper to fix image path (Live server friendly)
 const fixImageUrl = (imagePath) => {
   if (!imagePath) return "/assets/teams/default-avatar.jpg";
 
   // Case 1: Agar path relative hai (/uploads/...)
-  if (imagePath.startsWith("/uploads/")) {
-    return `${SERVER_URL}${imagePath}`;
+  // Hum check karte hain ki imagePath mein "/uploads/" hai ya nahi
+  if (imagePath.includes("/uploads/")) {
+    // Agar path pehle se "/uploads/filename.jpg" hai
+    const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
+    return `${SERVER_URL}${cleanPath}`;
   }
 
-  // Case 2: Agar database mein galti se full path save ho gaya ho (Absolute path cleanup)
+  // Case 2: Agar database mein sirf filename hai ya absolute path cleanup chahiye
   const filenameMatch = imagePath.match(/uploads[/\\](.+)$/);
   if (filenameMatch) {
     return `${SERVER_URL}/uploads/${filenameMatch[1]}`;
   }
 
-  // Fallback: Default avatar agar kuch match na kare
-  return "/assets/teams/default-avatar.jpg";
+  // Case 3: Agar static asset path hai (jo public folder mein hai)
+  return imagePath;
 };
 
 const TeamAdmin = () => {
@@ -29,7 +33,7 @@ const TeamAdmin = () => {
   const [editingMember, setEditingMember] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState(null); // Image preview ke liye alag state
+  const [previewUrl, setPreviewUrl] = useState(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -40,7 +44,6 @@ const TeamAdmin = () => {
     github: "",
   });
 
-  // Image preview handle karne ke liye aur memory leak se bachne ke liye
   useEffect(() => {
     if (!imageFile) {
       setPreviewUrl(null);
@@ -48,19 +51,17 @@ const TeamAdmin = () => {
     }
     const objectUrl = URL.createObjectURL(imageFile);
     setPreviewUrl(objectUrl);
-
-    // Clean up memory when component unmounts or image changes
     return () => URL.revokeObjectURL(objectUrl);
   }, [imageFile]);
 
   const fetchMembers = async () => {
     setLoading(true);
     try {
+      // Live server par CORS issue se bachne ke liye full URL use karein
       const res = await axios.get(`${SERVER_URL}/api/team`);
       setTeamMembers(res.data);
     } catch (err) {
       console.error("Failed to fetch members:", err);
-      alert("Error fetching team members.");
     } finally {
       setLoading(false);
     }
@@ -113,7 +114,7 @@ const TeamAdmin = () => {
         alert("Member updated successfully!");
       } else {
         if (!imageFile) {
-          alert("Please select an image for the new member.");
+          alert("Please select an image.");
           setLoading(false);
           return;
         }
@@ -158,81 +159,71 @@ const TeamAdmin = () => {
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Manage Team Members</h1>
+      <h1 className="text-3xl font-bold mb-6 text-gray-800">
+        Manage Team Members (Live)
+      </h1>
 
       {/* --- FORM SECTION --- */}
       <form
         onSubmit={handleSubmit}
-        className="space-y-4 p-6 bg-white rounded-lg shadow-md mb-8"
+        className="space-y-4 p-6 bg-white rounded-lg shadow-md mb-8 border border-gray-100"
       >
-        <h2 className="text-2xl font-semibold">
+        <h2 className="text-2xl font-semibold text-indigo-600">
           {editingMember ? "Edit Member" : "Add New Member"}
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block mb-1 font-medium">Name*</label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-          <div>
-            <label className="block mb-1 font-medium">Role*</label>
-            <input
-              type="text"
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block mb-1 font-medium">Bio</label>
-          <textarea
-            name="bio"
-            value={formData.bio}
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
             onChange={handleChange}
+            placeholder="Name*"
             className="w-full p-2 border rounded"
-            rows="3"
-          ></textarea>
+            required
+          />
+          <input
+            type="text"
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            placeholder="Role*"
+            className="w-full p-2 border rounded"
+            required
+          />
         </div>
 
-        <div>
-          <label className="block mb-1 font-medium">Image (Photo)*</label>
+        <textarea
+          name="bio"
+          value={formData.bio}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+          rows="3"
+          placeholder="Bio"
+        ></textarea>
+
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <label className="block mb-2 font-medium">Profile Image*</label>
           <input
             type="file"
             id="imageInput"
             onChange={handleFileChange}
             accept="image/*"
-            className="w-full p-2 border rounded"
+            className="w-full p-1 text-sm"
           />
-          {editingMember && (
-            <small className="text-gray-500 block mt-1">
-              Leave blank to keep current image.
-            </small>
-          )}
 
-          {/* Form Preview Image Logic */}
           {(previewUrl || (editingMember && editingMember.image)) && (
-            <div className="mt-2 relative inline-block">
+            <div className="mt-3 relative inline-block">
               <img
                 src={previewUrl || fixImageUrl(editingMember.image)}
                 alt="Preview"
-                className="w-24 h-24 object-cover rounded border shadow-sm"
+                className="w-24 h-24 object-cover rounded-full border-4 border-white shadow-md"
                 onError={(e) => {
                   e.target.src = "/assets/teams/default-avatar.jpg";
                 }}
               />
-              <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-[10px] px-1 rounded">
-                {previewUrl ? "New" : "Current"}
+              <span className="absolute bottom-0 right-0 bg-indigo-500 text-white text-[10px] px-2 py-0.5 rounded-full shadow">
+                {previewUrl ? "New" : "Live"}
               </span>
             </div>
           )}
@@ -269,10 +260,10 @@ const TeamAdmin = () => {
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-blue-300 transition-colors"
+            className="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 disabled:bg-gray-400 shadow-md"
           >
             {loading
-              ? "Processing..."
+              ? "Saving..."
               : editingMember
               ? "Update Member"
               : "Add Member"}
@@ -281,7 +272,7 @@ const TeamAdmin = () => {
             <button
               type="button"
               onClick={resetForm}
-              className="px-6 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+              className="px-6 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
             >
               Cancel
             </button>
@@ -290,46 +281,44 @@ const TeamAdmin = () => {
       </form>
 
       {/* --- LIST SECTION --- */}
-      <h2 className="text-2xl font-semibold mb-4">Current Team</h2>
-      {loading && teamMembers.length === 0 ? (
-        <p>Loading members...</p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {teamMembers.map((member) => (
-            <div
-              key={member._id}
-              className="bg-white rounded-lg shadow-md overflow-hidden border hover:shadow-lg transition-shadow"
-            >
-              <img
-                src={fixImageUrl(member.image)}
-                alt={member.name}
-                className="w-full h-48 object-cover bg-gray-100"
-                onError={(e) => {
-                  e.target.src = "/assets/teams/default-avatar.jpg";
-                }}
-              />
-              <div className="p-4">
-                <h3 className="text-xl font-bold">{member.name}</h3>
-                <p className="text-blue-600 font-medium mb-2">{member.role}</p>
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => handleEditClick(member)}
-                    className="flex-1 py-1 bg-yellow-500 text-white rounded text-sm hover:bg-yellow-600"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(member._id)}
-                    className="flex-1 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"
-                  >
-                    Delete
-                  </button>
-                </div>
+      <h2 className="text-2xl font-semibold mb-6 text-gray-800">
+        Current Team Members
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {teamMembers.map((member) => (
+          <div
+            key={member._id}
+            className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
+          >
+            <img
+              src={fixImageUrl(member.image)}
+              alt={member.name}
+              className="w-full h-56 object-cover"
+              onError={(e) => {
+                e.target.src = "/assets/teams/default-avatar.jpg";
+              }}
+            />
+            <div className="p-4">
+              <h3 className="text-xl font-bold text-gray-900">{member.name}</h3>
+              <p className="text-indigo-600 font-medium mb-4">{member.role}</p>
+              <div className="flex space-x-2 border-t pt-4">
+                <button
+                  onClick={() => handleEditClick(member)}
+                  className="flex-1 py-2 bg-yellow-50 text-yellow-700 rounded-lg text-sm font-semibold hover:bg-yellow-100"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(member._id)}
+                  className="flex-1 py-2 bg-red-50 text-red-700 rounded-lg text-sm font-semibold hover:bg-red-100"
+                >
+                  Delete
+                </button>
               </div>
             </div>
-          ))}
-        </div>
-      )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
