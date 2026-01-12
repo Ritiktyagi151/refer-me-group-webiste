@@ -25,6 +25,8 @@ import WhatsAppWidget from "../../components/WhatsAppWidget";
 import HiringSection from "../../components/HiringSection";
 import JobAssistanceSection from "../../components/PlacementRecordsSection";
 
+
+
 const Home = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isQuizOpen, setIsQuizOpen] = useState(false);
@@ -53,6 +55,7 @@ const Home = () => {
       />
 
       <main className="w-full">
+       
         <WhatsAppWidget />
         <EnquiryModal isOpen={isModalOpen} onClose={closeModal} />
         {/* <Quiz isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} /> */}
