@@ -41,6 +41,7 @@ import {
   FaArrowRight,
   FaBook,
 } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 import { Link, Links, useNavigate } from "react-router-dom";
 
 export default function Navbar() {
@@ -551,12 +552,12 @@ export default function Navbar() {
               </Link>
 
               <Link
-                to="https://twitter.com"
+                to="https://x.com/referme_group"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-white bg-opacity-20 p-2 rounded-full text-white hover:opacity-90 transition-opacity"
               >
-                <FaTwitter />
+                <FaXTwitter />
               </Link>
 
               <Link

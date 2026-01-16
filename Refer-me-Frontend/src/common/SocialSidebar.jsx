@@ -46,7 +46,7 @@ const SocialSidebar = () => {
       icon: <FaXTwitter />,
       color: "bg-black",
       label: "X (Twitter)",
-      link: "https://x.com/home",
+      link: "https://x.com/referme_group",
       delay: "400ms",
     },
   ];
