@@ -25,7 +25,7 @@ const Blogs = () => {
     <>
       {/* 2. SEO Management Tags Add Karein */}
       <SEOManagement
-        title="Official Career Blog | Refer Me Group Insights"
+        title=" Blog | Refer Me Group Insights"
         description="Read the latest professional insights, career growth strategies, and emerging industry trends from Refer Me Group experts to stay ahead in your journey."
         keywords="career blog, professional development tips, job search strategies, industry trends 2025, Refer Me Group insights"
         canonical="/blogs"

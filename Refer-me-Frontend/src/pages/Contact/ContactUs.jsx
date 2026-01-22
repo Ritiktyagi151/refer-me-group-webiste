@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
+import SEOManagement from "../../components/seo/SEOManagement"; // Iska path check kar lijiyega
 
 const ContactUs = () => {
   const {
@@ -30,7 +31,7 @@ const ContactUs = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(data),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -73,6 +74,14 @@ const ContactUs = () => {
 
   return (
     <>
+      {/* 2. SEO Management Tags Add Karein */}
+      <SEOManagement
+        title="Contact Us | Refer Me Group - Professional Support"
+        description="Get in touch with Refer Me Group for career growth strategies, professional insights, and industry trends. We are here to help you stay ahead in your journey."
+        keywords="contact refer me group, career support, job search help, professional insights ghaziabad"
+        canonical="/contact"
+      />
+
       <div>
         <img
           src={"/assets/banner-new/contact.jpeg"}
