@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaLinkedin, FaTwitter, FaGithub } from "react-icons/fa";
 import axios from "axios";
+import SEOManagement from "../../components/seo/SEOManagement";
 
 // const SERVER_URL = "http://localhost:5000"; // Base URL
 const SERVER_URL = "https://refermegroup.com";
@@ -95,7 +96,7 @@ const TeamMemberCard = ({ member }) => {
   );
 };
 
-// ✅ Main component (Ab sirf Backend data fetch karega)
+// ✅ Main component
 const OurTeam = () => {
   const [teamMembers, setTeamMembers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -104,7 +105,6 @@ const OurTeam = () => {
     const fetchTeam = async () => {
       try {
         const res = await axios.get(`${SERVER_URL}/api/team`);
-        // Backend data transform aur state update
         setTeamMembers(res.data);
       } catch (err) {
         console.error("Failed to fetch team:", err);
@@ -124,47 +124,57 @@ const OurTeam = () => {
   }
 
   return (
-    <section className="relative py-24 bg-gradient-to-br from-gray-50 via-blue-50 to-gray-100 overflow-hidden">
-      {/* Floating blobs */}
-      <div className="absolute top-[-50px] left-[-50px] w-64 h-64 bg-indigo-200 rounded-full mix-blend-multiply filter blur-2xl opacity-50 animate-blob pointer-events-none"></div>
-      <div className="absolute bottom-[-50px] right-[-50px] w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-2xl opacity-50 animate-blob pointer-events-none"></div>
+    <>
+      {/* SEO Management Integration */}
+      <SEOManagement
+        title="Our Team | Refer Me Group Experts & Mentors"
+        description="Meet the experienced mentors, trainers, and leaders behind Refer Me Group’s success."
+        keywords="Refer Me Group team, mentors, trainers, leadership team"
+        canonical="/about/team"
+      />
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
-        <div className="text-center mb-16">
-          <motion.h2
-            initial={{ opacity: 0, y: -30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            viewport={{ once: true }}
-            className="text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl lg:text-6xl"
-          >
-            Meet Our <span className="text-indigo-600">Dynamic Team</span>
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="mt-6 text-xl text-gray-600 max-w-3xl mx-auto"
-          >
-            Behind every success story is a dedicated team. Get to know the
-            passionate individuals driving Refer Me Group forward.
-          </motion.p>
-        </div>
+      <section className="relative py-24 bg-gradient-to-br from-gray-50 via-blue-50 to-gray-100 overflow-hidden">
+        {/* Floating blobs */}
+        <div className="absolute top-[-50px] left-[-50px] w-64 h-64 bg-indigo-200 rounded-full mix-blend-multiply filter blur-2xl opacity-50 animate-blob pointer-events-none"></div>
+        <div className="absolute bottom-[-50px] right-[-50px] w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-2xl opacity-50 animate-blob pointer-events-none"></div>
 
-        {teamMembers.length === 0 ? (
-          <p className="text-center text-gray-500">
-            No team members available at the moment.
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
-            {teamMembers.map((member) => (
-              <TeamMemberCard key={member._id} member={member} />
-            ))}
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
+          <div className="text-center mb-16">
+            <motion.h2
+              initial={{ opacity: 0, y: -30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7 }}
+              viewport={{ once: true }}
+              className="text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl lg:text-6xl"
+            >
+              Meet Our <span className="text-indigo-600">Dynamic Team</span>
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="mt-6 text-xl text-gray-600 max-w-3xl mx-auto"
+            >
+              Behind every success story is a dedicated team. Get to know the
+              passionate individuals driving Refer Me Group forward.
+            </motion.p>
           </div>
-        )}
-      </div>
-    </section>
+
+          {teamMembers.length === 0 ? (
+            <p className="text-center text-gray-500">
+              No team members available at the moment.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
+              {teamMembers.map((member) => (
+                <TeamMemberCard key={member._id} member={member} />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+    </>
   );
 };
 

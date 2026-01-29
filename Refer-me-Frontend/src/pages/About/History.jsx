@@ -15,6 +15,7 @@ import {
 // Removed GiGrowth, GiAchievement as they weren't directly used or better covered by Fa icons
 import { GiGrowth, GiAchievement } from "react-icons/gi"; // Corrected: GiGrowth and GiAchievement imported
 import Vision from "./Vision";
+import SEOManagement from "../../components/seo/SEOManagement";
 
 const History = () => {
   // Data from your prompt, structured for easier use in the component
@@ -84,6 +85,12 @@ const History = () => {
 
   return (
     <>
+      <SEOManagement
+        title="Our History | Refer Me Group Journey"
+        description="Discover the journey and milestones of Refer Me Group in transforming careers through learning and referrals."
+        keywords="Refer Me Group history, company journey, career platform evolution"
+        canonical="/about/history"
+      />
       <Vision />
       <div className="bg-gray-50 font-sans antialiased">
         {/* Hero Section */}

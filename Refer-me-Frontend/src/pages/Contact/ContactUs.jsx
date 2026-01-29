@@ -76,9 +76,9 @@ const ContactUs = () => {
     <>
       {/* 2. SEO Management Tags Add Karein */}
       <SEOManagement
-        title="Contact Us | Refer Me Group - Professional Support"
-        description="Get in touch with Refer Me Group for career growth strategies, professional insights, and industry trends. We are here to help you stay ahead in your journey."
-        keywords="contact refer me group, career support, job search help, professional insights ghaziabad"
+        title="Contact Refer Me Group | Start Your Career Growth"
+        description="Get in touch with Refer Me Group for training, partnerships, or career guidance."
+        keywords="contact Refer Me Group, career support"
         canonical="/contact"
       />
 

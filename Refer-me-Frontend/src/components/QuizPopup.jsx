@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
+import SEOManagement from "./seo/SEOManagement";
 
 const CareerQuizPage = () => {
   const navigate = useNavigate();
@@ -476,7 +477,6 @@ const CareerQuizPage = () => {
     },
   ];
 
-  // Calculate scores for each category
   const calculateScores = () => {
     const categoryScores = {
       "Cloud Computing and DevOps": 0,
@@ -488,7 +488,6 @@ const CareerQuizPage = () => {
       "Project Manager": 0,
     };
 
-    // Question mapping to categories
     const questionCategories = {
       1: ["Full Stack Development", "Data Science and Analytics"],
       2: [
@@ -525,22 +524,18 @@ const CareerQuizPage = () => {
       15: ["Project Manager"],
     };
 
-    // Calculate scores for each category
     Object.keys(answers).forEach((qIndex) => {
       const questionId = parseInt(qIndex) + 1;
       const answerValue = answers[qIndex].value;
-
       if (questionCategories[questionId]) {
         questionCategories[questionId].forEach((category) => {
           categoryScores[category] += answerValue;
         });
       }
     });
-
     return categoryScores;
   };
 
-  // Determine career path based on scores
   const determineCareerPath = (scores) => {
     const careerPaths = {
       "Cloud Computing and DevOps": [
@@ -584,8 +579,6 @@ const CareerQuizPage = () => {
 
     let maxScore = 0;
     let recommendedCategory = "";
-
-    // Find category with highest score
     Object.keys(scores).forEach((category) => {
       if (scores[category] > maxScore) {
         maxScore = scores[category];
@@ -593,7 +586,6 @@ const CareerQuizPage = () => {
       }
     });
 
-    // Return random career from the highest scoring category
     const careers = careerPaths[recommendedCategory];
     const randomCareer = careers[Math.floor(Math.random() * careers.length)];
 
@@ -604,40 +596,29 @@ const CareerQuizPage = () => {
     };
   };
 
-  // Progress update
   useEffect(() => {
     const answeredCount = Object.keys(answers).length;
-    const newProgress = (answeredCount / questions.length) * 100;
-    setProgress(newProgress);
+    setProgress((answeredCount / questions.length) * 100);
   }, [answers, questions.length]);
 
   const handleOptionChange = (qIndex, option) => {
     setAnswers((prev) => ({ ...prev, [qIndex]: option }));
-
-    // Auto-navigate to next question after a short delay
     setTimeout(() => {
-      if (qIndex < questions.length - 1) {
-        setCurrentQuestion(qIndex + 1);
-      }
+      if (qIndex < questions.length - 1) setCurrentQuestion(qIndex + 1);
     }, 500);
   };
 
   const handleNext = () => {
-    // Validate if current question is answered
     if (!answers[currentQuestion]) {
       toast.error("⚠️ Please select an answer before proceeding!");
       return;
     }
-
-    if (currentQuestion < questions.length - 1) {
+    if (currentQuestion < questions.length - 1)
       setCurrentQuestion((prev) => prev + 1);
-    }
   };
 
   const handlePrev = () => {
-    if (currentQuestion > 0) {
-      setCurrentQuestion((prev) => prev - 1);
-    }
+    if (currentQuestion > 0) setCurrentQuestion((prev) => prev - 1);
   };
 
   const handleSubmit = () => {
@@ -647,17 +628,12 @@ const CareerQuizPage = () => {
     }
 
     setIsSubmitting(true);
-
-    // Calculate correct and incorrect answers
     let correctCount = 0;
     let incorrectCount = 0;
 
     Object.keys(answers).forEach((qIndex) => {
-      if (answers[qIndex].correct) {
-        correctCount++;
-      } else {
-        incorrectCount++;
-      }
+      if (answers[qIndex].correct) correctCount++;
+      else incorrectCount++;
     });
 
     setCorrectAnswers(correctCount);
@@ -675,11 +651,8 @@ const CareerQuizPage = () => {
       setIsSubmitting(false);
       toast.success("🎉 Quiz submitted successfully!");
 
-      // Redirect to appropriate course page based on career path
       setTimeout(() => {
         setShowResultPopup(false);
-
-        // Map career categories to course routes
         const careerToRoute = {
           "Cloud Computing and DevOps": "/courses/cloud-engineering-aws-devops",
           "Artificial Intelligence and Machine Learning":
@@ -690,21 +663,14 @@ const CareerQuizPage = () => {
           "Internet of Things (IoT)": "/courses/api-automation-ai",
           "Project Manager": "/courses/selenium-ai",
         };
-
         navigate(careerToRoute[careerResult.category] || "/courses");
-      }, 10000); // Increased timeout to 10 seconds to allow user to read the information
+      }, 10000);
     }, 800);
   };
 
-  const getDotColor = (index) => {
-    return answers[index] ? "#4a6cf7" : "#e2e8f0";
-  };
+  const getDotColor = (index) => (answers[index] ? "#4a6cf7" : "#e2e8f0");
+  const getDotTextColor = (index) => (answers[index] ? "white" : "#64748b");
 
-  const getDotTextColor = (index) => {
-    return answers[index] ? "white" : "#64748b";
-  };
-
-  // Get career options for the recommended category
   const getCareerOptions = (category) => {
     const careerOptions = {
       "Cloud Computing and DevOps": [
@@ -745,438 +711,203 @@ const CareerQuizPage = () => {
         "Technical Project Manager",
       ],
     };
-
     return careerOptions[category] || [];
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
-        padding: "20px",
-      }}
-    >
+    <>
+      {/* SEO Management Integration */}
+      <SEOManagement
+        title="Career Quiz | Find Your Ideal Tech Career - Refer Me Group"
+        description="Take our 15-question career assessment quiz to discover your ideal tech path. Whether it's AI, Cloud, or Full Stack, we'll guide you to the right role."
+        keywords="Tech Career Quiz, Career Assessment, Job Role Discovery, Tech Career Path, Career Counseling Quiz, AI Cloud Cybersecurity Careers"
+        canonical="/career-quiz"
+      />
+
       <div
         style={{
-          Width: "100%",
-          margin: "0 auto",
-          background: "white",
-          borderRadius: "12px",
-          padding: "25px",
-          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
-          position: "relative",
+          minHeight: "100vh",
+          background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+          padding: "20px",
         }}
       >
-        <h1
-          style={{
-            textAlign: "center",
-            color: "#4a6cf7",
-            marginBottom: "10px",
-            fontSize: "32px",
-            fontWeight: "700",
-          }}
-        >
-          Career Assessment Quiz
-        </h1>
-
-        <p
-          style={{
-            textAlign: "center",
-            color: "#64748b",
-            marginBottom: "30px",
-          }}
-        >
-          Discover your ideal tech career path by answering these 15 questions
-        </p>
-
-        {/* Progress bar */}
         <div
           style={{
-            height: "12px",
-            backgroundColor: "#e9ecef",
-            borderRadius: "6px",
-            marginBottom: "25px",
-            overflow: "hidden",
-          }}
-        >
-          <div
-            style={{
-              height: "100%",
-              width: `${progress}%`,
-              backgroundColor: "#4a6cf7",
-              borderRadius: "6px",
-              transition: "width 0.5s ease",
-            }}
-          />
-        </div>
-
-        {/* Question Card */}
-        <div
-          key={currentQuestion}
-          style={{
-            marginBottom: "25px",
-            padding: "20px",
-            border: "1px solid #e2e8f0",
+            maxWidth: "800px",
+            margin: "0 auto",
+            background: "white",
             borderRadius: "12px",
-            backgroundColor: "#f8fafc",
+            padding: "25px",
+            boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
+            position: "relative",
           }}
         >
+          <h1
+            style={{
+              textAlign: "center",
+              color: "#4a6cf7",
+              marginBottom: "10px",
+              fontSize: "32px",
+              fontWeight: "700",
+            }}
+          >
+            Career Assessment Quiz
+          </h1>
+
           <p
             style={{
-              fontSize: "18px",
-              fontWeight: "600",
-              marginBottom: "15px",
-              color: "#1e293b",
+              textAlign: "center",
+              color: "#64748b",
+              marginBottom: "30px",
             }}
           >
-            {currentQuestion + 1}. {questions[currentQuestion].question}
+            Discover your ideal tech career path by answering these 15 questions
           </p>
-          {questions[currentQuestion].options.map((opt, i) => (
-            <label
-              key={i}
-              style={{
-                display: "block",
-                padding: "12px 15px",
-                marginBottom: "10px",
-                backgroundColor:
-                  answers[currentQuestion] &&
-                  answers[currentQuestion].id === opt.id
-                    ? "#edf2ff"
-                    : "white",
-                border:
-                  answers[currentQuestion] &&
-                  answers[currentQuestion].id === opt.id
-                    ? "2px solid #4a6cf7"
-                    : "2px solid #e2e8f0",
-                borderRadius: "8px",
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-              }}
-            >
-              <input
-                type="radio"
-                name={`question-${currentQuestion}`}
-                value={opt.id}
-                checked={
-                  answers[currentQuestion] &&
-                  answers[currentQuestion].id === opt.id
-                }
-                onChange={() => handleOptionChange(currentQuestion, opt)}
-                style={{ marginRight: "10px" }}
-              />
-              {opt.text}
-            </label>
-          ))}
-        </div>
 
-        {/* Dots */}
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "8px",
-            marginBottom: "25px",
-            justifyContent: "center",
-          }}
-        >
-          {questions.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => {
-                // Validate if user can navigate to this question
-                // Allow navigation to any answered question or the next unanswered question
-                const lastAnsweredIndex = Math.max(
-                  ...Object.keys(answers).map(Number)
-                );
-
-                if (answers[index] || index <= lastAnsweredIndex + 1) {
-                  setCurrentQuestion(index);
-                } else {
-                  toast.error("⚠️ Please complete questions in order!");
-                }
-              }}
-              style={{
-                width: "38px",
-                height: "38px",
-                borderRadius: "50%",
-                border: "none",
-                backgroundColor: getDotColor(index),
-                color: getDotTextColor(index),
-                cursor:
-                  answers[index] ||
-                  index <= Math.max(...Object.keys(answers).map(Number), -1) + 1
-                    ? "pointer"
-                    : "not-allowed",
-                fontWeight: "600",
-                opacity:
-                  answers[index] ||
-                  index <= Math.max(...Object.keys(answers).map(Number), -1) + 1
-                    ? 1
-                    : 0.6,
-              }}
-            >
-              {index + 1}
-            </button>
-          ))}
-        </div>
-
-        {/* Navigation buttons at bottom */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "20px",
-            flexWrap: "wrap",
-            gap: "10px",
-          }}
-        >
-          <button
-            onClick={handlePrev}
-            disabled={currentQuestion === 0}
-            style={{
-              padding: "10px 20px",
-              background: currentQuestion === 0 ? "#ccc" : "#4a6cf7",
-              color: "white",
-              border: "none",
-              borderRadius: "6px",
-              cursor: currentQuestion === 0 ? "not-allowed" : "pointer",
-              fontWeight: "600",
-              minWidth: "100px",
-            }}
-          >
-            Previous
-          </button>
-
-          <span
-            style={{ fontWeight: "600", color: "#495057", textAlign: "center" }}
-          >
-            Question {currentQuestion + 1} of {questions.length}
-          </span>
-
-          {currentQuestion < questions.length - 1 ? (
-            <button
-              onClick={handleNext}
-              style={{
-                padding: "10px 20px",
-                background: "#4a6cf7",
-                color: "white",
-                border: "none",
-                borderRadius: "6px",
-                cursor: "pointer",
-                fontWeight: "600",
-                minWidth: "100px",
-              }}
-            >
-              Next
-            </button>
-          ) : (
-            <button
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-              style={{
-                padding: "10px 20px",
-                background: isSubmitting ? "#ccc" : "#10b981",
-                color: "white",
-                border: "none",
-                borderRadius: "6px",
-                cursor: isSubmitting ? "not-allowed" : "pointer",
-                fontWeight: "600",
-                minWidth: "100px",
-              }}
-            >
-              {isSubmitting ? "Submitting..." : "Submit Quiz"}
-            </button>
-          )}
-        </div>
-
-        {/* Result Popup */}
-        {showResultPopup && (
           <div
             style={{
-              position: "fixed",
-              inset: 0,
-              background: "rgba(0,0,0,0.6)",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              zIndex: 4000,
-              padding: "20px",
+              height: "12px",
+              backgroundColor: "#e9ecef",
+              borderRadius: "6px",
+              marginBottom: "25px",
+              overflow: "hidden",
             }}
           >
             <div
               style={{
-                width: "100%",
-                maxWidth: "600px",
-                background: "white",
-                padding: "30px",
-                borderRadius: "12px",
-                textAlign: "center",
-                boxShadow: "0 10px 30px rgba(0, 0, 0, 0.2)",
-                maxHeight: "90vh",
-                overflowY: "auto",
+                height: "100%",
+                width: `${progress}%`,
+                backgroundColor: "#4a6cf7",
+                borderRadius: "6px",
+                transition: "width 0.5s ease",
+              }}
+            />
+          </div>
+
+          <div
+            key={currentQuestion}
+            style={{
+              marginBottom: "25px",
+              padding: "20px",
+              border: "1px solid #e2e8f0",
+              borderRadius: "12px",
+              backgroundColor: "#f8fafc",
+            }}
+          >
+            <p
+              style={{
+                fontSize: "18px",
+                fontWeight: "600",
+                marginBottom: "15px",
+                color: "#1e293b",
               }}
             >
-              <h3
+              {currentQuestion + 1}. {questions[currentQuestion].question}
+            </p>
+            {questions[currentQuestion].options.map((opt, i) => (
+              <label
+                key={i}
                 style={{
-                  marginBottom: "15px",
-                  color: "#0f172a",
-                  fontSize: "24px",
-                }}
-              >
-                Career Assessment Result
-              </h3>
-
-              {/* Score display - only shown after submission */}
-              {showScore && (
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    gap: "20px",
-                    marginBottom: "20px",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <div
-                    style={{
-                      padding: "10px 15px",
-                      backgroundColor: "#10B981",
-                      color: "white",
-                      borderRadius: "8px",
-                      fontWeight: "600",
-                      minWidth: "120px",
-                    }}
-                  >
-                    Correct: {correctAnswers}
-                  </div>
-                  <div
-                    style={{
-                      padding: "10px 15px",
-                      backgroundColor: "#EF4444",
-                      color: "white",
-                      borderRadius: "8px",
-                      fontWeight: "600",
-                      minWidth: "120px",
-                    }}
-                  >
-                    Incorrect: {incorrectAnswers}
-                  </div>
-                </div>
-              )}
-
-              <p
-                style={{
-                  color: "#334155",
-                  fontSize: "18px",
-                  fontWeight: "600",
+                  display: "block",
+                  padding: "12px 15px",
                   marginBottom: "10px",
-                }}
-              >
-                Recommended Career Path:
-              </p>
-              <p
-                style={{
-                  color: "#4a6cf7",
-                  fontSize: "22px",
-                  fontWeight: "700",
-                  marginBottom: "20px",
-                }}
-              >
-                {careerPath}
-              </p>
-
-              {/* Additional information about career options */}
-              <div
-                style={{
-                  backgroundColor: "#f8fafc",
-                  padding: "15px",
+                  backgroundColor:
+                    answers[currentQuestion]?.id === opt.id
+                      ? "#edf2ff"
+                      : "white",
+                  border:
+                    answers[currentQuestion]?.id === opt.id
+                      ? "2px solid #4a6cf7"
+                      : "2px solid #e2e8f0",
                   borderRadius: "8px",
-                  marginBottom: "20px",
-                  textAlign: "left",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
                 }}
               >
-                <p
-                  style={{
-                    fontWeight: "600",
-                    marginBottom: "10px",
-                    color: "#334155",
-                  }}
-                >
-                  On the basis of answers given by you, we recommend that you
-                  can try for these roles in {recommendedCategory}:
-                </p>
-                <ul style={{ marginLeft: "20px", marginBottom: "15px" }}>
-                  {getCareerOptions(recommendedCategory).map(
-                    (option, index) => (
-                      <li key={index} style={{ marginBottom: "5px" }}>
-                        {option}
-                      </li>
-                    )
-                  )}
-                </ul>
-                <p style={{ marginBottom: "10px" }}>
-                  If you are interested to grow your career in these fields, you
-                  can explore our course{" "}
-                  <a
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const careerToRoute = {
-                        "Cloud Computing and DevOps":
-                          "/courses/cloud-computing",
-                        "Artificial Intelligence and Machine Learning":
-                          "/courses/ai-ml",
-                        Cybersecurity: "/courses/cybersecurity",
-                        "Full Stack Development": "/courses/full-stack",
-                        "Data Science and Analytics": "/courses/data-science",
-                        "Internet of Things (IoT)": "/courses/iot",
-                        "Project Manager": "/courses/project-management",
-                      };
-                      navigate(
-                        careerToRoute[recommendedCategory] || "/courses"
-                      );
-                    }}
-                    style={{
-                      color: "#4a6cf7",
-                      fontWeight: "600",
-                      textDecoration: "underline",
-                    }}
-                  >
-                    (click here)
-                  </a>
-                </p>
-                <p style={{ fontStyle: "italic", color: "#64748b" }}>
-                  1400+ Professionals have changed their career with us and are
-                  living their dream jobs
-                </p>
-              </div>
+                <input
+                  type="radio"
+                  name={`question-${currentQuestion}`}
+                  value={opt.id}
+                  checked={answers[currentQuestion]?.id === opt.id}
+                  onChange={() => handleOptionChange(currentQuestion, opt)}
+                  style={{ marginRight: "10px" }}
+                />
+                {opt.text}
+              </label>
+            ))}
+          </div>
 
-              <p
-                style={{
-                  color: "#334155",
-                  fontSize: "16px",
-                }}
-              >
-                Redirecting to relevant course in 10 seconds...
-              </p>
-
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "8px",
+              marginBottom: "25px",
+              justifyContent: "center",
+            }}
+          >
+            {questions.map((_, index) => (
               <button
+                key={index}
                 onClick={() => {
-                  setShowResultPopup(false);
-                  const careerToRoute = {
-                    "Cloud Computing and DevOps": "/courses/cloud-computing",
-                    "Artificial Intelligence and Machine Learning":
-                      "/courses/ai-ml",
-                    Cybersecurity: "/courses/cybersecurity",
-                    "Full Stack Development": "/courses/full-stack",
-                    "Data Science and Analytics": "/courses/data-science",
-                    "Internet of Things (IoT)": "/courses/iot",
-                    "Project Manager": "/courses/project-management",
-                  };
-                  navigate(careerToRoute[recommendedCategory] || "/courses");
+                  const lastAnsweredIndex = Math.max(
+                    ...Object.keys(answers).map(Number),
+                    -1,
+                  );
+                  if (answers[index] || index <= lastAnsweredIndex + 1)
+                    setCurrentQuestion(index);
+                  else toast.error("⚠️ Please complete questions in order!");
                 }}
+                style={{
+                  width: "38px",
+                  height: "38px",
+                  borderRadius: "50%",
+                  border: "none",
+                  backgroundColor: getDotColor(index),
+                  color: getDotTextColor(index),
+                  cursor: "pointer",
+                  fontWeight: "600",
+                }}
+              >
+                {index + 1}
+              </button>
+            ))}
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "20px",
+              flexWrap: "wrap",
+              gap: "10px",
+            }}
+          >
+            <button
+              onClick={handlePrev}
+              disabled={currentQuestion === 0}
+              style={{
+                padding: "10px 20px",
+                background: currentQuestion === 0 ? "#ccc" : "#4a6cf7",
+                color: "white",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer",
+                fontWeight: "600",
+                minWidth: "100px",
+              }}
+            >
+              Previous
+            </button>
+
+            <span style={{ fontWeight: "600", color: "#495057" }}>
+              Question {currentQuestion + 1} of {questions.length}
+            </span>
+
+            {currentQuestion < questions.length - 1 ? (
+              <button
+                onClick={handleNext}
                 style={{
                   padding: "10px 20px",
                   background: "#4a6cf7",
@@ -1185,68 +916,198 @@ const CareerQuizPage = () => {
                   borderRadius: "6px",
                   cursor: "pointer",
                   fontWeight: "600",
-                  marginTop: "15px",
+                  minWidth: "100px",
                 }}
               >
-                Go to Course Now
+                Next
               </button>
-            </div>
+            ) : (
+              <button
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                style={{
+                  padding: "10px 20px",
+                  background: isSubmitting ? "#ccc" : "#10b981",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  fontWeight: "600",
+                  minWidth: "100px",
+                }}
+              >
+                {isSubmitting ? "Submitting..." : "Submit Quiz"}
+              </button>
+            )}
           </div>
-        )}
+
+          {showResultPopup && (
+            <div
+              style={{
+                position: "fixed",
+                inset: 0,
+                background: "rgba(0,0,0,0.6)",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                zIndex: 4000,
+                padding: "20px",
+              }}
+            >
+              <div
+                style={{
+                  width: "100%",
+                  maxWidth: "600px",
+                  background: "white",
+                  padding: "30px",
+                  borderRadius: "12px",
+                  textAlign: "center",
+                  boxShadow: "0 10px 30px rgba(0, 0, 0, 0.2)",
+                  maxHeight: "90vh",
+                  overflowY: "auto",
+                }}
+              >
+                <h3
+                  style={{
+                    marginBottom: "15px",
+                    color: "#0f172a",
+                    fontSize: "24px",
+                  }}
+                >
+                  Career Assessment Result
+                </h3>
+
+                {showScore && (
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      gap: "20px",
+                      marginBottom: "20px",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <div
+                      style={{
+                        padding: "10px 15px",
+                        backgroundColor: "#10B981",
+                        color: "white",
+                        borderRadius: "8px",
+                        fontWeight: "600",
+                      }}
+                    >
+                      Correct: {correctAnswers}
+                    </div>
+                    <div
+                      style={{
+                        padding: "10px 15px",
+                        backgroundColor: "#EF4444",
+                        color: "white",
+                        borderRadius: "8px",
+                        fontWeight: "600",
+                      }}
+                    >
+                      Incorrect: {incorrectAnswers}
+                    </div>
+                  </div>
+                )}
+
+                <p
+                  style={{
+                    color: "#334155",
+                    fontSize: "18px",
+                    fontWeight: "600",
+                    marginBottom: "10px",
+                  }}
+                >
+                  Recommended Career Path:
+                </p>
+                <p
+                  style={{
+                    color: "#4a6cf7",
+                    fontSize: "22px",
+                    fontWeight: "700",
+                    marginBottom: "20px",
+                  }}
+                >
+                  {careerPath}
+                </p>
+
+                <div
+                  style={{
+                    backgroundColor: "#f8fafc",
+                    padding: "15px",
+                    borderRadius: "8px",
+                    marginBottom: "20px",
+                    textAlign: "left",
+                  }}
+                >
+                  <p
+                    style={{
+                      fontWeight: "600",
+                      marginBottom: "10px",
+                      color: "#334155",
+                    }}
+                  >
+                    On the basis of answers given by you, we recommend that you
+                    can try for these roles in {recommendedCategory}:
+                  </p>
+                  <ul style={{ marginLeft: "20px", marginBottom: "15px" }}>
+                    {getCareerOptions(recommendedCategory).map(
+                      (option, index) => (
+                        <li key={index} style={{ marginBottom: "5px" }}>
+                          {option}
+                        </li>
+                      ),
+                    )}
+                  </ul>
+                  <p style={{ fontStyle: "italic", color: "#64748b" }}>
+                    1400+ Professionals have changed their career with us and
+                    are living their dream jobs
+                  </p>
+                </div>
+
+                <p style={{ color: "#334155", fontSize: "16px" }}>
+                  Redirecting to relevant course in 10 seconds...
+                </p>
+
+                <button
+                  onClick={() => {
+                    setShowResultPopup(false);
+                    const careerToRoute = {
+                      "Cloud Computing and DevOps":
+                        "/courses/cloud-engineering-aws-devops",
+                      "Artificial Intelligence and Machine Learning":
+                        "/courses/ai-automation",
+                      Cybersecurity: "/courses/cloud-engineering-azure-devops",
+                      "Full Stack Development":
+                        "/courses/cypress-typescript-ai",
+                      "Data Science and Analytics": "/courses/data-science",
+                      "Internet of Things (IoT)": "/courses/api-automation-ai",
+                      "Project Manager": "/courses/selenium-ai",
+                    };
+                    navigate(careerToRoute[recommendedCategory] || "/courses");
+                  }}
+                  style={{
+                    padding: "10px 20px",
+                    background: "#4a6cf7",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "6px",
+                    cursor: "pointer",
+                    fontWeight: "600",
+                    marginTop: "15px",
+                  }}
+                >
+                  Go to Course Now
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-
-      {/* Toast */}
       <ToastContainer position="top-center" autoClose={2500} />
-
-      {/* Responsive styles */}
-      <style>
-        {`
-          @media (max-width: 768px) {
-            .quiz-container {
-              padding: 15px;
-            }
-            
-            .navigation-buttons {
-              flex-direction: column;
-              gap: 15px;
-            }
-            
-            .navigation-buttons button {
-              width: 100%;
-            }
-            
-            .question-dots {
-              gap: 5px;
-            }
-            
-            .question-dots button {
-              width: 32px;
-              height: 32px;
-              font-size: 14px;
-            }
-          }
-          
-          @media (max-width: 480px) {
-            .quiz-title {
-              font-size: 24px;
-            }
-            
-            .question-text {
-              font-size: 16px;
-            }
-            
-            .option-label {
-              padding: 10px;
-              font-size: 14px;
-            }
-            
-            .result-popup {
-              padding: 20px;
-            }
-          }
-        `}
-      </style>
-    </div>
+    </>
   );
 };
 

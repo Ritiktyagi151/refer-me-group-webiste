@@ -25,8 +25,6 @@ import WhatsAppWidget from "../../components/WhatsAppWidget";
 import HiringSection from "../../components/HiringSection";
 import JobAssistanceSection from "../../components/PlacementRecordsSection";
 
-
-
 const Home = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isQuizOpen, setIsQuizOpen] = useState(false);
@@ -48,14 +46,13 @@ const Home = () => {
     <>
       {/* ✅ Yahan SEO data add kiya hai */}
       <SEOManagement
-        title="Career Advancement & Professional Training | Refer Me Group"
-        description="Upskill with expert-led training in AI, Cloud, BA, PMP, Scrum & more. Join Refer Me Group to boost your career with job-focused programs & live mentoring."
-        keywords="career advancement training, professional IT courses online, AI automation training, business analyst certification, project management training programs"
+        title="Refer Me Group | Career Growth, Training & Job Referrals"
+        description="Refer Me Group helps professionals grow with industry-led training, job referrals, freelancing, webinars, and career mentorship."
+        keywords="Refer Me Group, career growth platform, job referrals, professional training, skill development"
         canonical="/"
       />
 
       <main className="w-full">
-       
         <WhatsAppWidget />
         <EnquiryModal isOpen={isModalOpen} onClose={closeModal} />
         {/* <Quiz isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} /> */}

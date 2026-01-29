@@ -239,7 +239,7 @@ export default function Navbar() {
   const filteredCourses = categoriesMenuItems.filter(
     (item) =>
       item.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchTerm.toLowerCase())
+      item.description.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const handleSearch = (e) => {
@@ -478,13 +478,10 @@ export default function Navbar() {
                   </div>
                 </div>
                 <div className="dropdown">
-                  <Link
-                    to="/services"
-                    className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-white hover:text-yellow-300 transition-colors"
-                  >
+                  <p className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-white hover:text-yellow-300 transition-colors">
                     Our Services
                     <FaChevronDown className="text-xs mt-0.5" />
-                  </Link>
+                  </p>
                   <div className="dropdown-menu rounded-lg shadow-lg bg-white">
                     {servicesMenuItems.map((item) => (
                       <Link
@@ -561,7 +558,7 @@ export default function Navbar() {
               </Link>
 
               <Link
-                to="https://www.youtube.com/@ReferMeGroupQA"
+                to="https://www.youtube.com/@ReferMeGroup"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-white bg-opacity-20 p-2 rounded-full text-white hover:opacity-90 transition-opacity"
