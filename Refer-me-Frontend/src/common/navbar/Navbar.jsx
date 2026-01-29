@@ -42,7 +42,7 @@ import {
   FaBook,
 } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
-import { Link, Links, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Navbar() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -58,16 +58,6 @@ export default function Navbar() {
     setOpenMobileDropdown(openMobileDropdown === dropdown ? null : dropdown);
   };
 
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleLogin = () => {
-    setIsLoading(true);
-    // Simulate login API call
-    setTimeout(() => {
-      setIsLoading(false);
-      // Handle login success/failure here
-    }, 1500);
-  };
   const categoriesMenuItems = [
     {
       key: "1",
@@ -248,11 +238,12 @@ export default function Navbar() {
   };
 
   const handleCourseClick = (path, e) => {
-    e.preventDefault(); // Prevent default behavior
-    e.stopPropagation(); // Stop event bubbling
+    e.preventDefault();
+    e.stopPropagation();
     setIsSearchOpen(false);
     setSearchTerm("");
     setSidebarOpen(false);
+    setIsCoursesOpen(false);
     navigate(path);
   };
 
@@ -266,11 +257,8 @@ export default function Navbar() {
         setIsSearchOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
@@ -278,10 +266,7 @@ export default function Navbar() {
       <div
         className="w-full bg-white shadow-sm"
         style={{
-          backgroundImage: `
-         linear-gradient(to right, rgba(255,255,255, 0.9), rgba(255,255, 255, 0.9)),
-         url('/assets/bg-img/books.jpg')
-       `,
+          backgroundImage: `linear-gradient(to right, rgba(255,255,255, 0.9), rgba(255,255, 255, 0.9)), url('/assets/bg-img/books.jpg')`,
           backgroundRepeat: "repeat",
         }}
       >
@@ -317,9 +302,8 @@ export default function Navbar() {
                       <div className="p-4 text-gray-500">No courses found</div>
                     ) : (
                       filteredCourses.map((item) => (
-                        <Link
+                        <div
                           key={item.key}
-                          to={item.path}
                           className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors duration-200 cursor-pointer"
                           onClick={(e) => handleCourseClick(item.path, e)}
                         >
@@ -332,7 +316,7 @@ export default function Navbar() {
                               {item.description}
                             </div>
                           </div>
-                        </Link>
+                        </div>
                       ))
                     )}
                   </div>
@@ -361,30 +345,6 @@ export default function Navbar() {
                   </p>
                 </div>
               </div>
-              {/* 
-            <button
-      onClick={handleLogin}
-      disabled={isLoading}
-      className={`
-        w-full py-3 px-4 rounded-lg font-medium text-white
-        bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2
-        focus:ring-blue-500 focus:ring-offset-2 transition-colors
-        disabled:opacity-70 disabled:cursor-not-allowed
-        flex items-center justify-center
-      `}
-    >
-      {isLoading ? (
-        <>
-          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          Logging in...
-        </>
-      ) : (
-        'Login'
-      )}
-    </button> */}
             </div>
 
             <button
@@ -411,33 +371,34 @@ export default function Navbar() {
                   <FaBars className="text-lg" />
                   <span>All Courses</span>
                   <FaChevronDown
-                    className={`text-xs mt-0.5 transition-transform ${
-                      isCoursesOpen ? "rotate-180" : ""
-                    }`}
+                    className={`text-xs mt-0.5 transition-transform ${isCoursesOpen ? "rotate-180" : ""}`}
                   />
                 </button>
 
                 {isCoursesOpen && (
                   <div
-                    className="absolute left-0 mt-1 w-[1420px] bg-white rounded-lg shadow-xl border border-gray-100 z-50"
+                    className="absolute left-0 mt-1 w-[90vw] max-w-[1200px] bg-white rounded-lg shadow-xl border border-gray-100 z-50"
                     onMouseEnter={() => setIsCoursesOpen(true)}
                     onMouseLeave={() => setIsCoursesOpen(false)}
                   >
-                    <div className="p-5">
-                      <div className="grid grid-cols-4 gap-4">
+                    <div className="p-5 max-h-[70vh] overflow-y-auto">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {categoriesMenuItems.map((item) => (
                           <Link
                             key={item.key}
                             to={item.path}
                             className="flex items-center gap-3 px-3 py-1 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors duration-200"
+                            onClick={() => setIsCoursesOpen(false)}
                           >
                             <div className="bg-blue-50 p-2 rounded-lg text-blue-600">
                               {item.icon}
                             </div>
                             <div>
-                              <div className="font-medium">{item.label}</div>
+                              <div className="font-medium text-sm">
+                                {item.label}
+                              </div>
                               {item.description && (
-                                <div className="text-xs text-gray-500 mt-1">
+                                <div className="text-[10px] text-gray-500 mt-1 leading-tight">
                                   {item.description}
                                 </div>
                               )}
@@ -462,8 +423,7 @@ export default function Navbar() {
                     to="/about"
                     className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-white hover:text-yellow-300 transition-colors"
                   >
-                    About Us
-                    <FaChevronDown className="text-xs mt-0.5" />
+                    About Us <FaChevronDown className="text-xs mt-0.5" />
                   </Link>
                   <div className="dropdown-menu rounded-lg shadow-lg bg-white">
                     {aboutMenuItems.map((item) => (
@@ -478,9 +438,8 @@ export default function Navbar() {
                   </div>
                 </div>
                 <div className="dropdown">
-                  <p className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-white hover:text-yellow-300 transition-colors">
-                    Our Services
-                    <FaChevronDown className="text-xs mt-0.5" />
+                  <p className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-white hover:text-yellow-300 transition-colors cursor-pointer">
+                    Our Services <FaChevronDown className="text-xs mt-0.5" />
                   </p>
                   <div className="dropdown-menu rounded-lg shadow-lg bg-white">
                     {servicesMenuItems.map((item) => (
@@ -529,7 +488,6 @@ export default function Navbar() {
               >
                 <FaFacebook />
               </Link>
-
               <Link
                 to="https://www.instagram.com/refermegroup/"
                 target="_blank"
@@ -538,7 +496,6 @@ export default function Navbar() {
               >
                 <FaInstagram />
               </Link>
-
               <Link
                 to="https://www.linkedin.com/company/refermegroup/"
                 target="_blank"
@@ -547,7 +504,6 @@ export default function Navbar() {
               >
                 <FaLinkedin />
               </Link>
-
               <Link
                 to="https://x.com/referme_group"
                 target="_blank"
@@ -556,7 +512,6 @@ export default function Navbar() {
               >
                 <FaXTwitter />
               </Link>
-
               <Link
                 to="https://www.youtube.com/@ReferMeGroup"
                 target="_blank"
@@ -570,10 +525,9 @@ export default function Navbar() {
         </div>
       </div>
 
+      {/* Sidebar Mobile */}
       <div
-        className={`fixed top-0 left-0 h-full w-80 bg-white z-50 shadow-xl transform transition-transform duration-300 ease-in-out ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed top-0 left-0 h-full w-80 bg-white z-[100] shadow-xl transform transition-transform duration-300 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         <div className="flex justify-between items-center p-5 border-b sticky top-0 bg-white z-10">
           <img src="/assets/logo/rmg-logo.png" className="h-8" alt="RMG Logo" />
@@ -584,46 +538,7 @@ export default function Navbar() {
             <FaTimes size={20} />
           </button>
         </div>
-        {/* 
-        <div className="p-4 border-b">
-          <div className="relative" ref={searchContainerRef}>
-            <input
-              type="text"
-              placeholder="Search for courses..."
-              className="w-full px-4 py-2 pl-10 rounded-full border border-gray-200 focus:border-yellow-400 outline-none"
-              value={searchTerm}
-              onChange={handleSearch}
-              onFocus={() => setIsSearchOpen(searchTerm.length > 0)}
-            />
-            <FaSearch className="absolute left-3 top-3 text-gray-400" />
-            {isSearchOpen && (
-              <div
-                ref={dropdownRef}
-                className="absolute left-0 mt-1 w-full bg-white rounded-lg shadow-xl border border-gray-100 z-[60] max-h-60 overflow-y-auto"
-              >
-                {filteredCourses.length === 0 ? (
-                  <div className="p-4 text-gray-500">No courses found</div>
-                ) : (
-                  filteredCourses.map((item) => (
-                    <div
-                      key={item.key}
-                      className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors duration-200 cursor-pointer"
-                      onClick={(e) => handleCourseClick(item.path, e)}
-                    >
-                      <div className="bg-blue-50 p-2 rounded-lg text-blue-600">{item.icon}</div>
-                      <div>
-                        <div className="font-medium">{item.label}</div>
-                        <div className="text-xs text-gray-500">{item.description}</div>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
-          </div>
-        </div> */}
-
-        <div className="overflow-y-scroll h-[calc(100%-100px)]">
+        <div className="overflow-y-auto h-[calc(100%-100px)]">
           <nav className="flex flex-col py-2">
             <Link
               to="/"
@@ -650,7 +565,7 @@ export default function Navbar() {
                     <Link
                       key={item.key}
                       to={item.path}
-                      className="block px-1 py-1 text-sm rounded hover:bg-yellow-50 flex items-center gap-2 transition-colors"
+                      className="block px-3 py-2 text-sm rounded hover:bg-yellow-50 transition-colors"
                       onClick={() => setSidebarOpen(false)}
                     >
                       {item.label}
@@ -736,88 +651,42 @@ export default function Navbar() {
             </Link>
           </nav>
         </div>
-
-        <div className="p-4 border-b space-y-1">
-          <div className="flex items-center gap-3">
-            <div className="bg-yellow-100 p-2 rounded-full">
-              <FaPhoneAlt className="text-yellow-600 text-sm" />
-            </div>
-            <div>
-              <p className="text-xs text-gray-500">24/7 Support</p>
-              <p className="text-sm font-medium">+91 76785 73511</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="bg-yellow-100 p-2 rounded-full">
-              <FaEnvelope className="text-yellow-600 text-sm" />
-            </div>
-            <div>
-              <p className="text-xs text-gray-500">Email Us</p>
-              <p className="text-sm font-medium">contact@refermegroup.com</p>
-            </div>
-          </div>
-        </div>
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gray-50 border-t">
-          <div className="flex justify-center gap-3">
-            <Link
-              to="https://www.facebook.com/refermegroup.qa"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-blue-600 p-1.5 text-sm rounded-full text-white hover:opacity-90 transition-opacity"
-            >
-              <FaFacebook />
-            </Link>
-
-            <Link
-              to="https://www.instagram.com/refermegroup/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-gradient-to-tr from-pink-600 to-amber-500 p-1.5 text-sm rounded-full text-white hover:opacity-90 transition-opacity"
-            >
-              <FaInstagram />
-            </Link>
-
-            <Link
-              to="https://www.linkedin.com/company/refermegroup/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-blue-700 p-1.5 text-sm rounded-full text-white hover:opacity-90 transition-opacity"
-            >
-              <FaLinkedin />
-            </Link>
-
-            <Link
-              to="https://twitter.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-sky-500 p-1.5 text-sm rounded-full text-white hover:opacity-90 transition-opacity"
-            >
-              <FaTwitter />
-            </Link>
-
-            <Link
-              to="https://www.youtube.com/@ReferMeGroupQA"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-red-600 p-1.5 text-sm rounded-full text-white hover:opacity-90 transition-opacity"
-            >
-              <FaYoutube />
-            </Link>
-            <a
-              href="https://wa.me/917678573511" // ✅ Must start with https://
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-green-500 p-1.5 text-sm rounded-full text-white hover:opacity-90 transition-opacity"
-            >
-              <FaWhatsapp />
-            </a>
-          </div>
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gray-50 border-t flex justify-center gap-3">
+          <Link
+            to="https://www.facebook.com/refermegroup.qa"
+            target="_blank"
+            className="bg-blue-600 p-1.5 text-sm rounded-full text-white"
+          >
+            <FaFacebook />
+          </Link>
+          <Link
+            to="https://www.instagram.com/refermegroup/"
+            target="_blank"
+            className="bg-gradient-to-tr from-pink-600 to-amber-500 p-1.5 text-sm rounded-full text-white"
+          >
+            <FaInstagram />
+          </Link>
+          <Link
+            to="https://www.linkedin.com/company/refermegroup/"
+            target="_blank"
+            className="bg-blue-700 p-1.5 text-sm rounded-full text-white"
+          >
+            <FaLinkedin />
+          </Link>
+          <a
+            href="https://wa.me/917678573511"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-green-500 p-1.5 text-sm rounded-full text-white"
+          >
+            <FaWhatsapp />
+          </a>
         </div>
       </div>
 
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          className="fixed inset-0 bg-black bg-opacity-50 z-[90]"
           onClick={() => setSidebarOpen(false)}
         />
       )}
