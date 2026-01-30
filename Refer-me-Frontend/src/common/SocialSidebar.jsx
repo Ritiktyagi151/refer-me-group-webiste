@@ -1,16 +1,16 @@
-import React, { useState } from "react"; // 1. useState import kiya
+import React, { useState } from "react";
 import {
   FaYoutube,
   FaFacebookF,
   FaInstagram,
   FaLinkedinIn,
   FaXTwitter,
-  FaChevronLeft, // Hide icon
-  FaChevronRight, // Show icon
+  FaChevronLeft,
+  FaChevronRight,
 } from "react-icons/fa6";
 
 const SocialSidebar = () => {
-  const [isOpen, setIsOpen] = useState(true); // 2. State banayi hide/show ke liye
+  const [isOpen, setIsOpen] = useState(true);
 
   const socialLinks = [
     {
@@ -56,7 +56,8 @@ const SocialSidebar = () => {
   ];
 
   return (
-    <div className="fixed left-0 top-1/2 -translate-y-1/2 z-[999] flex flex-col items-start gap-4 p-4">
+    // 1. "left-0" ko "right-0" kiya aur "items-start" ko "items-end"
+    <div className="fixed right-0 top-1/2 -translate-y-1/2 z-[999] flex flex-col items-end gap-4 p-4">
       <style>
         {`
           @keyframes float {
@@ -73,9 +74,11 @@ const SocialSidebar = () => {
       {/* --- Toggle Button --- */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="bg-slate-800 text-white p-2 rounded-r-lg shadow-md hover:bg-slate-700 transition-colors mb-2 ml-[-16px]"
+        // 2. rounded corners ko swap kiya (rounded-l-lg) aur margin adjust kiya
+        className="bg-slate-800 text-white p-2 rounded-l-lg shadow-md hover:bg-slate-700 transition-colors mb-2 mr-[-16px]"
       >
-        {isOpen ? <FaChevronLeft size={18} /> : <FaChevronRight size={18} />}
+        {/* 3. Icons ko flip kiya */}
+        {isOpen ? <FaChevronRight size={18} /> : <FaChevronLeft size={18} />}
       </button>
 
       {/* --- Social Icons Container --- */}
@@ -83,35 +86,36 @@ const SocialSidebar = () => {
         className={`flex flex-col gap-4 transition-all duration-500 transform ${
           isOpen
             ? "translate-x-0 opacity-100"
-            : "-translate-x-24 opacity-0 pointer-events-none"
+            : "translate-x-24 opacity-0 pointer-events-none" // 4. -translate-x ko positive translate-x kiya
         }`}
       >
         {socialLinks.map((item) => (
           <div
             key={item.id}
-            className="relative flex items-center group animate-float"
+            className="relative flex items-center justify-end group animate-float"
             style={{ animationDelay: item.delay }}
           >
+            {/* Tooltip Label (Icons ke left me dikhega) */}
+            <span
+              className="absolute right-16 scale-0 group-hover:scale-100 transition-all duration-300 
+              bg-slate-900 text-white font-medium text-[11px] py-1.5 px-4 rounded-lg shadow-2xl 
+              uppercase tracking-widest whitespace-nowrap border-r-4 border-cyan-400"
+            >
+              {item.label}
+            </span>
+
             <a
               href={item.link}
               target="_blank"
               rel="noopener noreferrer"
               className={`${item.color} text-white w-12 h-12 rounded-xl flex items-center justify-center shadow-lg 
-              hover:scale-110 hover:rotate-6 hover:translate-x-3 transition-all duration-500 
+              hover:scale-110 hover:-rotate-6 hover:-translate-x-3 transition-all duration-500 
               border-2 border-white/20 group-hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]
               relative overflow-hidden`}
             >
               <div className="absolute top-0 -left-full w-full h-full bg-white/20 -skew-x-12 group-hover:left-full transition-all duration-700"></div>
               <span className="text-xl z-10">{item.icon}</span>
             </a>
-
-            <span
-              className="absolute left-16 scale-0 group-hover:scale-100 transition-all duration-300 
-              bg-slate-900 text-white font-medium text-[11px] py-1.5 px-4 rounded-lg shadow-2xl 
-              uppercase tracking-widest whitespace-nowrap border-l-4 border-cyan-400"
-            >
-              {item.label}
-            </span>
           </div>
         ))}
       </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const WhatsAppWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -7,12 +7,32 @@ const WhatsAppWidget = () => {
     setIsOpen(!isOpen);
   };
 
+  // --- Scroll hone par popup ko smoothly band karne ke liye ---
+  useEffect(() => {
+    const handleScroll = () => {
+      if (isOpen) {
+        // Halki delay ke saath band hoga toh smooth lagega
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      window.addEventListener("scroll", handleScroll, { passive: true });
+    }
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [isOpen]);
+
   return (
-    <div className="fixed bottom-6 right-6 z-50">
-      {/* WhatsApp Button */}
+    <div className="fixed bottom-6 right-6 z-50 font-sans">
+      {/* WhatsApp Button - Scale effect added for smoothness */}
       <button
         onClick={togglePopup}
-        className="bg-green-500 hover:bg-green-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all duration-300"
+        className={`bg-green-500 hover:bg-green-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-500 ease-in-out transform hover:scale-110 active:scale-95 ${
+          isOpen ? "rotate-12" : "rotate-0"
+        }`}
         aria-label="WhatsApp Chat"
       >
         <svg
@@ -25,43 +45,57 @@ const WhatsAppWidget = () => {
         </svg>
       </button>
 
-      {/* Popup */}
+      {/* Popup - Smooth Entrance and Exit */}
       {isOpen && (
-        <div className="absolute bottom-20 right-0 w-72 bg-white rounded-lg shadow-xl overflow-hidden">
-          <div className="bg-green-500 p-4 text-white">
-            <h3 className="font-bold text-lg">Refer Me Group</h3>
-            <p className="text-sm">We're here to help!</p>
+        <div className="absolute bottom-20 right-0 w-72 bg-white rounded-2xl shadow-2xl overflow-hidden transition-all duration-500 ease-out animate-in fade-in zoom-in-95 slide-in-from-bottom-10">
+          <div className="bg-green-500 p-5 text-white relative">
+            {/* Header Text - Added more padding for better look */}
+            <div className="pl-8">
+              <h3 className="font-bold text-lg leading-tight tracking-wide">
+                Refer Me Group
+              </h3>
+              <p className="text-xs opacity-90 mt-1">
+                Online | Typically replies instantly
+              </p>
+            </div>
+
+            {/* Close/Cross Button - Left side per request */}
+            <button
+              onClick={togglePopup}
+              className="absolute top-5 left-3 text-white hover:bg-green-600 rounded-full p-1 transition-all duration-300"
+              aria-label="Close"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
           </div>
-          <div className="p-4">
-            <p className="text-gray-700 mb-4">
-              Click the button below to chat on WhatsApp
-            </p>
+
+          <div className="p-6 bg-gray-50">
+            <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-100 mb-4">
+              <p className="text-gray-600 text-sm leading-relaxed">
+                Hi there! 👋 <br />
+                How can we help you today?
+              </p>
+            </div>
             <a
               href="https://wa.me/917678573511"
               target="_blank"
               rel="noopener noreferrer"
-              className="block bg-green-500 hover:bg-green-600 text-white text-center py-2 px-4 rounded transition duration-300"
+              className="block bg-green-500 hover:bg-green-600 text-white text-center py-3 px-4 rounded-xl font-semibold shadow-md transition-all duration-300 hover:shadow-lg active:scale-95"
             >
               Start Chat
             </a>
           </div>
-          <button
-            onClick={togglePopup}
-            className="absolute top-2 right-2 text-white hover:text-gray-200"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
         </div>
       )}
     </div>
