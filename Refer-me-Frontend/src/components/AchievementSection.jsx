@@ -42,9 +42,9 @@ const AchievementSection = () => {
 
     // Step 2: Update target values with your data
     const targetValues = {
-      professionals: 1200,
-      courses: 15,
-      hours: 12000, // 12K = 12000
+      professionals: 1500,
+      courses: 21,
+      hours: 13000, // 12K = 12000
       countries: 20,
       mentors: 15,
     };
