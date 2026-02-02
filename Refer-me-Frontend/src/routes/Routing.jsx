@@ -28,6 +28,9 @@ import Webinars from "../pages/Services/Webinars";
 import WebinarDetail from "../pages/Services/WebinarDetail";
 import CourseDetail from "../components/CourseDetail";
 
+// ✅ 1. Payment Status Page Import
+import PaymentStatus from "../components/PaymentStatus";
+
 // Blog post imports
 import Blog1 from "../pages/Blogs/Blog1";
 import Blog2 from "../pages/Blogs/Blog2";
@@ -47,10 +50,6 @@ import AdminProfile from "../Admin/AdminProfile/AdminProfile";
 import AdminSettings from "../Admin/AdminProfile/AdminSettings";
 import AdminLogin from "../Admin/AddLogin/AdminLogin";
 import AdminContact from "../Admin/AdminContact/AdminContact";
-// import AdminAbout from "../Admin/AboutUS/AdminAbout";
-// import OurStoryAdmin from "../Admin/AboutUS/OurStoryAdmin";
-// import CoreCmtyAdmin from "../Admin/AboutUS/CoreCmtyAdmin";
-// import PaymentPolicyAdmin from "../Admin/AboutUS/PaymentPolicyAdmin";
 import WebniarAdmin from "../Admin/OurServices/WebniarAdmin";
 import ManthanAdmin from "../Admin/OurServices/ManthanAdmin";
 import AdminLogout from "../Admin/AddLogin/AdminLogout";
@@ -65,10 +64,8 @@ const ProtectedRoute = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is authenticated (you can replace this with your actual auth check)
     const checkAuth = () => {
       const token = localStorage.getItem("adminToken");
-      // You might want to validate the token on the server in a real application
       setIsAuthenticated(!!token);
       setIsLoading(false);
     };
@@ -77,7 +74,11 @@ const ProtectedRoute = ({ children }) => {
   }, []);
 
   if (isLoading) {
-    return <div>Loading...</div>; // Or a loading spinner component
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Loading...
+      </div>
+    );
   }
 
   return isAuthenticated ? children : <Navigate to="/login" replace />;
@@ -118,6 +119,9 @@ const router = createBrowserRouter([
 
       // Webinar detail
       { path: "webinars/:id", element: <WebinarDetail /> },
+
+      // ✅ 2. Payment Status Route Added Here
+      { path: "payment-status", element: <PaymentStatus /> },
 
       // Blogs section
       {
@@ -161,7 +165,7 @@ const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
-      { index: true, element: <Dashboard /> }, // /admin
+      { index: true, element: <Dashboard /> },
       { path: "dashboard", element: <Dashboard /> },
       { path: "navbar", element: <AdminNavbar /> },
       { path: "footer", element: <AdminFooter /> },
@@ -172,11 +176,6 @@ const router = createBrowserRouter([
       { path: "blog", element: <AdminBlogs /> },
       { path: "jobs-groups", element: <JobsGropusSAdmin /> },
       { path: "adminteam", element: <TeamAdmin /> },
-
-      // { path: "about/what-we-do", element: <AdminAbout /> },
-      // { path: "about/our-story", element: <OurStoryAdmin /> },
-      // { path: "about/core-committee", element: <CoreCmtyAdmin /> },
-      // { path: "about/payment-policy", element: <PaymentPolicyAdmin /> },
       { path: "services/webinars", element: <WebniarAdmin /> },
       { path: "services/manthan", element: <ManthanAdmin /> },
     ],
@@ -185,7 +184,11 @@ const router = createBrowserRouter([
   // 404 route
   {
     path: "*",
-    element: <h2>404 page not found!</h2>,
+    element: (
+      <div className="text-center p-20 text-2xl font-bold">
+        404 Page Not Found!
+      </div>
+    ),
   },
 ]);
 

@@ -5,7 +5,6 @@ import { FiCalendar, FiUsers, FiClock, FiSearch } from "react-icons/fi";
 import { motion } from "framer-motion";
 import SEOManagement from "../../components/seo/SEOManagement";
 
-
 const Webinars = () => {
   const navigate = useNavigate();
   const [webinars, setWebinars] = useState([]);
@@ -57,7 +56,7 @@ const Webinars = () => {
       />
 
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">Upcoming Webinars</h1>
+        <h1 className="text-3xl font-bold mb-6">Upcoming Webinars/Demo</h1>
 
         {/* Search Bar */}
         <div className="mb-6 flex items-center gap-2">

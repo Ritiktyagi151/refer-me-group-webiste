@@ -30,22 +30,33 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-// Production CORS Configuration
+// --- MIDDLEWARES ---
+
+// 1. CORS Configuration (Payment callbacks ke liye credentials zaroori hain)
 app.use(
   cors({
     origin: ["https://refermegroup.com", "http://localhost:5173"],
     credentials: true,
-  })
+  }),
 );
 
-// --- FIX: STATIC FOLDER SERVING ---
-// Ye browser ko uploads folder access karne ki permission deta hai
+// 2. Static Folder Serving
 app.use("/uploads", express.static(uploadsDir));
 
+// 3. Request Parsing (PayU hamesha URL-Encoded data bhejta hai)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// API Routes
+// 4. Request Logger (Testing ke liye helpful hai)
+app.use((req, res, next) => {
+  if (req.method === "POST") {
+    console.log(`📩 Incoming POST to: ${req.url}`);
+  }
+  next();
+});
+
+// --- API ROUTES ---
+
 app.use("/api/users", userRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/settings", settingRoutes);
@@ -56,17 +67,28 @@ app.use("/api/services", serviceRoutes);
 app.use("/api/contact-messages", contactRoutes);
 app.use("/api/careers", careerRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+
+// ✅ Yeh route PayU Success/Fail aur Hash generate handle karega
 app.use("/api/payment", paymentRoutes);
+
 app.use("/api/webinars", webinarRoutes);
 app.use("/api/manthan", manthanRoutes);
 app.use("/api/team", teamRoutes);
 
-app.get("/", (req, res) => res.send("API is running..."));
+app.get("/", (req, res) =>
+  res.send("🚀 Refer Me Group API is running smoothly..."),
+);
+
+// --- DATABASE & SERVER ---
 
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB connected"))
-  .catch((err) => console.error("❌ DB error:", err));
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server on port ${PORT}`));
+  .then(() => {
+    console.log("✅ MongoDB Connected Successfully");
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => console.log(`🚀 Server started on port ${PORT}`));
+  })
+  .catch((err) => {
+    console.error("❌ Database Connection Error:", err.message);
+    process.exit(1);
+  });
