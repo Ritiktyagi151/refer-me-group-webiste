@@ -69,7 +69,7 @@ app.use("/api/careers", careerRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
 // ✅ Yeh route PayU Success/Fail aur Hash generate handle karega
-app.use("/api/payment", paymentRoutes);
+app.use("/payment", paymentRoutes);
 
 app.use("/api/webinars", webinarRoutes);
 app.use("/api/manthan", manthanRoutes);
