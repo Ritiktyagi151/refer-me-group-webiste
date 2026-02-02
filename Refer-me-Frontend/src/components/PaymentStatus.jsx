@@ -18,18 +18,21 @@ const PaymentStatus = () => {
             <FaTimesCircle className="text-red-500 text-8xl mx-auto animate-pulse" />
           )}
         </div>
+
         <h1 className="text-3xl font-bold text-gray-800 mb-4">
-          {isSuccess ? "Registration Success!" : "Payment Failed"}
+          {isSuccess ? "Registration Successful!" : "Payment Failed"}
         </h1>
+
         <p className="text-gray-600 mb-8 text-lg text-balance">
           {isSuccess
-            ? `Dhanyawad ${name}! Aapka registration safal raha. Confirmation details email par bhej di gayi hain.`
-            : `Maaf karein, transaction fail ho gaya. Kripya apne bank details check karein ya dobara koshish karein.`}
+            ? `Thank you ${name}! Your registration was successful. Confirmation details have been sent to your email.`
+            : "Sorry, the transaction failed. Please check your bank details or try again."}
         </p>
+
         <Link
           to="/"
           className={`inline-flex items-center gap-2 text-white px-8 py-3 rounded-full font-bold transition-all shadow-lg hover:scale-105 
-                    ${isSuccess ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"}`}
+          ${isSuccess ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"}`}
         >
           <FaHome /> Back to Home
         </Link>
