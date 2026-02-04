@@ -1,97 +1,83 @@
 import express from "express";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
-import dotenv from "dotenv";
-import path from "path";
-
-// Load env
-dotenv.config({ path: path.join(process.cwd(), ".env") });
 
 const router = express.Router();
 
 /* ==============================
-   SMTP CONFIG
+   SMTP TRANSPORTER (SAFE)
 ================================ */
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.MAIL_USER,
-    pass: process.env.MAIL_PASS,
-  },
-});
-
-// Verify SMTP once at startup
-(async () => {
-  try {
-    await transporter.verify();
-    console.log("✅ SMTP Server Verified Successfully");
-  } catch (err) {
-    console.error("❌ SMTP Verification Failed:", err.message);
+const createTransporter = () => {
+  if (!process.env.MAIL_USER || !process.env.MAIL_PASS) {
+    throw new Error("SMTP ENV variables missing");
   }
-})();
+
+  return nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: {
+      user: process.env.MAIL_USER,
+      pass: process.env.MAIL_PASS,
+    },
+  });
+};
 
 /* ==============================
-   EMAIL SERVICE
+   SEND EMAILS
 ================================ */
 const sendNotificationEmails = async (status, data) => {
   try {
+    console.log(
+      "📧 SMTP:",
+      process.env.MAIL_USER,
+      process.env.MAIL_PASS ? "PASS_LOADED" : "PASS_MISSING",
+    );
+
+    const transporter = createTransporter();
+    await transporter.verify();
+
     const isSuccess = status === "success";
 
     const customerMail = {
       from: `"Refer Me Group" <${process.env.MAIL_USER}>`,
       to: data.email,
       subject: isSuccess
-        ? "Registration Confirmed – Refer Me Group"
+        ? "Registration Successful – Refer Me Group"
         : "Payment Failed – Refer Me Group",
       html: `
-        <div style="font-family:Arial;padding:20px;border:1px solid #ddd;border-radius:10px;max-width:600px;margin:auto">
-          <h2 style="color:${isSuccess ? "#2e7d32" : "#d32f2f"}">
-            ${isSuccess ? "Payment Successful" : "Payment Failed"}
-          </h2>
-          <p>Dear <b>${data.firstname}</b>,</p>
-          <p>
-            ${
-              isSuccess
-                ? "Your registration has been completed successfully."
-                : "Your payment failed. Please try again."
-            }
-          </p>
-          <hr/>
-          <p><b>Transaction ID:</b> ${data.txnid}</p>
-          <p><b>Amount:</b> ₹${data.amount}</p>
-          <p>Regards,<br/><b>Refer Me Group Team</b></p>
-        </div>
+        <h2>${isSuccess ? "Payment Successful" : "Payment Failed"}</h2>
+        <p>Name: ${data.firstname}</p>
+        <p>Transaction ID: ${data.txnid}</p>
+        <p>Amount: ₹${data.amount}</p>
       `,
     };
 
     const adminMail = {
       from: `"Payment Alert" <${process.env.MAIL_USER}>`,
       to: process.env.ADMIN_EMAIL,
-      subject: `PAYMENT ${status.toUpperCase()} | ${data.firstname}`,
+      subject: `PAYMENT ${status.toUpperCase()}`,
       html: `
-        <h3>New Payment Notification</h3>
-        <p><b>Status:</b> ${status.toUpperCase()}</p>
-        <p><b>Name:</b> ${data.firstname}</p>
-        <p><b>Email:</b> ${data.email}</p>
-        <p><b>Phone:</b> ${data.phone}</p>
-        <p><b>Txn ID:</b> ${data.txnid}</p>
-        <p><b>Amount:</b> ₹${data.amount}</p>
+        <p>Status: ${status}</p>
+        <p>Name: ${data.firstname}</p>
+        <p>Email: ${data.email}</p>
+        <p>Phone: ${data.phone}</p>
+        <p>Txn ID: ${data.txnid}</p>
+        <p>Amount: ₹${data.amount}</p>
       `,
     };
 
     await transporter.sendMail(customerMail);
     await transporter.sendMail(adminMail);
 
-    console.log("✅ Emails sent to user & admin");
-  } catch (error) {
-    console.error("❌ Email Send Error:", error.message);
+    console.log("✅ Emails sent successfully");
+  } catch (err) {
+    console.error("❌ Email trigger error:", err.message);
   }
 };
 
 /* ==============================
-   PAYU CALLBACK HANDLER
+   PAYU CALLBACK
 ================================ */
 const handlePayUCallback = async (req, res) => {
   try {
@@ -136,7 +122,7 @@ router.post("/payu", (req, res) => {
     const hashString = `${key}|${txnid}|${amount}|${productinfo}|${name}|${email}|||||||||||${salt}`;
     const hash = crypto.createHash("sha512").update(hashString).digest("hex");
 
-    res.status(200).json({
+    res.json({
       success: true,
       actionUrl:
         process.env.PAYU_MODE === "test"
@@ -161,9 +147,6 @@ router.post("/payu", (req, res) => {
   }
 });
 
-/* ==============================
-   ROUTES
-================================ */
 router.post("/success", handlePayUCallback);
 router.post("/fail", handlePayUCallback);
 

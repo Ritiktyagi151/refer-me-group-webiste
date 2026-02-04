@@ -5,7 +5,48 @@ import cors from "cors";
 import path from "path";
 import fs from "fs";
 
-// Routes imports
+// 🔐 ENV load (ONLY HERE)
+dotenv.config();
+
+const app = express();
+
+/* ==============================
+   CREATE UPLOADS FOLDER
+================================ */
+const uploadsDir = path.join(process.cwd(), "uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+/* ==============================
+   MIDDLEWARES
+================================ */
+app.use(
+  cors({
+    origin: [
+      "https://refermegroup.com",
+      "https://www.refermegroup.com",
+      "http://localhost:5173",
+    ],
+    credentials: true,
+  }),
+);
+
+app.use("/uploads", express.static(uploadsDir));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// POST logger (debug)
+app.use((req, res, next) => {
+  if (req.method === "POST") {
+    console.log(`📩 Incoming POST: ${req.originalUrl}`);
+  }
+  next();
+});
+
+/* ==============================
+   ROUTES
+================================ */
 import userRoutes from "./routes/userRoutes.js";
 import blogRoutes from "./routes/blogRoutes.js";
 import settingRoutes from "./routes/settingRoutes.js";
@@ -21,42 +62,6 @@ import webinarRoutes from "./routes/webinar.js";
 import manthanRoutes from "./routes/manthanRoutes.js";
 import teamRoutes from "./routes/teamRoutes.js";
 
-dotenv.config();
-const app = express();
-
-// --- SETUP: Auto-create uploads folder ---
-const uploadsDir = path.join(process.cwd(), "uploads");
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-// --- MIDDLEWARES ---
-
-// 1. CORS Configuration (Payment callbacks ke liye credentials zaroori hain)
-app.use(
-  cors({
-    origin: ["https://refermegroup.com", "http://localhost:5173"],
-    credentials: true,
-  }),
-);
-
-// 2. Static Folder Serving
-app.use("/uploads", express.static(uploadsDir));
-
-// 3. Request Parsing (PayU hamesha URL-Encoded data bhejta hai)
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// 4. Request Logger (Testing ke liye helpful hai)
-app.use((req, res, next) => {
-  if (req.method === "POST") {
-    console.log(`📩 Incoming POST to: ${req.url}`);
-  }
-  next();
-});
-
-// --- API ROUTES ---
-
 app.use("/api/users", userRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/settings", settingRoutes);
@@ -68,27 +73,31 @@ app.use("/api/contact-messages", contactRoutes);
 app.use("/api/careers", careerRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
-// ✅ Yeh route PayU Success/Fail aur Hash generate handle karega
+// 🔥 PAYU + SMTP
 app.use("/api/payment", paymentRoutes);
 
 app.use("/api/webinars", webinarRoutes);
 app.use("/api/manthan", manthanRoutes);
 app.use("/api/team", teamRoutes);
 
-app.get("/", (req, res) =>
-  res.send("🚀 Refer Me Group API is running smoothly..."),
-);
+app.get("/", (req, res) => {
+  res.send("🚀 Refer Me Group API running...");
+});
 
-// --- DATABASE & SERVER ---
-
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
+/* ==============================
+   DB + SERVER
+================================ */
+const startServer = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
     console.log("✅ MongoDB Connected Successfully");
+
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => console.log(`🚀 Server started on port ${PORT}`));
-  })
-  .catch((err) => {
+  } catch (err) {
     console.error("❌ Database Connection Error:", err.message);
     process.exit(1);
-  });
+  }
+};
+
+startServer();
