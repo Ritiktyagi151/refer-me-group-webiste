@@ -4,114 +4,133 @@ import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import path from "path";
 
-// Load other variables like PAYU keys from .env
+// Load env
 dotenv.config({ path: path.join(process.cwd(), ".env") });
 
 const router = express.Router();
 
-/**
- * Logic 1: SMTP Email Service
- */
-const sendNotificationEmails = async (status, data) => {
+/* ==============================
+   SMTP CONFIG
+================================ */
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.MAIL_USER,
+    pass: process.env.MAIL_PASS,
+  },
+});
+
+// Verify SMTP once at startup
+(async () => {
   try {
-    console.log("-------------------------------------------------");
-    console.log("DEBUG: Initializing SMTP with Hardcoded Credentials...");
-
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
-      auth: {
-        user: "contact@refermegroup.com", // Your Email
-        pass: "vvwmzgnsscqfwkmh", // PASTE YOUR 16-DIGIT CODE HERE
-      },
-    });
-
-    // Verify SMTP connection
     await transporter.verify();
     console.log("✅ SMTP Server Verified Successfully");
+  } catch (err) {
+    console.error("❌ SMTP Verification Failed:", err.message);
+  }
+})();
 
+/* ==============================
+   EMAIL SERVICE
+================================ */
+const sendNotificationEmails = async (status, data) => {
+  try {
     const isSuccess = status === "success";
 
     const customerMail = {
-      from: `"Refer Me Group" <contact@refermegroup.com>`,
+      from: `"Refer Me Group" <${process.env.MAIL_USER}>`,
       to: data.email,
       subject: isSuccess
-        ? "Registration Confirmed! - Refer Me Group"
-        : "Payment Failed Notice",
+        ? "Registration Confirmed – Refer Me Group"
+        : "Payment Failed – Refer Me Group",
       html: `
-        <div style="font-family: Arial, sans-serif; padding: 25px; border: 1px solid #e0e0e0; border-radius: 12px; max-width: 600px; margin: auto;">
-          <h2 style="color: ${isSuccess ? "#2e7d32" : "#d32f2f"}; text-align: center;">
-            Registration ${isSuccess ? "Successful" : "Failed"}
+        <div style="font-family:Arial;padding:20px;border:1px solid #ddd;border-radius:10px;max-width:600px;margin:auto">
+          <h2 style="color:${isSuccess ? "#2e7d32" : "#d32f2f"}">
+            ${isSuccess ? "Payment Successful" : "Payment Failed"}
           </h2>
           <p>Dear <b>${data.firstname}</b>,</p>
-          <p>${isSuccess ? "Registration successful! Our team will contact you soon." : "Payment failed. Please try again."}</p>
-          <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #3b82f6;">
-            <p style="margin: 5px 0;"><b>Transaction ID:</b> ${data.txnid}</p>
-            <p style="margin: 5px 0;"><b>Amount Paid:</b> ₹${data.amount}</p>
-          </div>
-          <p>Best Regards,<br><b>Refer Me Group Team</b></p>
-        </div>`,
+          <p>
+            ${
+              isSuccess
+                ? "Your registration has been completed successfully."
+                : "Your payment failed. Please try again."
+            }
+          </p>
+          <hr/>
+          <p><b>Transaction ID:</b> ${data.txnid}</p>
+          <p><b>Amount:</b> ₹${data.amount}</p>
+          <p>Regards,<br/><b>Refer Me Group Team</b></p>
+        </div>
+      `,
     };
 
     const adminMail = {
-      from: `"Payment Alert" <contact@refermegroup.com>`,
-      to: "contact@refermegroup.com",
-      subject: `ALERT: ${status.toUpperCase()} Payment from ${data.firstname}`,
-      html: `<h3>New Enrollment Notification</h3>
-             <p><b>Status:</b> ${status.toUpperCase()}</p>
-             <p><b>Name:</b> ${data.firstname}</p>
-             <p><b>Email:</b> ${data.email}</p>
-             <p><b>Phone:</b> ${data.phone}</p>
-             <p><b>Txn ID:</b> ${data.txnid}</p>
-             <p><b>Amount:</b> ₹${data.amount}</p>`,
+      from: `"Payment Alert" <${process.env.MAIL_USER}>`,
+      to: process.env.ADMIN_EMAIL,
+      subject: `PAYMENT ${status.toUpperCase()} | ${data.firstname}`,
+      html: `
+        <h3>New Payment Notification</h3>
+        <p><b>Status:</b> ${status.toUpperCase()}</p>
+        <p><b>Name:</b> ${data.firstname}</p>
+        <p><b>Email:</b> ${data.email}</p>
+        <p><b>Phone:</b> ${data.phone}</p>
+        <p><b>Txn ID:</b> ${data.txnid}</p>
+        <p><b>Amount:</b> ₹${data.amount}</p>
+      `,
     };
 
     await transporter.sendMail(customerMail);
     await transporter.sendMail(adminMail);
-    console.log("✅ Emails dispatched to User and Admin.");
+
+    console.log("✅ Emails sent to user & admin");
   } catch (error) {
-    console.error("❌ SMTP Service Error Log:", error.message);
+    console.error("❌ Email Send Error:", error.message);
   }
 };
 
-/**
- * Logic 2: PayU Callback Handlers
- */
+/* ==============================
+   PAYU CALLBACK HANDLER
+================================ */
 const handlePayUCallback = async (req, res) => {
   try {
     const paymentData = req.body;
-    console.log("📥 Callback received from PayU");
+    console.log("📥 PayU Callback Received");
 
-    if (!paymentData || Object.keys(paymentData).length === 0) {
+    if (!paymentData || !paymentData.status) {
       return res.redirect(
-        `https://refermegroup.com/payment-status?status=error`,
+        `${process.env.BASE_URL}/payment-status?status=error`,
       );
     }
 
     const status = paymentData.status === "success" ? "success" : "fail";
 
-    sendNotificationEmails(status, paymentData);
+    await sendNotificationEmails(status, paymentData);
 
-    const frontendUrl = `https://refermegroup.com/payment-status?status=${status}&name=${paymentData.firstname || "User"}`;
-    return res.redirect(frontendUrl);
-  } catch (error) {
-    console.error("❌ Callback Processing Error:", error);
-    res.redirect(`https://refermegroup.com/payment-status?status=error`);
+    return res.redirect(
+      `${process.env.BASE_URL}/payment-status?status=${status}&name=${
+        paymentData.firstname || "User"
+      }`,
+    );
+  } catch (err) {
+    console.error("❌ PayU Callback Error:", err.message);
+    return res.redirect(`${process.env.BASE_URL}/payment-status?status=error`);
   }
 };
 
-/**
- * Logic 3: Hash Generation for Payment Start
- */
+/* ==============================
+   PAYU HASH API
+================================ */
 router.post("/payu", (req, res) => {
   try {
     const { name, email, phone, amount, productinfo, txnid } = req.body;
+
     const key = process.env.PAYU_KEY;
     const salt = process.env.PAYU_SALT;
 
     if (!key || !salt) {
-      return res.status(500).json({ message: "Server Keys Missing" });
+      return res.status(500).json({ message: "PayU keys missing" });
     }
 
     const hashString = `${key}|${txnid}|${amount}|${productinfo}|${name}|${email}|||||||||||${salt}`;
@@ -131,8 +150,8 @@ router.post("/payu", (req, res) => {
         firstname: name,
         email,
         phone,
-        surl: `https://refermegroup.com/api/payment/success`,
-        furl: `https://refermegroup.com/api/payment/fail`,
+        surl: `${process.env.BASE_URL}/api/payment/success`,
+        furl: `${process.env.BASE_URL}/api/payment/fail`,
         hash,
         service_provider: "payu_paisa",
       },
@@ -142,6 +161,9 @@ router.post("/payu", (req, res) => {
   }
 });
 
+/* ==============================
+   ROUTES
+================================ */
 router.post("/success", handlePayUCallback);
 router.post("/fail", handlePayUCallback);
 
