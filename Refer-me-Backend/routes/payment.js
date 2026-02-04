@@ -2,43 +2,41 @@ import express from "express";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
+import path from "path";
 
-// Load environment variables specifically for this route
-dotenv.config();
+// --- Load Environment Variables ---
+dotenv.config({ path: path.join(process.cwd(), ".env") });
 
 const router = express.Router();
 
 /**
  * Logic 1: SMTP Email Service
+ * Sends notification to User and Admin
  */
 const sendNotificationEmails = async (status, data) => {
   try {
-    // --- DEBUGGING LOGS START ---
     console.log("-------------------------------------------------");
     console.log("DEBUG: Initializing SMTP Service...");
-    console.log("DEBUG: Configured Admin Email ->", "contact@refermegroup.com");
-    console.log(
-      "DEBUG: EMAIL_PASS from Env ->",
-      process.env.EMAIL_PASS ? "FOUND" : "NOT FOUND",
-    );
-    if (process.env.EMAIL_PASS) {
-      console.log("DEBUG: EMAIL_PASS Length ->", process.env.EMAIL_PASS.length);
-      // Security check: pehle 2 character print karein confirm karne ke liye
-      console.log(
-        "DEBUG: EMAIL_PASS Starts with ->",
-        process.env.EMAIL_PASS.substring(0, 2),
-      );
+
+    // Variables fetch from process.env
+    const adminEmail = "contact@refermegroup.com";
+    const appPassword = process.env.EMAIL_PASS;
+
+    if (!appPassword) {
+      console.error("❌ ERROR: EMAIL_PASS is missing in .env file!");
+      return; // Stop if no password
     }
+
+    console.log("DEBUG: EMAIL_PASS detected. Length:", appPassword.length);
     console.log("-------------------------------------------------");
-    // --- DEBUGGING LOGS END ---
 
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 465,
       secure: true,
       auth: {
-        user: "contact@refermegroup.com",
-        pass: process.env.EMAIL_PASS,
+        user: adminEmail,
+        pass: appPassword,
       },
     });
 
@@ -48,8 +46,9 @@ const sendNotificationEmails = async (status, data) => {
 
     const isSuccess = status === "success";
 
+    // 1. Mail for Customer
     const customerMail = {
-      from: `"Refer Me Group" <contact@refermegroup.com>`,
+      from: `"Refer Me Group" <${adminEmail}>`,
       to: data.email,
       subject: isSuccess
         ? "Registration Confirmed! - Refer Me Group"
@@ -62,27 +61,30 @@ const sendNotificationEmails = async (status, data) => {
           <p>Dear <b>${data.firstname}</b>,</p>
           <p>${isSuccess ? "Registration successful! Our team will contact you soon." : "Payment failed. Please try again."}</p>
           <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #3b82f6;">
-            <p><b>Transaction ID:</b> ${data.txnid}</p>
-            <p><b>Amount:</b> ₹${data.amount}</p>
+            <p style="margin: 5px 0;"><b>Transaction ID:</b> ${data.txnid}</p>
+            <p style="margin: 5px 0;"><b>Amount Paid:</b> ₹${data.amount}</p>
           </div>
           <p>Best Regards,<br><b>Refer Me Group Team</b></p>
         </div>`,
     };
 
+    // 2. Mail for Admin
     const adminMail = {
-      from: `"Payment Alert" <contact@refermegroup.com>`,
-      to: "contact@refermegroup.com",
+      from: `"Payment Alert" <${adminEmail}>`,
+      to: adminEmail,
       subject: `ALERT: ${status.toUpperCase()} Payment from ${data.firstname}`,
-      html: `<h3>New Enrollment</h3>
+      html: `<h3>New Enrollment Notification</h3>
              <p><b>Status:</b> ${status.toUpperCase()}</p>
              <p><b>Name:</b> ${data.firstname}</p>
              <p><b>Email:</b> ${data.email}</p>
-             <p><b>Txn ID:</b> ${data.txnid}</p>`,
+             <p><b>Phone:</b> ${data.phone}</p>
+             <p><b>Txn ID:</b> ${data.txnid}</p>
+             <p><b>Amount:</b> ₹${data.amount}</p>`,
     };
 
     await transporter.sendMail(customerMail);
     await transporter.sendMail(adminMail);
-    console.log("✅ Confirmation and Admin emails dispatched.");
+    console.log("✅ Emails dispatched to User and Admin.");
   } catch (error) {
     console.error("❌ SMTP Service Error Log:", error.message);
   }
@@ -104,10 +106,11 @@ const handlePayUCallback = async (req, res) => {
 
     const status = paymentData.status === "success" ? "success" : "fail";
 
-    // Trigger emails in background
+    // Trigger emails in background (don't await to speed up redirect)
     sendNotificationEmails(status, paymentData);
 
     const frontendUrl = `https://refermegroup.com/payment-status?status=${status}&name=${paymentData.firstname || "User"}`;
+    console.log(`🚀 Redirecting to: ${frontendUrl}`);
     return res.redirect(frontendUrl);
   } catch (error) {
     console.error("❌ Callback Processing Error:", error);
@@ -116,7 +119,7 @@ const handlePayUCallback = async (req, res) => {
 };
 
 /**
- * Logic 3: Hash Generation
+ * Logic 3: Hash Generation for Payment Start
  */
 router.post("/payu", (req, res) => {
   try {
