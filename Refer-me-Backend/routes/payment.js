@@ -1,26 +1,44 @@
 import express from "express";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
+import dotenv from "dotenv";
+
+// Load environment variables specifically for this route
+dotenv.config();
 
 const router = express.Router();
 
 /**
  * Logic 1: SMTP Email Service
- * Sends confirmation to the User and an alert to contact@refermegroup.com
  */
 const sendNotificationEmails = async (status, data) => {
   try {
+    // --- DEBUGGING LOGS START ---
+    console.log("-------------------------------------------------");
+    console.log("DEBUG: Initializing SMTP Service...");
+    console.log("DEBUG: Configured Admin Email ->", "contact@refermegroup.com");
     console.log(
-      "--- Initializing SMTP Service for contact@refermegroup.com ---",
+      "DEBUG: EMAIL_PASS from Env ->",
+      process.env.EMAIL_PASS ? "FOUND" : "NOT FOUND",
     );
+    if (process.env.EMAIL_PASS) {
+      console.log("DEBUG: EMAIL_PASS Length ->", process.env.EMAIL_PASS.length);
+      // Security check: pehle 2 character print karein confirm karne ke liye
+      console.log(
+        "DEBUG: EMAIL_PASS Starts with ->",
+        process.env.EMAIL_PASS.substring(0, 2),
+      );
+    }
+    console.log("-------------------------------------------------");
+    // --- DEBUGGING LOGS END ---
 
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 465,
-      secure: true, // Use SSL
+      secure: true,
       auth: {
-        user: "contact@refermegroup.com", // Your Workspace Email
-        pass: process.env.EMAIL_PASS, // Your 16-digit Google App Password
+        user: "contact@refermegroup.com",
+        pass: process.env.EMAIL_PASS,
       },
     });
 
@@ -30,7 +48,6 @@ const sendNotificationEmails = async (status, data) => {
 
     const isSuccess = status === "success";
 
-    // A. Email for the Registered User
     const customerMail = {
       from: `"Refer Me Group" <contact@refermegroup.com>`,
       to: data.email,
@@ -43,39 +60,26 @@ const sendNotificationEmails = async (status, data) => {
             Registration ${isSuccess ? "Successful" : "Failed"}
           </h2>
           <p>Dear <b>${data.firstname}</b>,</p>
-          <p>${
-            isSuccess
-              ? "Thank you for registering with Refer Me Group. We have successfully received your payment. Our team will contact you soon."
-              : "We noticed an issue with your payment attempt. No funds were captured. Please try the registration process again."
-          }</p>
+          <p>${isSuccess ? "Registration successful! Our team will contact you soon." : "Payment failed. Please try again."}</p>
           <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #3b82f6;">
-            <p style="margin: 5px 0;"><b>Transaction ID:</b> ${data.txnid}</p>
-            <p style="margin: 5px 0;"><b>Amount Paid:</b> ₹${data.amount}</p>
-            <p style="margin: 5px 0;"><b>Plan:</b> ${data.productinfo}</p>
+            <p><b>Transaction ID:</b> ${data.txnid}</p>
+            <p><b>Amount:</b> ₹${data.amount}</p>
           </div>
-          <p style="font-size: 14px; color: #666;">Best Regards,<br><b>Refer Me Group Team</b></p>
+          <p>Best Regards,<br><b>Refer Me Group Team</b></p>
         </div>`,
     };
 
-    // B. Email for the Admin (contact@refermegroup.com)
     const adminMail = {
-      from: `"Payment Alert System" <contact@refermegroup.com>`,
+      from: `"Payment Alert" <contact@refermegroup.com>`,
       to: "contact@refermegroup.com",
       subject: `ALERT: ${status.toUpperCase()} Payment from ${data.firstname}`,
-      html: `
-        <div style="font-family: Arial; padding: 20px; background-color: #fff9c4; border: 1px dashed #fbc02d;">
-          <h3 style="margin-top: 0;">New Enrollment Notification</h3>
-          <p><b>Status:</b> ${status.toUpperCase()}</p>
-          <p><b>Customer Name:</b> ${data.firstname}</p>
-          <p><b>Customer Email:</b> ${data.email}</p>
-          <p><b>Phone:</b> ${data.phone}</p>
-          <p><b>Transaction ID:</b> ${data.txnid}</p>
-          <p><b>Amount:</b> ₹${data.amount}</p>
-          <p><b>Timestamp:</b> ${new Date().toLocaleString()}</p>
-        </div>`,
+      html: `<h3>New Enrollment</h3>
+             <p><b>Status:</b> ${status.toUpperCase()}</p>
+             <p><b>Name:</b> ${data.firstname}</p>
+             <p><b>Email:</b> ${data.email}</p>
+             <p><b>Txn ID:</b> ${data.txnid}</p>`,
     };
 
-    // Dispatch Emails
     await transporter.sendMail(customerMail);
     await transporter.sendMail(adminMail);
     console.log("✅ Confirmation and Admin emails dispatched.");
@@ -86,7 +90,6 @@ const sendNotificationEmails = async (status, data) => {
 
 /**
  * Logic 2: PayU Callback Handlers
- * Receives data from PayU and redirects user to Frontend UI
  */
 const handlePayUCallback = async (req, res) => {
   try {
@@ -104,10 +107,7 @@ const handlePayUCallback = async (req, res) => {
     // Trigger emails in background
     sendNotificationEmails(status, paymentData);
 
-    // Redirect user to React Frontend
     const frontendUrl = `https://refermegroup.com/payment-status?status=${status}&name=${paymentData.firstname || "User"}`;
-    console.log(`🚀 Redirecting to: ${frontendUrl}`);
-
     return res.redirect(frontendUrl);
   } catch (error) {
     console.error("❌ Callback Processing Error:", error);
@@ -116,7 +116,7 @@ const handlePayUCallback = async (req, res) => {
 };
 
 /**
- * Logic 3: Hash Generation for Payment Start
+ * Logic 3: Hash Generation
  */
 router.post("/payu", (req, res) => {
   try {
@@ -125,9 +125,7 @@ router.post("/payu", (req, res) => {
     const salt = process.env.PAYU_SALT;
 
     if (!key || !salt) {
-      return res
-        .status(500)
-        .json({ message: "Server Configuration Error: Keys Missing" });
+      return res.status(500).json({ message: "Server Keys Missing" });
     }
 
     const hashString = `${key}|${txnid}|${amount}|${productinfo}|${name}|${email}|||||||||||${salt}`;
@@ -154,12 +152,10 @@ router.post("/payu", (req, res) => {
       },
     });
   } catch (err) {
-    console.error("❌ Hash Generation Error:", err);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
-// Setup Success and Failure routes for PayU POST response
 router.post("/success", handlePayUCallback);
 router.post("/fail", handlePayUCallback);
 
