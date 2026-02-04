@@ -5,8 +5,13 @@ import cors from "cors";
 import path from "path";
 import fs from "fs";
 
-// 🔐 ENV load (ONLY HERE)
-dotenv.config();
+/* ==============================
+   🔐 ENV LOAD (ONLY ONCE)
+================================ */
+if (!process.env._ENV_LOADED) {
+  dotenv.config();
+  process.env._ENV_LOADED = "true";
+}
 
 const app = express();
 
@@ -36,7 +41,7 @@ app.use("/uploads", express.static(uploadsDir));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// POST logger (debug)
+// POST logger
 app.use((req, res, next) => {
   if (req.method === "POST") {
     console.log(`📩 Incoming POST: ${req.originalUrl}`);

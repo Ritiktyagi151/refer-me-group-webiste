@@ -5,14 +5,18 @@ import nodemailer from "nodemailer";
 const router = express.Router();
 
 /* ==============================
-   SMTP TRANSPORTER (SAFE)
+   SMTP TRANSPORTER (CACHED & SAFE)
 ================================ */
-const createTransporter = () => {
+let cachedTransporter = null;
+
+const getTransporter = () => {
+  if (cachedTransporter) return cachedTransporter;
+
   if (!process.env.MAIL_USER || !process.env.MAIL_PASS) {
-    throw new Error("SMTP ENV variables missing");
+    throw new Error("SMTP ENV variables missing at runtime");
   }
 
-  return nodemailer.createTransport({
+  cachedTransporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
     secure: true,
@@ -21,6 +25,9 @@ const createTransporter = () => {
       pass: process.env.MAIL_PASS,
     },
   });
+
+  console.log("✅ SMTP Transporter initialized once");
+  return cachedTransporter;
 };
 
 /* ==============================
@@ -28,15 +35,12 @@ const createTransporter = () => {
 ================================ */
 const sendNotificationEmails = async (status, data) => {
   try {
-    console.log(
-      "📧 SMTP:",
-      process.env.MAIL_USER,
-      process.env.MAIL_PASS ? "PASS_LOADED" : "PASS_MISSING",
-    );
+    console.log("📧 SMTP ENV CHECK:", {
+      MAIL_USER: process.env.MAIL_USER,
+      MAIL_PASS: process.env.MAIL_PASS ? "LOADED" : "MISSING",
+    });
 
-    const transporter = createTransporter();
-    await transporter.verify();
-
+    const transporter = getTransporter();
     const isSuccess = status === "success";
 
     const customerMail = {
@@ -91,7 +95,6 @@ const handlePayUCallback = async (req, res) => {
     }
 
     const status = paymentData.status === "success" ? "success" : "fail";
-
     await sendNotificationEmails(status, paymentData);
 
     return res.redirect(
