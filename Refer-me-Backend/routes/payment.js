@@ -4,39 +4,26 @@ import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import path from "path";
 
-// --- Load Environment Variables ---
+// Load other variables like PAYU keys from .env
 dotenv.config({ path: path.join(process.cwd(), ".env") });
 
 const router = express.Router();
 
 /**
  * Logic 1: SMTP Email Service
- * Sends notification to User and Admin
  */
 const sendNotificationEmails = async (status, data) => {
   try {
     console.log("-------------------------------------------------");
-    console.log("DEBUG: Initializing SMTP Service...");
-
-    // Variables fetch from process.env
-    const adminEmail = "contact@refermegroup.com";
-    const appPassword = process.env.EMAIL_PASS;
-
-    if (!appPassword) {
-      console.error("❌ ERROR: EMAIL_PASS is missing in .env file!");
-      return; // Stop if no password
-    }
-
-    console.log("DEBUG: EMAIL_PASS detected. Length:", appPassword.length);
-    console.log("-------------------------------------------------");
+    console.log("DEBUG: Initializing SMTP with Hardcoded Credentials...");
 
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 465,
       secure: true,
       auth: {
-        user: adminEmail,
-        pass: appPassword,
+        user: "contact@refermegroup.com", // Your Email
+        pass: "vvwmzgnsscqfwkmh", // PASTE YOUR 16-DIGIT CODE HERE
       },
     });
 
@@ -46,9 +33,8 @@ const sendNotificationEmails = async (status, data) => {
 
     const isSuccess = status === "success";
 
-    // 1. Mail for Customer
     const customerMail = {
-      from: `"Refer Me Group" <${adminEmail}>`,
+      from: `"Refer Me Group" <contact@refermegroup.com>`,
       to: data.email,
       subject: isSuccess
         ? "Registration Confirmed! - Refer Me Group"
@@ -68,10 +54,9 @@ const sendNotificationEmails = async (status, data) => {
         </div>`,
     };
 
-    // 2. Mail for Admin
     const adminMail = {
-      from: `"Payment Alert" <${adminEmail}>`,
-      to: adminEmail,
+      from: `"Payment Alert" <contact@refermegroup.com>`,
+      to: "contact@refermegroup.com",
       subject: `ALERT: ${status.toUpperCase()} Payment from ${data.firstname}`,
       html: `<h3>New Enrollment Notification</h3>
              <p><b>Status:</b> ${status.toUpperCase()}</p>
@@ -106,11 +91,9 @@ const handlePayUCallback = async (req, res) => {
 
     const status = paymentData.status === "success" ? "success" : "fail";
 
-    // Trigger emails in background (don't await to speed up redirect)
     sendNotificationEmails(status, paymentData);
 
     const frontendUrl = `https://refermegroup.com/payment-status?status=${status}&name=${paymentData.firstname || "User"}`;
-    console.log(`🚀 Redirecting to: ${frontendUrl}`);
     return res.redirect(frontendUrl);
   } catch (error) {
     console.error("❌ Callback Processing Error:", error);
