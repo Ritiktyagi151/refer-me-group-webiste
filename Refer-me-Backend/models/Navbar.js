@@ -1,7 +1,6 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const NavbarSchema = new mongoose.Schema({
-    // Isse hum verify karenge ki hum hamesha ek hi doc update karein
     identifier: { type: String, default: 'main_navbar', unique: true },
     contactInfo: {
         phone: String,
@@ -9,7 +8,8 @@ const NavbarSchema = new mongoose.Schema({
     },
     socialLinks: [{
         platform: String,
-        url: String
+        url: String,
+        icon: String
     }],
     menuItems: {
         courses: [{
@@ -18,9 +18,11 @@ const NavbarSchema = new mongoose.Schema({
             path: String,
             icon: String,
             description: String,
-            color: { type: String, default: 'blue' }
+            color: String
         }]
     }
 }, { timestamps: true });
 
-module.exports = mongoose.model('Navbar', NavbarSchema);
+// CommonJS hatao aur ye likho:
+const Navbar = mongoose.model('Navbar', NavbarSchema);
+export default Navbar;

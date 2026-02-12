@@ -1,11 +1,9 @@
-const express = require('express');
+import express from "express";
 const router = express.Router();
-const navbarController = require('../controllers/navbarController');
+// Named imports use karo kyunki controller mein 'export const' use kiya hai
+import { getNavbar, updateNavbar } from "../controllers/navbarController.js";
 
-// GET: https://refermegroup.com/api/navbar
-router.get('/', navbarController.getNavbar);
+router.get("/", getNavbar);
+router.put("/", updateNavbar);
 
-// PUT: https://refermegroup.com/api/navbar
-router.put('/', navbarController.updateNavbar);
-
-module.exports = router;
+export default router;
