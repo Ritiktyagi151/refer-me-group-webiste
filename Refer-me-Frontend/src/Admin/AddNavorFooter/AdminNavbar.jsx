@@ -228,7 +228,7 @@ const AdminPanel = () => {
             onClick={() => setIsLocked(!isLocked)}
             className={`w-full flex items-center justify-center gap-3 p-3 rounded-xl transition-all duration-300 ${isLocked ? "bg-rose-500/20 text-rose-500 border border-rose-500/50" : "bg-emerald-500/20 text-emerald-500 border border-emerald-500/50"}`}
           >
-            {isLocked ? <FaLock /> : <FaUnlock />}
+            {isLocked ? <FaLock /> : <FaUnlock />}{" "}
             {sidebarOpen && (
               <span className="font-semibold uppercase text-xs tracking-widest">
                 {isLocked ? "Panel Locked" : "Panel Active"}
@@ -334,7 +334,12 @@ const AdminPanel = () => {
                         (item, idx) => (
                           <motion.tr
                             layout
-                            key={activeTab === "courses" ? item.id : idx}
+                            // ERROR RESOLVED HERE: Added Unique Key
+                            key={
+                              activeTab === "courses"
+                                ? item.id || `course-${idx}`
+                                : item.platform || `social-${idx}`
+                            }
                             className="group hover:bg-indigo-50/30 transition-colors"
                           >
                             <td className="px-6 py-4">
