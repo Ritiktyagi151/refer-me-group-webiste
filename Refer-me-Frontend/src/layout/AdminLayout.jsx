@@ -65,6 +65,12 @@ const AdminDashboard = () => {
       icon: Home,
       link: "/admin/dashboard",
     },
+    {
+      id: "navbar",
+      name: "Navbar",
+      icon: FileText,
+      link: "/admin/navbar",
+    },
     // --- NAYA SECTION SHURU ---
     {
       id: "about",
@@ -178,8 +184,8 @@ const AdminDashboard = () => {
                             ? "bg-gray-700 text-white"
                             : "bg-blue-100 text-blue-600"
                           : darkMode
-                          ? "text-gray-400 hover:bg-gray-700 hover:text-white"
-                          : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                            ? "text-gray-400 hover:bg-gray-700 hover:text-white"
+                            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                       }`}
                     >
                       <div className="flex items-center">
@@ -227,8 +233,8 @@ const AdminDashboard = () => {
                           ? "bg-gray-700 text-white"
                           : "bg-blue-100 text-blue-600"
                         : darkMode
-                        ? "text-gray-400 hover:bg-gray-700 hover:text-white"
-                        : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                          ? "text-gray-400 hover:bg-gray-700 hover:text-white"
+                          : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                     }`}
                     onClick={() => setActiveTab(item.id)}
                   >

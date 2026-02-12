@@ -1,29 +1,40 @@
-import SiteMeta from "../models/SiteMeta.js";
+const Navbar = require("../models/Navbar");
 
-export const getNavbar = async (req, res) => {
+// GET Navbar Data
+exports.getNavbar = async (req, res) => {
   try {
-    const doc = await SiteMeta.findOne({}, { navbar: 1 }).sort({
-      createdAt: -1,
-    });
-    res.json(doc?.navbar || {});
-  } catch (e) {
-    res
-      .status(500)
-      .json({ error: "Failed to fetch navbar", details: e.message });
+    let navbar = await Navbar.findOne({ identifier: "main_navbar" });
+
+    // Agar pehli baar hai aur data nahi hai, toh default empty object bhejenge
+    if (!navbar) {
+      navbar = await Navbar.create({ identifier: "main_navbar" });
+    }
+
+    res.status(200).json(navbar);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
 
-export const saveNavbar = async (req, res) => {
+// UPDATE Navbar Data (PUT)
+exports.updateNavbar = async (req, res) => {
   try {
-    const doc = await SiteMeta.findOneAndUpdate(
-      {},
-      { navbar: req.body },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
+    const { contactInfo, socialLinks, menuItems } = req.body;
+
+    const updatedNavbar = await Navbar.findOneAndUpdate(
+      { identifier: "main_navbar" },
+      {
+        contactInfo,
+        socialLinks,
+        menuItems,
+      },
+      { new: true, upsert: true }, // upsert true matlab agar nahi hai toh bana dega
     );
-    res.json(doc.navbar);
-  } catch (e) {
+
+    res.status(200).json(updatedNavbar);
+  } catch (error) {
     res
-      .status(400)
-      .json({ error: "Failed to save navbar", details: e.message });
+      .status(500)
+      .json({ message: "Failed to update navbar", error: error.message });
   }
 };
